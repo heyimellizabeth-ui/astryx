@@ -5,7 +5,8 @@ export type Severity = 'error' | 'warning';
 export interface Issue {
   kind: 'leave' | 'leave-pending' | 'overlap' | 'rest' | 'unavailable';
   severity: Severity;
-  message: string;
+  /** Facts for the sentence the UI writes in the viewer's language. */
+  params: {name?: string; gapMinutes?: number; minMinutes?: number};
 }
 
 /** Absolute start and end of a shift in minutes since 1970, so midnight crossings compare correctly. */
@@ -29,13 +30,13 @@ export function shiftIssues(shift: Shift, data: Pick<PlannerData, 'staff' | 'shi
 
   const approved = leaveCovering(shift.staffId, shift.date, data.timeOff, 'approved');
   if (approved) {
-    issues.push({kind: 'leave', severity: 'error', message: `${person?.name ?? 'Staff'} is on approved leave`});
+    issues.push({kind: 'leave', severity: 'error', params: {name: person?.name ?? ''}});
   } else if (leaveCovering(shift.staffId, shift.date, data.timeOff, 'pending')) {
-    issues.push({kind: 'leave-pending', severity: 'warning', message: 'A leave request for this day is still pending'});
+    issues.push({kind: 'leave-pending', severity: 'warning', params: {}});
   }
 
   if (person?.unavailable.includes(weekdayIndex(shift.date))) {
-    issues.push({kind: 'unavailable', severity: 'warning', message: 'Marked unavailable on this weekday'});
+    issues.push({kind: 'unavailable', severity: 'warning', params: {}});
   }
 
   const [start, end] = shiftSpan(shift);
@@ -44,15 +45,11 @@ export function shiftIssues(shift: Shift, data: Pick<PlannerData, 'staff' | 'shi
     if (other.id === shift.id || other.staffId !== shift.staffId) continue;
     const [os, oe] = shiftSpan(other);
     if (os < end && start < oe) {
-      issues.push({kind: 'overlap', severity: 'error', message: 'Overlaps another shift'});
+      issues.push({kind: 'overlap', severity: 'error', params: {}});
     } else {
       const gap = os >= end ? os - end : start - oe;
       if (gap < minRest && gap >= 0 && Math.abs(dayNumber(other.date) - dayNumber(shift.date)) <= 1) {
-        issues.push({
-          kind: 'rest',
-          severity: 'warning',
-          message: `Only ${(gap / 60).toFixed(1)}h rest next to another shift (minimum ${data.settings.minRestHours}h)`,
-        });
+        issues.push({kind: 'rest', severity: 'warning', params: {gapMinutes: gap, minMinutes: minRest}});
       }
     }
   }
@@ -62,7 +59,7 @@ export function shiftIssues(shift: Shift, data: Pick<PlannerData, 'staff' | 'shi
 function dedupe(issues: Issue[]): Issue[] {
   const seen = new Set<string>();
   return issues.filter((i) => {
-    const key = `${i.kind}:${i.message}`;
+    const key = `${i.kind}:${JSON.stringify(i.params)}`;
     if (seen.has(key)) return false;
     seen.add(key);
     return true;

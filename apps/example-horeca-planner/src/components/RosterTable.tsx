@@ -6,10 +6,10 @@ import {Text} from '@astryxdesign/core/Text';
 import {Token} from '@astryxdesign/core/Token';
 import {VStack} from '@astryxdesign/core/VStack';
 import {PlusIcon} from '@heroicons/react/16/solid';
-import {formatDayLong, formatHours, weekdayShort} from '../lib/dates';
 import {coverageFor, leaveCovering, paidMinutes, requiredFor, staffWeekMinutes} from '../lib/rules';
-import {DEPT_LABEL, type Dept, type ISODate, type PlannerData, type Shift, type Staff} from '../types';
-import {PersonCell, eur} from './shared';
+import {useI18n} from '../i18n/I18nProvider';
+import {type Dept, type ISODate, type PlannerData, type Shift, type Staff} from '../types';
+import {PersonCell} from './shared';
 import {ShiftToken} from './ShiftToken';
 
 interface RosterRow extends Record<string, unknown> {
@@ -32,6 +32,7 @@ interface Props {
 const DEPT_ORDER: Dept[] = ['kitchen', 'service', 'bar'];
 
 export function RosterTable({data, days, weekStart, dept, isManager, viewerId, onAdd, onOpenShift}: Props) {
+  const {t, fmt, hours, dept: deptName, leaveType} = useI18n();
   const visibleDepts = dept === 'all' ? DEPT_ORDER : [dept];
 
   const rows = useMemo<RosterRow[]>(() => {
@@ -52,11 +53,11 @@ export function RosterTable({data, days, weekStart, dept, isManager, viewerId, o
 
   const dayColumns = days.map((date, i) => ({
     key: `day${i}`,
-    header: `${weekdayShort(date)} ${Number(date.slice(8))}`,
+    header: `${fmt.weekdayShort(date)} ${Number(date.slice(8))}`,
     width: proportional(1, {minWidth: 108}),
     renderCell: (row: RosterRow) => {
       if (row.kind === 'coverage') {
-        if (data.settings.closedDays.includes(i)) return <Text type="supporting">Closed</Text>;
+        if (data.settings.closedDays.includes(i)) return <Text type="supporting">{t('common.closed')}</Text>;
         return (
           <VStack gap={0.5} hAlign="start">
             {visibleDepts.map((d) => {
@@ -69,7 +70,7 @@ export function RosterTable({data, days, weekStart, dept, isManager, viewerId, o
                   size="sm"
                   color={short ? 'red' : 'green'}
                   icon={short ? <Icon icon="warning" /> : <Icon icon="check" />}
-                  label={`${DEPT_LABEL[d]} ${have}/${need}`}
+                  label={`${deptName(d)} ${have}/${need}`}
                 />
               );
             })}
@@ -81,9 +82,9 @@ export function RosterTable({data, days, weekStart, dept, isManager, viewerId, o
         return (
           <VStack gap={1} hAlign="start">
             {open.map((s) => (
-              <ShiftToken key={s.id} shift={s} data={data} onOpen={onOpenShift} canOpen={isManager} />
+              <ShiftToken key={s.id} shift={s} data={data} onOpen={onOpenShift} canOpen={isManager} stacked />
             ))}
-            {isManager && <IconButton label={`Add open shift on ${formatDayLong(date)}`} icon={<Icon icon={PlusIcon} />} size="sm" variant="ghost" onClick={() => onAdd(date, null)} />}
+            {isManager && <IconButton label={t('table.addOpenOn', {day: fmt.dayLong(date)})} icon={<Icon icon={PlusIcon} />} size="sm" variant="ghost" onClick={() => onAdd(date, null)} />}
           </VStack>
         );
       }
@@ -92,12 +93,12 @@ export function RosterTable({data, days, weekStart, dept, isManager, viewerId, o
       const pending = approved ? undefined : leaveCovering(staff.id, date, data.timeOff, 'pending');
       return (
         <VStack gap={1} hAlign="start">
-          {approved && <Token size="sm" color="gray" label={approved.type === 'sick' ? 'Sick' : 'Off'} description={`Approved ${approved.type} leave`} />}
-          {pending && <Token size="sm" color="yellow" label="Requested off" description="Leave request waiting for a decision" />}
+          {approved && <Token size="sm" color="gray" label={approved.type === 'sick' ? t('table.sick') : t('table.off')} description={t('table.approvedLeave', {type: leaveType(approved.type)})} />}
+          {pending && <Token size="sm" color="yellow" label={t('table.requestedOff')} description={t('table.requestedOffDesc')} />}
           {shiftsOn(date, staff.id).map((s) => (
             <ShiftToken key={s.id} shift={s} data={data} onOpen={onOpenShift} canOpen={isManager || staff.id === viewerId} />
           ))}
-          {isManager && <IconButton label={`Add shift for ${staff.name} on ${formatDayLong(date)}`} icon={<Icon icon={PlusIcon} />} size="sm" variant="ghost" onClick={() => onAdd(date, staff)} />}
+          {isManager && <IconButton label={t('table.addFor', {name: staff.name, day: fmt.dayLong(date)})} icon={<Icon icon={PlusIcon} />} size="sm" variant="ghost" onClick={() => onAdd(date, staff)} />}
         </VStack>
       );
     },
@@ -115,10 +116,10 @@ export function RosterTable({data, days, weekStart, dept, isManager, viewerId, o
       columns={[
         {
           key: 'who',
-          header: 'Team',
+          header: t('table.team'),
           width: proportional(1, {minWidth: 150}),
           renderCell: (row) => {
-            if (row.kind === 'coverage') return <Text weight="semibold">Coverage</Text>;
+            if (row.kind === 'coverage') return <Text weight="semibold">{t('table.coverage')}</Text>;
             if (row.kind === 'open') return <PersonCellOpen />;
             return <PersonCell staff={row.staff as Staff} />;
           },
@@ -126,7 +127,7 @@ export function RosterTable({data, days, weekStart, dept, isManager, viewerId, o
         ...dayColumns,
         {
           key: 'total',
-          header: 'Week',
+          header: t('table.week'),
           width: pixel(92),
           align: 'end',
           renderCell: (row) => {
@@ -134,23 +135,23 @@ export function RosterTable({data, days, weekStart, dept, isManager, viewerId, o
               const cost = data.shifts.filter((s) => days.includes(s.date) && s.staffId).reduce((sum, s) => sum + (paidMinutes(s) / 60) * (data.staff.find((p) => p.id === s.staffId)?.hourlyRate ?? 0), 0);
               return (
                 <VStack hAlign="end">
-                  <Text weight="semibold" hasTabularNumbers>{eur.format(cost)}</Text>
-                  <Text type="supporting">labour</Text>
+                  <Text weight="semibold" hasTabularNumbers>{fmt.eur(cost)}</Text>
+                  <Text type="supporting">{t('table.labour')}</Text>
                 </VStack>
               );
             }
             if (row.kind === 'open') {
               const mins = weekRows.filter((s) => !s.staffId).reduce((sum, s) => sum + paidMinutes(s), 0);
-              return <Text type="supporting" hasTabularNumbers>{mins ? formatHours(mins) : 'None'}</Text>;
+              return <Text type="supporting" hasTabularNumbers>{mins ? hours(mins) : t('common.none')}</Text>;
             }
             const staff = row.staff as Staff;
             const mins = staffWeekMinutes(staff.id, data.shifts, weekStart);
             const over = mins / 60 > data.settings.maxWeeklyHours;
             return (
               <VStack hAlign="end" gap={0.5}>
-                <Text weight="semibold" hasTabularNumbers>{formatHours(mins)}</Text>
-                <Text type="supporting" hasTabularNumbers>of {staff.contractHours}h</Text>
-                {over && <Token size="sm" color="red" label="Over limit" />}
+                <Text weight="semibold" hasTabularNumbers>{hours(mins)}</Text>
+                <Text type="supporting" hasTabularNumbers>{t('table.ofContract', {hours: hours(staff.contractHours * 60)})}</Text>
+                {over && <Token size="sm" color="red" label={t('table.overLimit')} />}
               </VStack>
             );
           },
@@ -161,10 +162,11 @@ export function RosterTable({data, days, weekStart, dept, isManager, viewerId, o
 }
 
 function PersonCellOpen() {
+  const {t} = useI18n();
   return (
     <VStack>
-      <Text weight="semibold">Open shifts</Text>
-      <Text type="supporting">Nobody assigned yet</Text>
+      <Text weight="semibold">{t('table.openName')}</Text>
+      <Text type="supporting">{t('table.nobody')}</Text>
     </VStack>
   );
 }

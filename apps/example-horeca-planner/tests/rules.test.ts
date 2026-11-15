@@ -16,33 +16,33 @@ const shift = (id: string, d: PlannerData): Shift => {
 describe('shiftIssues', () => {
   it('flags a shift on approved leave as an error', () => {
     const d = seed();
-    const issues = shiftIssues(shift('sh-lars-1', d), d);
+    const issues = shiftIssues(shift('sh-nikitas-1', d), d);
     expect(issues.map((i) => i.kind)).toContain('leave');
     expect(issues.find((i) => i.kind === 'leave')?.severity).toBe('error');
   });
 
   it('flags a shift on a day with a pending request as a warning', () => {
     const d = seed();
-    const issues = shiftIssues(shift('sh-priya-4', d), d);
+    const issues = shiftIssues(shift('sh-rita-4', d), d);
     expect(issues).toEqual([expect.objectContaining({kind: 'leave-pending', severity: 'warning'})]);
   });
 
   it('warns about too little rest after a close that runs past midnight', () => {
     const d = seed();
-    const issues = shiftIssues(shift('sh-jonas-5', d), d);
-    expect(issues.some((i) => i.kind === 'rest' && i.message.includes('10.5h'))).toBe(true);
+    const issues = shiftIssues(shift('sh-nikitas-5', d), d);
+    expect(issues.some((i) => i.kind === 'rest' && i.params.gapMinutes === 630 && i.params.minMinutes === 660)).toBe(true);
   });
 
   it('reports overlapping shifts for the same person', () => {
     const d = seed();
-    const clash: Shift = {...shift('sh-marco-1', d), id: 'extra', start: '12:00', end: '20:00'};
+    const clash: Shift = {...shift('sh-asterios-1', d), id: 'extra', start: '12:00', end: '20:00'};
     const issues = shiftIssues(clash, {...d, shifts: [...d.shifts, clash]});
     expect(issues.some((i) => i.kind === 'overlap' && i.severity === 'error')).toBe(true);
   });
 
   it('warns when scheduled on a weekday the person cannot work', () => {
     const d = seed();
-    const sunday: Shift = {...shift('sh-open-1', d), id: 'sun', staffId: 'st-daan', date: '2026-11-15'};
+    const sunday: Shift = {...shift('sh-open-1', d), id: 'sun', staffId: 'st-albaraa', date: '2026-11-17'};
     expect(shiftIssues(sunday, {...d, shifts: [...d.shifts, sunday]}).some((i) => i.kind === 'unavailable')).toBe(true);
   });
 
@@ -60,8 +60,9 @@ describe('shiftIssues', () => {
 describe('hours and cost', () => {
   it('adds up paid hours per person for a week', () => {
     const d = seed();
-    expect(staffWeekMinutes('st-marco', d.shifts, WEEK)).toBe(5 * 450);
-    expect(staffWeekMinutes('st-marco', d.shifts, '2026-11-30')).toBe(0);
+    expect(staffWeekMinutes('st-asterios', d.shifts, WEEK)).toBe(5 * 450);
+    expect(staffWeekMinutes('st-spyros', d.shifts, WEEK)).toBe(0);
+    expect(staffWeekMinutes('st-asterios', d.shifts, '2026-11-30')).toBe(0);
   });
 
   it('prices only assigned shifts', () => {
@@ -82,13 +83,13 @@ describe('coverage', () => {
 
   it('does not count someone on approved leave', () => {
     const d = seed();
-    // Tuesday kitchen: Marco, plus Lars who is off sick.
-    expect(coverageFor('kitchen', '2026-11-10', d)).toBe(1);
+    // Tuesday service: Dimitri, Giannis and Nikitas, who is off sick.
+    expect(coverageFor('service', '2026-11-10', d)).toBe(2);
   });
 
   it('seeds next week without the people who are on approved leave', () => {
     const d = seed();
-    const nextWeek = d.shifts.filter((x) => x.date >= '2026-11-16' && x.date <= '2026-11-22' && x.staffId === 'st-aiko');
+    const nextWeek = d.shifts.filter((x) => x.date >= '2026-11-16' && x.date <= '2026-11-22' && x.staffId === 'st-eugenia');
     expect(nextWeek.map((x) => x.date)).toEqual(['2026-11-21', '2026-11-22']);
   });
 
@@ -103,15 +104,16 @@ describe('coverage', () => {
 describe('leave', () => {
   it('counts approved and pending holiday days separately', () => {
     const d = seed();
-    expect(leaveDays('st-marco', d.timeOff, 2026, 'approved')).toBe(8);
-    expect(leaveDays('st-priya', d.timeOff, 2026, 'pending')).toBe(3);
-    expect(leaveDays('st-priya', d.timeOff, 2026, 'approved')).toBe(0);
+    expect(leaveDays('st-soula', d.timeOff, 2026, 'approved')).toBe(8);
+    expect(leaveDays('st-spyros', d.timeOff, 2026, 'approved')).toBe(7);
+    expect(leaveDays('st-rita', d.timeOff, 2026, 'pending')).toBe(3);
+    expect(leaveDays('st-rita', d.timeOff, 2026, 'approved')).toBe(0);
   });
 
   it('finds the shifts a request would clash with', () => {
     const d = seed();
-    expect(shiftsInRange('st-priya', '2026-11-13', '2026-11-15', d.shifts)).toHaveLength(3);
-    expect(shiftsInRange('st-priya', '2026-12-01', '2026-12-03', d.shifts)).toHaveLength(0);
+    expect(shiftsInRange('st-rita', '2026-11-13', '2026-11-15', d.shifts)).toHaveLength(3);
+    expect(shiftsInRange('st-rita', '2026-12-01', '2026-12-03', d.shifts)).toHaveLength(0);
   });
 });
 
@@ -127,7 +129,7 @@ describe('open board', () => {
     const sick = shift('sh-open-2', d);
     const onLeave: Shift = {...sick, date: '2026-11-10'};
     const ranked = candidatesFor(onLeave, {...d, shifts: [...d.shifts]});
-    expect(ranked.find((c) => c.staff.id === 'st-lars')?.blocked).toBe(true);
+    expect(ranked.find((c) => c.staff.id === 'st-nikitas')?.blocked).toBe(true);
     expect(ranked[0].blocked).toBe(false);
     expect(ranked[0].staff.dept).toBe('kitchen');
   });

@@ -3,6 +3,7 @@ import {HStack} from '@astryxdesign/core/HStack';
 import {VStack} from '@astryxdesign/core/VStack';
 import {Text} from '@astryxdesign/core/Text';
 import {useToast} from '@astryxdesign/core/Toast';
+import {useI18n} from '../i18n/I18nProvider';
 import type {Dept, Shift, Staff} from '../types';
 
 type TokenColor = 'orange' | 'blue' | 'purple';
@@ -17,6 +18,7 @@ export function shiftTime(shift: Pick<Shift, 'start' | 'end'>): string {
 }
 
 export function PersonCell({staff, caption}: {staff: Staff; caption?: string}) {
+  const {data} = useI18n();
   return (
     <HStack gap={2} align="center">
       <Avatar name={staff.name} size="sm" tooltip={false} />
@@ -25,7 +27,7 @@ export function PersonCell({staff, caption}: {staff: Staff; caption?: string}) {
           {staff.name}
         </Text>
         <Text type="supporting" maxLines={1}>
-          {caption ?? staff.position}
+          {caption ?? data(staff.position)}
         </Text>
       </VStack>
     </HStack>
@@ -39,6 +41,3 @@ export function useNotify() {
     fail: (body: string) => showToast({body, type: 'error'}),
   };
 }
-
-export const eur = new Intl.NumberFormat('en-IE', {style: 'currency', currency: 'EUR', maximumFractionDigits: 0});
-export const eur2 = new Intl.NumberFormat('en-IE', {style: 'currency', currency: 'EUR'});

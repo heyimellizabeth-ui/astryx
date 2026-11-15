@@ -10,10 +10,11 @@ import {Text} from '@astryxdesign/core/Text';
 import {TextArea} from '@astryxdesign/core/TextArea';
 import {VStack} from '@astryxdesign/core/VStack';
 import {asDateValue} from '../lib/astryxDates';
-import {daysInclusive, formatRange, isISODate, startOfWeek, todayISO} from '../lib/dates';
+import {useI18n} from '../i18n/I18nProvider';
+import {daysInclusive, isISODate, startOfWeek, todayISO} from '../lib/dates';
 import {leaveDays, shiftsInRange} from '../lib/rules';
 import {newId, usePlanner} from '../state/store';
-import {LEAVE_LABEL, type LeaveType} from '../types';
+import {type LeaveType} from '../types';
 import {useNotify} from './shared';
 
 interface Props {
@@ -24,6 +25,7 @@ interface Props {
 
 export function TimeOffDialog({staffId: initialStaff, onClose}: Props) {
   const {data, isManager, viewerId, dispatch} = usePlanner();
+  const {t, tn, fmt, leaveType} = useI18n();
   const notify = useNotify();
   const today = todayISO();
 
@@ -58,31 +60,31 @@ export function TimeOffDialog({staffId: initialStaff, onClose}: Props) {
         createdAt: today,
       },
     });
-    notify.ok(isManager ? 'Time off recorded' : 'Request sent to your manager');
+    notify.ok(isManager ? t('leave.recorded') : t('leave.sent'));
     onClose();
   }
 
   return (
     <Dialog isOpen onOpenChange={(open) => !open && onClose()} purpose="form" width={500}>
       <Layout
-        header={<DialogHeader title={isManager ? 'Record time off' : 'Request time off'} subtitle={valid ? `${formatRange(start, end)} · ${days} ${days === 1 ? 'day' : 'days'}` : undefined} onOpenChange={() => onClose()} />}
+        header={<DialogHeader title={isManager ? t('leave.recordTitle') : t('leave.requestTitle')} subtitle={valid ? `${fmt.range(start, end, t('common.to'))} · ${tn('common.day', days)}` : undefined} onOpenChange={() => onClose()} />}
         content={
           <LayoutContent>
             <VStack gap={4}>
               {isManager ? (
-                <Selector label="Who" options={data.staff.map((s) => ({value: s.id, label: s.name}))} value={staffId} onChange={setStaffId} hasSearch />
+                <Selector label={t('common.who')} options={data.staff.map((s) => ({value: s.id, label: s.name}))} value={staffId} onChange={setStaffId} hasSearch />
               ) : (
-                <Text>Requesting as {person?.name ?? 'a team member'}</Text>
+                <Text>{t('leave.requestingAs', {name: person?.name ?? ''})}</Text>
               )}
               <Selector
-                label="Type"
-                options={(Object.keys(LEAVE_LABEL) as LeaveType[]).map((t) => ({value: t, label: LEAVE_LABEL[t]}))}
+                label={t('common.type')}
+                options={((['holiday', 'sick', 'unpaid', 'other']) as LeaveType[]).map((k) => ({value: k, label: leaveType(k)}))}
                 value={type}
                 onChange={(v) => setType(v as LeaveType)}
               />
               <HStack gap={3} align="start">
                 <DateInput
-                  label="From"
+                  label={t('leave.from')}
                   value={asDateValue(start)}
                   onChange={(v) => {
                     if (!v) return;
@@ -91,22 +93,22 @@ export function TimeOffDialog({staffId: initialStaff, onClose}: Props) {
                   }}
                   isRequired
                 />
-                <DateInput label="Until and including" value={asDateValue(end)} min={asDateValue(start)} onChange={(v) => v && setEnd(v)} isRequired />
+                <DateInput label={t('leave.until')} value={asDateValue(end)} min={asDateValue(start)} onChange={(v) => v && setEnd(v)} isRequired />
               </HStack>
-              <TextArea label="Note" value={note} onChange={setNote} rows={2} isOptional placeholder="Anything your manager should know" />
+              <TextArea label={t('common.note')} value={note} onChange={setNote} rows={2} isOptional placeholder={t('leave.notePlaceholder')} />
               {type === 'holiday' && person && valid && (
                 <Banner
                   status={days > left ? 'warning' : 'info'}
-                  title={days > left ? `Over the allowance by ${days - left} days` : `${left - days} of ${person.leaveAllowance} holiday days left after this`}
-                  description={`${used} taken and ${booked} requested in ${year}.`}
+                  title={days > left ? tn('leave.over', days - left) : t('leave.leftAfter', {left: left - days, total: person.leaveAllowance})}
+                  description={t('leave.takenRequested', {used, booked, year})}
                   collapsible={false}
                 />
               )}
               {clashes > 0 && person && (
                 <Banner
                   status="warning"
-                  title={`${clashes} rostered ${clashes === 1 ? 'shift falls' : 'shifts fall'} in this period`}
-                  description={isManager ? 'You can release them to the open board when you approve.' : 'Your manager will need to cover them before approving.'}
+                  title={tn('leave.clash', clashes)}
+                  description={isManager ? t('leave.clashManager') : t('leave.clashStaff')}
                   collapsible={false}
                 />
               )}
@@ -116,8 +118,8 @@ export function TimeOffDialog({staffId: initialStaff, onClose}: Props) {
         footer={
           <LayoutFooter>
             <HStack gap={2} hAlign="end">
-              <Button label="Cancel" onClick={onClose} />
-              <Button label={isManager ? 'Record time off' : 'Send request'} variant="primary" onClick={submit} isDisabled={!valid} />
+              <Button label={t('common.cancel')} onClick={onClose} />
+              <Button label={isManager ? t('leave.record') : t('leave.send')} variant="primary" onClick={submit} isDisabled={!valid} />
             </HStack>
           </LayoutFooter>
         }

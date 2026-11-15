@@ -23,7 +23,8 @@ import {todayISO} from './lib/dates';
 import {upcomingOnBoard} from './lib/rules';
 import {hrefFor, useRoute, type View} from './lib/route';
 import {PlannerProvider, usePlanner} from './state/store';
-import {MANAGER} from './types';
+import {I18nProvider, useI18n} from './i18n/I18nProvider';
+import {LANGS, type Lang} from './i18n/format';
 import {OpenShiftsView} from './views/OpenShiftsView';
 import {RosterView} from './views/RosterView';
 import {SettingsView} from './views/SettingsView';
@@ -32,30 +33,35 @@ import {TimeOffView} from './views/TimeOffView';
 
 function Navigation({view}: {view: View}) {
   const {data, viewerId, isManager, dispatch} = usePlanner();
+  const {t, lang, setLang} = useI18n();
   const pending = data.timeOff.filter((t) => t.status === 'pending').length;
   const open = upcomingOnBoard(data.shifts, todayISO()).length;
-  const viewerOptions = [{value: MANAGER, label: 'Manager'}, ...data.staff.map((s) => ({value: s.id, label: s.name}))];
+  const viewerOptions = [...data.staff]
+    .sort((a, b) => Number(b.role === 'admin') - Number(a.role === 'admin') || a.name.localeCompare(b.name))
+    .map((s) => ({value: s.id, label: s.name, description: t(`role.${s.role}`)}));
 
   return (
     <SideNav
-      aria-label="Planner"
+      aria-label={t('nav.label')}
       collapsible
-      header={<SideNavHeading heading="Mise" subheading="Horeca planner" icon={<Icon icon={RectangleGroupIcon} />} />}
+      header={<SideNavHeading heading={t('app.name')} subheading={t('app.tagline')} icon={<Icon icon={RectangleGroupIcon} />} />}
       footer={
-        <VStack padding={2}>
+        <VStack padding={2} gap={3}>
+          <Selector label={t('lang.label')} options={LANGS.map((l) => ({value: l.code, label: l.name}))} value={lang} onChange={(value) => setLang(value as Lang)} />
           <Selector
-            label="Viewing as"
-            description={isManager ? 'Approve requests and edit the roster' : 'Request time off and pick up shifts'}
+            label={t('viewer.label')}
+            description={isManager ? t('viewer.descManager') : t('viewer.descStaff')}
             options={viewerOptions}
             value={viewerId}
+            hasSearch
             onChange={(value) => dispatch({type: 'viewer/set', viewerId: value})}
           />
         </VStack>
       }>
-      <SideNavSection title="Plan">
-        <SideNavItem label="Roster" href={hrefFor('roster')} icon={CalendarDaysIcon} selectedIcon={CalendarDaysSolid} isSelected={view === 'roster'} />
+      <SideNavSection title={t('nav.plan')}>
+        <SideNavItem label={t('nav.roster')} href={hrefFor('roster')} icon={CalendarDaysIcon} selectedIcon={CalendarDaysSolid} isSelected={view === 'roster'} />
         <SideNavItem
-          label="Time off"
+          label={t('nav.timeOff')}
           href={hrefFor('time-off')}
           icon={ClockIcon}
           selectedIcon={ClockSolid}
@@ -63,7 +69,7 @@ function Navigation({view}: {view: View}) {
           endContent={pending > 0 ? <Badge variant="warning" label={String(pending)} /> : undefined}
         />
         <SideNavItem
-          label="Open shifts"
+          label={t('nav.openShifts')}
           href={hrefFor('open-shifts')}
           icon={HandRaisedIcon}
           selectedIcon={HandRaisedSolid}
@@ -71,10 +77,10 @@ function Navigation({view}: {view: View}) {
           endContent={open > 0 ? <Badge variant="info" label={String(open)} /> : undefined}
         />
       </SideNavSection>
-      <SideNavSection title="Restaurant">
-        <SideNavItem label="Team" href={hrefFor('team')} icon={UsersIcon} selectedIcon={UsersSolid} isSelected={view === 'team'} />
+      <SideNavSection title={t('nav.restaurant')}>
+        <SideNavItem label={t('nav.team')} href={hrefFor('team')} icon={UsersIcon} selectedIcon={UsersSolid} isSelected={view === 'team'} />
         {isManager && (
-          <SideNavItem label="Settings" href={hrefFor('settings')} icon={Cog6ToothIcon} selectedIcon={Cog6ToothSolid} isSelected={view === 'settings'} />
+          <SideNavItem label={t('nav.settings')} href={hrefFor('settings')} icon={Cog6ToothIcon} selectedIcon={Cog6ToothSolid} isSelected={view === 'settings'} />
         )}
       </SideNavSection>
     </SideNav>
@@ -98,8 +104,10 @@ function Screen() {
 
 export default function App() {
   return (
-    <PlannerProvider>
-      <Screen />
-    </PlannerProvider>
+    <I18nProvider>
+      <PlannerProvider>
+        <Screen />
+      </PlannerProvider>
+    </I18nProvider>
   );
 }

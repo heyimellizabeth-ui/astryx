@@ -12,17 +12,18 @@ import {TextInput} from '@astryxdesign/core/TextInput';
 import {TimeInput} from '@astryxdesign/core/TimeInput';
 import {VStack} from '@astryxdesign/core/VStack';
 import {asDateValue, asTimeValue} from '../lib/astryxDates';
-import {formatDayLong, formatHours, isHhmm, isISODate} from '../lib/dates';
+import {useI18n} from '../i18n/I18nProvider';
+import {isHhmm, isISODate} from '../lib/dates';
 import {paidMinutes, shiftIssues} from '../lib/rules';
 import {newId, usePlanner} from '../state/store';
-import {DEPT_LABEL, type Dept, type Shift} from '../types';
+import {type Dept, type Shift} from '../types';
 import {useNotify} from './shared';
 
 const PRESETS = [
-  {label: 'Opening', start: '09:00', end: '17:00'},
-  {label: 'Lunch', start: '11:00', end: '17:00'},
-  {label: 'Dinner', start: '16:00', end: '23:30'},
-  {label: 'Close', start: '17:00', end: '00:30'},
+  {key: 'shift.preset.opening', start: '09:00', end: '17:00'},
+  {key: 'shift.preset.lunch', start: '11:00', end: '17:00'},
+  {key: 'shift.preset.dinner', start: '16:00', end: '23:30'},
+  {key: 'shift.preset.close', start: '17:00', end: '00:30'},
 ] as const;
 
 const OPEN = 'open';
@@ -38,6 +39,7 @@ interface Props {
 
 export function ShiftDialog({initial, onClose}: Props) {
   const {data, dispatch} = usePlanner();
+  const {t, fmt, hours, data: text, dept: deptName, issue: describe} = useI18n();
   const notify = useNotify();
   const isNew = !initial.id;
 
@@ -47,7 +49,7 @@ export function ShiftDialog({initial, onClose}: Props) {
   const [end, setEnd] = useState(initial.end ?? '23:30');
   const [breakMin, setBreakMin] = useState(initial.breakMin ?? 30);
   const [dept, setDept] = useState<Dept>(initial.dept ?? 'service');
-  const [position, setPosition] = useState(initial.position ?? '');
+  const [position, setPosition] = useState(text(initial.position));
   const [note, setNote] = useState(initial.note ?? '');
 
   const person = data.staff.find((s) => s.id === staffId);
@@ -75,44 +77,44 @@ export function ShiftDialog({initial, onClose}: Props) {
     const p = data.staff.find((s) => s.id === id);
     if (p) {
       setDept(p.dept);
-      setPosition(p.position);
+      setPosition(text(p.position));
     }
   }
 
   function save() {
     if (!valid) return;
     dispatch({type: 'shift/save', shift: {...draft, id: initial.id ?? newId('sh')}});
-    notify.ok(isNew ? 'Shift added' : 'Shift updated');
+    notify.ok(isNew ? t('shift.added') : t('shift.updated'));
     onClose();
   }
 
   function remove() {
     if (!initial.id) return;
     dispatch({type: 'shift/delete', id: initial.id});
-    notify.ok('Shift deleted');
+    notify.ok(t('shift.deleted'));
     onClose();
   }
 
   const staffOptions = [
-    {value: OPEN, label: 'Open shift (nobody yet)'},
-    ...data.staff.map((s) => ({value: s.id, label: `${s.name} · ${s.position}`})),
+    {value: OPEN, label: t('shift.openOption')},
+    ...data.staff.map((s) => ({value: s.id, label: `${s.name} · ${text(s.position)}`})),
   ];
 
   return (
     <Dialog isOpen onOpenChange={(open) => !open && onClose()} purpose="form" width={520}>
       <Layout
-        header={<DialogHeader title={isNew ? 'Add shift' : 'Edit shift'} subtitle={isISODate(date) ? formatDayLong(date) : undefined} onOpenChange={() => onClose()} />}
+        header={<DialogHeader title={isNew ? t('shift.addTitle') : t('shift.editTitle')} subtitle={isISODate(date) ? fmt.dayLong(date) : undefined} onOpenChange={() => onClose()} />}
         content={
           <LayoutContent>
             <VStack gap={4}>
-              <Selector label="Who works" options={staffOptions} value={staffId} onChange={pickStaff} hasSearch />
-              <DateInput label="Date" value={asDateValue(date)} onChange={(v) => v && setDate(v)} isRequired />
+              <Selector label={t('shift.who')} options={staffOptions} value={staffId} onChange={pickStaff} hasSearch />
+              <DateInput label={t('common.date')} value={asDateValue(date)} onChange={(v) => v && setDate(v)} isRequired />
               <HStack gap={1} wrap="wrap" align="center">
-                <Text type="supporting">Quick fill</Text>
+                <Text type="supporting">{t('shift.quickFill')}</Text>
                 {PRESETS.map((p) => (
                   <Button
-                    key={p.label}
-                    label={`${p.label} ${p.start} to ${p.end}`}
+                    key={p.key}
+                    label={`${t(p.key)} ${p.start} - ${p.end}`}
                     size="sm"
                     variant="ghost"
                     onClick={() => {
@@ -123,27 +125,27 @@ export function ShiftDialog({initial, onClose}: Props) {
                 ))}
               </HStack>
               <HStack gap={3} align="start">
-                <TimeInput label="Starts" value={asTimeValue(start)} onChange={(v) => v && setStart(v)} hourFormat="24h" presentation="text-input" isRequired />
-                <TimeInput label="Ends" value={asTimeValue(end)} onChange={(v) => v && setEnd(v)} hourFormat="24h" presentation="text-input" isRequired />
-                <NumberInput label="Unpaid break (min)" value={breakMin} onChange={(v) => setBreakMin(Math.max(0, v))} />
+                <TimeInput label={t('shift.starts')} value={asTimeValue(start)} onChange={(v) => v && setStart(v)} hourFormat="24h" presentation="text-input" isRequired />
+                <TimeInput label={t('shift.ends')} value={asTimeValue(end)} onChange={(v) => v && setEnd(v)} hourFormat="24h" presentation="text-input" isRequired />
+                <NumberInput label={t('shift.break')} value={breakMin} onChange={(v) => setBreakMin(Math.max(0, v))} />
               </HStack>
               <HStack gap={3} align="start">
                 <Selector
-                  label="Department"
-                  options={(Object.keys(DEPT_LABEL) as Dept[]).map((d) => ({value: d, label: DEPT_LABEL[d]}))}
+                  label={t('common.department')}
+                  options={(['kitchen', 'service', 'bar'] as Dept[]).map((d) => ({value: d, label: deptName(d)}))}
                   value={dept}
                   onChange={(v) => setDept(v as Dept)}
                 />
-                <TextInput label="Position" value={position} onChange={setPosition} placeholder={DEFAULT_POSITION[dept]} isOptional />
+                <TextInput label={t('common.position')} value={position} onChange={setPosition} placeholder={text(DEFAULT_POSITION[dept])} isOptional />
               </HStack>
-              <TextInput label="Note" value={note} onChange={setNote} isOptional placeholder="Section, tasks, large booking…" />
+              <TextInput label={t('common.note')} value={note} onChange={setNote} isOptional placeholder={t('shift.notePlaceholder')} />
               {valid && (
                 <Text type="supporting">
-                  {formatHours(paidMinutes(draft))} paid{person ? ` · ${(paidMinutes(draft) / 60 * person.hourlyRate).toFixed(0)} € labour` : ''}
+                  {person ? t('shift.paidCost', {hours: hours(paidMinutes(draft)), cost: fmt.eur((paidMinutes(draft) / 60) * person.hourlyRate)}) : t('shift.paid', {hours: hours(paidMinutes(draft))})}
                 </Text>
               )}
-              {issues.map((issue) => (
-                <Banner key={issue.message} status={issue.severity === 'error' ? 'error' : 'warning'} title={issue.message} collapsible={false} />
+              {issues.map((issue, i) => (
+                <Banner key={`${issue.kind}-${i}`} status={issue.severity === 'error' ? 'error' : 'warning'} title={describe(issue)} collapsible={false} />
               ))}
             </VStack>
           </LayoutContent>
@@ -151,10 +153,10 @@ export function ShiftDialog({initial, onClose}: Props) {
         footer={
           <LayoutFooter>
             <HStack gap={2} hAlign="between">
-              {isNew ? <VStack /> : <Button label="Delete shift" variant="destructive" onClick={remove} />}
+              {isNew ? <VStack /> : <Button label={t('shift.delete')} variant="destructive" onClick={remove} />}
               <HStack gap={2}>
-                <Button label="Cancel" onClick={onClose} />
-                <Button label={isNew ? 'Add shift' : 'Save changes'} variant="primary" onClick={save} isDisabled={!valid} />
+                <Button label={t('common.cancel')} onClick={onClose} />
+                <Button label={isNew ? t('shift.add') : t('common.saveChanges')} variant="primary" onClick={save} isDisabled={!valid} />
               </HStack>
             </HStack>
           </LayoutFooter>

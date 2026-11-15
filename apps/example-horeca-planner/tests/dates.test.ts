@@ -1,5 +1,6 @@
 import {describe, expect, it} from 'vitest';
-import {addDays, daysInclusive, eachDay, formatRange, isHhmm, isISODate, shiftMinutes, startOfWeek, weekdayIndex, weekDates} from '../src/lib/dates';
+import {makeFormats} from '../src/i18n/format';
+import {addDays, daysInclusive, eachDay, isHhmm, isISODate, shiftMinutes, startOfWeek, weekdayIndex, weekDates} from '../src/lib/dates';
 
 describe('dates', () => {
   it('finds the Monday that starts a week, including from a Sunday', () => {
@@ -46,8 +47,9 @@ describe('dates', () => {
   });
 
   it('formats ranges, adding the year only when it changes', () => {
-    expect(formatRange('2026-11-09', '2026-11-09')).toBe('Mon 9 Nov');
-    expect(formatRange('2026-11-09', '2026-11-13')).toBe('9 Nov to 13 Nov');
-    expect(formatRange('2026-12-30', '2027-01-02')).toBe('30 Dec to 2 Jan 2027');
+    const {range} = makeFormats('en');
+    expect(range('2026-11-09', '2026-11-09', 'to')).toBe('Mon 9 Nov');
+    expect(range('2026-11-09', '2026-11-13', 'to')).toBe('9 Nov to 13 Nov');
+    expect(range('2026-12-30', '2027-01-02', 'to')).toBe('30 Dec to 2 Jan 2027');
   });
 });

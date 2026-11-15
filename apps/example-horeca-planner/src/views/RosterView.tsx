@@ -17,13 +17,14 @@ import {ChevronLeftIcon, ChevronRightIcon} from '@heroicons/react/20/solid';
 import {RosterAgenda} from '../components/RosterAgenda';
 import {RosterTable} from '../components/RosterTable';
 import {ShiftDialog} from '../components/ShiftDialog';
-import {eur, shiftTime, useNotify} from '../components/shared';
-import {addDays, formatDay, formatDayLong, isISODate, startOfWeek, todayISO, weekDates} from '../lib/dates';
+import {shiftTime, useNotify} from '../components/shared';
+import {useI18n} from '../i18n/I18nProvider';
+import {addDays, isISODate, startOfWeek, todayISO, weekDates} from '../lib/dates';
 import type {Params, View} from '../lib/route';
 import {useNarrow} from '../lib/useNarrow';
 import {shiftIssues, summariseWeek, weekShifts} from '../lib/rules';
 import {usePlanner} from '../state/store';
-import {DEPT_LABEL, type Dept, type ISODate, type Shift, type Staff} from '../types';
+import {type Dept, type ISODate, type Shift, type Staff} from '../types';
 
 type DeptFilter = Dept | 'all';
 
@@ -34,6 +35,7 @@ interface Props {
 
 export function RosterView({params, navigate}: Props) {
   const {data, viewerId, isManager, dispatch} = usePlanner();
+  const {t, tn, fmt, dept: deptName, issue: describe, hours: fmtHours} = useI18n();
   const notify = useNotify();
   const thisWeek = startOfWeek(todayISO());
   const raw = params.get('week');
@@ -53,12 +55,13 @@ export function RosterView({params, navigate}: Props) {
     () =>
       weekShifts(data.shifts, weekStart).flatMap((s) =>
         shiftIssues(s, data).map((issue) => ({
-          key: `${s.id}-${issue.kind}-${issue.message}`,
+          key: `${s.id}-${issue.kind}-${JSON.stringify(issue.params)}`,
           severity: issue.severity,
-          text: `${data.staff.find((p) => p.id === s.staffId)?.name ?? 'Someone'} · ${formatDayLong(s.date)} ${shiftTime(s)} · ${issue.message}`,
+          text: `${data.staff.find((p) => p.id === s.staffId)?.name ?? t('roster.someone')} · ${fmt.dayLong(s.date)} ${shiftTime(s)} · ${describe(issue)}`,
         })),
       ),
-    [data, weekStart],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [data, weekStart, t, fmt, describe],
   );
 
   function openShift(shift: Shift) {
@@ -70,11 +73,11 @@ export function RosterView({params, navigate}: Props) {
   }
   function copyLastWeek() {
     dispatch({type: 'week/copy', from: addDays(weekStart, -7), to: weekStart});
-    notify.ok('Copied last week’s roster');
+    notify.ok(t('roster.copied'));
   }
   function togglePublish() {
     dispatch({type: 'week/publish', weekStart, published: !published});
-    notify.ok(published ? 'Roster moved back to draft' : 'Roster published. Your team can see it now.');
+    notify.ok(published ? t('roster.unpublishedToast') : t('roster.publishedToast'));
   }
 
   const budgetPct = Math.round((summary.cost / data.settings.weeklyBudget) * 100);
@@ -83,34 +86,34 @@ export function RosterView({params, navigate}: Props) {
     <VStack gap={4} padding={4}>
       <HStack hAlign="between" align="end" wrap="wrap" gap={3}>
         <VStack gap={1}>
-          <Heading level={1}>Roster</Heading>
+          <Heading level={1}>{t('roster.title')}</Heading>
           <HStack gap={2} align="center">
             <Text type="large">
-              {formatDay(days[0])} to {formatDay(days[6])} {days[6].slice(0, 4)}
+              {t('roster.range', {from: fmt.day(days[0]), to: fmt.day(days[6]), year: days[6].slice(0, 4)})}
             </Text>
-            <StatusDot variant={published ? 'success' : 'neutral'} label={published ? 'Published' : 'Draft'} />
-            <Text type="supporting">{published ? 'Published' : 'Draft'}</Text>
+            <StatusDot variant={published ? 'success' : 'neutral'} label={published ? t('common.published') : t('common.draft')} />
+            <Text type="supporting">{published ? t('common.published') : t('common.draft')}</Text>
           </HStack>
         </VStack>
         <HStack gap={2} wrap="wrap" align="center">
-          <IconButton label="Previous week" icon={<Icon icon={ChevronLeftIcon} />} onClick={() => go(addDays(weekStart, -7))} />
-          <Button label="This week" onClick={() => go(thisWeek)} isDisabled={weekStart === thisWeek} />
-          <IconButton label="Next week" icon={<Icon icon={ChevronRightIcon} />} onClick={() => go(addDays(weekStart, 7))} />
+          <IconButton label={t('roster.prevWeek')} icon={<Icon icon={ChevronLeftIcon} />} onClick={() => go(addDays(weekStart, -7))} />
+          <Button label={t('roster.thisWeek')} onClick={() => go(thisWeek)} isDisabled={weekStart === thisWeek} />
+          <IconButton label={t('roster.nextWeek')} icon={<Icon icon={ChevronRightIcon} />} onClick={() => go(addDays(weekStart, 7))} />
           {isManager && (
             <>
-              <Button label="Add shift" onClick={() => setEditing({date: weekStart === thisWeek ? todayISO() : weekStart})} />
+              <Button label={t('roster.addShift')} onClick={() => setEditing({date: weekStart === thisWeek ? todayISO() : weekStart})} />
               <Button
-                label={published ? 'Unpublish' : 'Publish week'}
+                label={published ? t('roster.unpublish') : t('roster.publish')}
                 variant={published ? 'secondary' : 'primary'}
                 onClick={togglePublish}
                 isDisabled={!published && summary.conflicts > 0}
-                tooltip={!published && summary.conflicts > 0 ? `Fix ${summary.conflicts} conflict${summary.conflicts === 1 ? '' : 's'} before publishing` : undefined}
+                tooltip={!published && summary.conflicts > 0 ? tn('roster.fixFirst', summary.conflicts) : undefined}
               />
               <DropdownMenu
-                button={{label: 'More', variant: 'ghost'}}
+                button={{label: t('roster.more'), variant: 'ghost'}}
                 items={[
-                  {label: 'Copy last week’s roster here', onClick: copyLastWeek},
-                  {label: 'Clear this week', variant: 'destructive', onClick: () => dispatch({type: 'week/clear', weekStart})},
+                  {label: t('roster.copyLast'), onClick: copyLastWeek},
+                  {label: t('roster.clearWeek'), variant: 'destructive', onClick: () => dispatch({type: 'week/clear', weekStart})},
                 ]}
               />
             </>
@@ -119,34 +122,34 @@ export function RosterView({params, navigate}: Props) {
       </HStack>
 
       <HStack hAlign="between" align="center" wrap="wrap" gap={3}>
-        <SegmentedControl label="Department" value={dept} onChange={(v) => go(weekStart, v as DeptFilter)}>
-          <SegmentedControlItem value="all" label="Everyone" />
-          {(Object.keys(DEPT_LABEL) as Dept[]).map((d) => (
-            <SegmentedControlItem key={d} value={d} label={DEPT_LABEL[d]} />
+        <SegmentedControl size="lg" label={t('common.department')} value={dept} onChange={(v) => go(weekStart, v as DeptFilter)}>
+          <SegmentedControlItem value="all" label={t('common.everyone')} />
+          {(['kitchen', 'service', 'bar'] as Dept[]).map((d) => (
+            <SegmentedControlItem key={d} value={d} label={deptName(d)} />
           ))}
         </SegmentedControl>
         <HStack gap={6} wrap="wrap" align="end">
-          <Stat label="Paid hours" value={`${summary.hours.toFixed(0)}h`} />
+          <Stat label={t('roster.paidHours')} value={fmtHours(summary.hours * 60)} />
           <VStack gap={1} width={220}>
             <HStack hAlign="between">
-              <Text type="supporting">Labour cost</Text>
+              <Text type="supporting">{t('roster.labourCost')}</Text>
               <Text weight="semibold" hasTabularNumbers>
-                {eur.format(summary.cost)} <Text type="supporting">of {eur.format(data.settings.weeklyBudget)}</Text>
+                {fmt.eur(summary.cost)} <Text type="supporting">{t('roster.labourOf', {budget: fmt.eur(data.settings.weeklyBudget)})}</Text>
               </Text>
             </HStack>
-            <ProgressBar label="Labour cost against weekly budget" isLabelHidden value={Math.min(budgetPct, 100)} variant={budgetPct > 100 ? 'error' : budgetPct > 90 ? 'warning' : 'accent'} />
+            <ProgressBar label={t('roster.labourBar')} isLabelHidden value={Math.min(budgetPct, 100)} variant={budgetPct > 100 ? 'error' : budgetPct > 90 ? 'warning' : 'accent'} />
           </VStack>
-          <Stat label="Open shifts" value={String(summary.openShifts)} />
-          <Stat label="Coverage gaps" value={String(summary.gaps)} />
+          <Stat label={t('roster.openShifts')} value={String(summary.openShifts)} />
+          <Stat label={t('roster.gaps')} value={String(summary.gaps)} />
         </HStack>
       </HStack>
 
-      {!isManager && !published && <Banner status="info" title="This week is still a draft" description="Shifts can change until your manager publishes the roster." collapsible={false} />}
+      {!isManager && !published && <Banner status="info" title={t('roster.draftTitle')} description={t('roster.draftDesc')} collapsible={false} />}
       {isManager && issueLines.length > 0 && (
         <Banner
           status={summary.conflicts > 0 ? 'error' : 'warning'}
-          title={`${summary.conflicts} ${summary.conflicts === 1 ? 'conflict' : 'conflicts'} and ${summary.warnings} ${summary.warnings === 1 ? 'warning' : 'warnings'} this week`}
-          description={summary.conflicts > 0 ? 'Resolve conflicts before you publish.' : 'Review before you publish.'}>
+          title={t('roster.issuesTitle', {conflicts: tn('roster.conflicts', summary.conflicts), warnings: tn('roster.warnings', summary.warnings)})}
+          description={summary.conflicts > 0 ? t('roster.issuesFix') : t('roster.issuesReview')}>
           <VStack gap={1}>
             {issueLines.map((l) => (
               <Text key={l.key}>{l.text}</Text>
@@ -165,26 +168,26 @@ export function RosterView({params, navigate}: Props) {
       {offering && (
         <Dialog isOpen onOpenChange={(o) => !o && setOffering(null)} width={440}>
           <Layout
-            header={<DialogHeader title="Your shift" subtitle={`${formatDayLong(offering.date)} · ${shiftTime(offering)}`} onOpenChange={() => setOffering(null)} />}
+            header={<DialogHeader title={t('roster.yourShift')} subtitle={`${fmt.dayLong(offering.date)} · ${shiftTime(offering)}`} onOpenChange={() => setOffering(null)} />}
             content={
               <LayoutContent>
                 <Text>
                   {offering.offered
-                    ? 'This shift is on the open board. You stay on it until a colleague takes it.'
-                    : 'Can’t make it? Offer this shift to the open board and a colleague can pick it up. You stay on it until someone does.'}
+                    ? t('roster.offeredHelp')
+                    : t('roster.offerHelp')}
                 </Text>
               </LayoutContent>
             }
             footer={
               <LayoutFooter>
                 <HStack gap={2} hAlign="end">
-                  <Button label="Close" onClick={() => setOffering(null)} />
+                  <Button label={t('common.close')} onClick={() => setOffering(null)} />
                   <Button
-                    label={offering.offered ? 'Take it back' : 'Offer to open board'}
+                    label={offering.offered ? t('roster.takeBack') : t('roster.offer')}
                     variant="primary"
                     onClick={() => {
                       dispatch({type: 'shift/save', shift: {...offering, offered: !offering.offered}});
-                      notify.ok(offering.offered ? 'Shift taken off the open board' : 'Shift offered to the open board');
+                      notify.ok(offering.offered ? t('roster.takenBackToast') : t('roster.offeredToast'));
                       setOffering(null);
                     }}
                   />

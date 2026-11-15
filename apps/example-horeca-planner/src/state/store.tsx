@@ -1,11 +1,11 @@
 import {createContext, useContext, useEffect, useMemo, useReducer, type Dispatch, type ReactNode} from 'react';
 import {addDays, startOfWeek, todayISO, weekDates} from '../lib/dates';
-import {buildSeed} from '../lib/seed';
-import {MANAGER, type ISODate, type LeaveStatus, type PlannerData, type Settings, type Shift, type Staff, type TimeOff} from '../types';
+import {DEFAULT_VIEWER, buildSeed} from '../lib/seed';
+import {type ISODate, type LeaveStatus, type PlannerData, type Settings, type Shift, type Staff, type TimeOff} from '../types';
 
 export interface PlannerState {
   data: PlannerData;
-  /** MANAGER or a staff id: who the app is being used as. */
+  /** The staff id of the person the app is being used as. */
   viewerId: string;
 }
 
@@ -63,15 +63,21 @@ export function reduce(state: PlannerState, action: Action): PlannerState {
     }
     case 'staff/save':
       return next({staff: upsert(data.staff, action.staff)});
-    case 'staff/delete':
+    case 'staff/delete': {
+      const target = data.staff.find((s) => s.id === action.id);
+      const admins = data.staff.filter((s) => s.role === 'admin');
+      // The roster always keeps at least one administrator.
+      if (!target || (target.role === 'admin' && admins.length <= 1)) return state;
+      const remaining = data.staff.filter((s) => s.id !== action.id);
       return {
         ...next({
         staff: data.staff.filter((s) => s.id !== action.id),
         timeOff: data.timeOff.filter((t) => t.staffId !== action.id),
         shifts: data.shifts.map((s) => (s.staffId === action.id ? {...s, staffId: null, offered: false} : s)),
       }),
-        viewerId: state.viewerId === action.id ? MANAGER : state.viewerId,
+        viewerId: state.viewerId === action.id ? (remaining.find((s) => s.role === 'admin')?.id ?? DEFAULT_VIEWER) : state.viewerId,
       };
+    }
     case 'settings/save':
       return next({settings: action.settings});
     case 'week/publish': {
@@ -93,7 +99,7 @@ export function reduce(state: PlannerState, action: Action): PlannerState {
     case 'viewer/set':
       return {...state, viewerId: action.viewerId};
     case 'reset':
-      return {data: buildSeed(), viewerId: MANAGER};
+      return {data: buildSeed(), viewerId: DEFAULT_VIEWER};
   }
 }
 
@@ -101,17 +107,17 @@ function weeksBetween(from: ISODate, to: ISODate): number {
   return Math.round((Date.parse(to) - Date.parse(from)) / (7 * 86_400_000));
 }
 
-const STORAGE_KEY = 'mise.planner.v1';
+const STORAGE_KEY = 'mise.planner.v2';
 
 function load(): PlannerState {
-  const fresh: PlannerState = {data: buildSeed(), viewerId: MANAGER};
+  const fresh: PlannerState = {data: buildSeed(), viewerId: DEFAULT_VIEWER};
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return fresh;
     const parsed = JSON.parse(raw) as Partial<PlannerState>;
     const d = parsed.data;
     if (!d || !Array.isArray(d.staff) || !Array.isArray(d.shifts) || !Array.isArray(d.timeOff) || !d.settings) return fresh;
-    return {data: d, viewerId: typeof parsed.viewerId === 'string' ? parsed.viewerId : MANAGER};
+    return {data: d, viewerId: typeof parsed.viewerId === 'string' ? parsed.viewerId : DEFAULT_VIEWER};
   } catch {
     return fresh;
   }
@@ -142,9 +148,9 @@ export function usePlanner() {
   const ctx = useContext(PlannerContext);
   if (!ctx) throw new Error('usePlanner must be used inside PlannerProvider');
   const {state, dispatch} = ctx;
-  const isManager = state.viewerId === MANAGER;
-  const viewer = state.data.staff.find((s) => s.id === state.viewerId) ?? null;
-  return {data: state.data, viewerId: state.viewerId, viewer, isManager, dispatch};
+  const viewer = state.data.staff.find((s) => s.id === state.viewerId) ?? state.data.staff.find((s) => s.role === 'admin') ?? null;
+  const isManager = viewer?.role === 'admin';
+  return {data: state.data, viewerId: viewer?.id ?? state.viewerId, viewer, isManager, dispatch};
 }
 
 export {startOfWeek, todayISO};

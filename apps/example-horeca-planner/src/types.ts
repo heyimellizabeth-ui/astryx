@@ -3,9 +3,13 @@ export type Hhmm = string; // HH:MM, 24h
 
 export type Dept = 'kitchen' | 'service' | 'bar';
 
+export type Role = 'admin' | 'employee';
+
 export interface Staff {
   id: string;
   name: string;
+  /** Administrators plan the roster and decide on requests. Employees see it and ask. */
+  role: Role;
   position: string;
   dept: Dept;
   /** Contracted hours per week. */
@@ -80,5 +84,3 @@ export const LEAVE_LABEL: Record<LeaveType, string> = {
   unpaid: 'Unpaid',
   other: 'Other',
 };
-
-export const MANAGER = 'manager';

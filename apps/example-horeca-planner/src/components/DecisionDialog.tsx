@@ -8,10 +8,10 @@ import {Switch} from '@astryxdesign/core/Switch';
 import {Text} from '@astryxdesign/core/Text';
 import {TextArea} from '@astryxdesign/core/TextArea';
 import {VStack} from '@astryxdesign/core/VStack';
-import {formatRange} from '../lib/dates';
+import {useI18n} from '../i18n/I18nProvider';
 import {shiftsInRange} from '../lib/rules';
 import {usePlanner} from '../state/store';
-import {LEAVE_LABEL, type TimeOff} from '../types';
+import {type TimeOff} from '../types';
 import {useNotify} from './shared';
 
 interface Props {
@@ -22,6 +22,7 @@ interface Props {
 
 export function DecisionDialog({request, decision, onClose}: Props) {
   const {data, dispatch} = usePlanner();
+  const {t, tn, fmt, data: text, leaveType} = useI18n();
   const notify = useNotify();
   const person = data.staff.find((s) => s.id === request.staffId);
   const affected = shiftsInRange(request.staffId, request.start, request.end, data.shifts);
@@ -31,8 +32,8 @@ export function DecisionDialog({request, decision, onClose}: Props) {
 
   function confirm() {
     dispatch({type: 'leave/decide', id: request.id, status: decision, decisionNote: note.trim() || undefined, releaseShifts: approving && release});
-    const name = person?.name ?? 'Request';
-    notify.ok(approving ? `${name}'s ${LEAVE_LABEL[request.type].toLowerCase()} approved` : `${name}'s request declined`);
+    const name = person?.name ?? '';
+    notify.ok(approving ? t('decision.approvedToast', {type: leaveType(request.type), name}) : t('decision.declinedToast', {name}));
     onClose();
   }
 
@@ -41,37 +42,37 @@ export function DecisionDialog({request, decision, onClose}: Props) {
       <Layout
         header={
           <DialogHeader
-            title={approving ? 'Approve time off' : 'Decline time off'}
-            subtitle={`${person?.name ?? 'Staff'} · ${LEAVE_LABEL[request.type]} · ${formatRange(request.start, request.end)}`}
+            title={approving ? t('decision.approveTitle') : t('decision.declineTitle')}
+            subtitle={`${person?.name ?? ''} · ${leaveType(request.type)} · ${fmt.range(request.start, request.end, t('common.to'))}`}
             onOpenChange={() => onClose()}
           />
         }
         content={
           <LayoutContent>
             <VStack gap={4}>
-              {request.note && <Text type="supporting">“{request.note}”</Text>}
+              {request.note && <Text type="supporting">“{text(request.note)}”</Text>}
               {approving && affected.length > 0 && (
                 <>
                   <Banner
                     status="warning"
-                    title={`${person?.name ?? 'They'} is rostered for ${affected.length} ${affected.length === 1 ? 'shift' : 'shifts'} in this period`}
+                    title={tn('decision.rostered', affected.length, {name: person?.name ?? ''})}
                     collapsible={false}
                   />
                   <Switch
-                    label={`Release ${affected.length === 1 ? 'the shift' : `${affected.length} shifts`} to the open board`}
-                    description="Colleagues can pick them up, and they stay visible on the roster until filled."
+                    label={tn('decision.release', affected.length)}
+                    description={t('decision.releaseDesc')}
                     value={release}
                     onChange={setRelease}
                   />
                 </>
               )}
               <TextArea
-                label={approving ? 'Note to staff' : 'Reason'}
+                label={approving ? t('decision.noteApprove') : t('decision.noteDecline')}
                 value={note}
                 onChange={setNote}
                 rows={2}
                 isOptional
-                placeholder={approving ? 'Enjoy the break' : 'Suggest other dates if you can'}
+                placeholder={approving ? t('decision.phApprove') : t('decision.phDecline')}
               />
             </VStack>
           </LayoutContent>
@@ -79,8 +80,8 @@ export function DecisionDialog({request, decision, onClose}: Props) {
         footer={
           <LayoutFooter>
             <HStack gap={2} hAlign="end">
-              <Button label="Cancel" onClick={onClose} />
-              <Button label={approving ? 'Approve' : 'Decline request'} variant={approving ? 'primary' : 'destructive'} onClick={confirm} />
+              <Button label={t('common.cancel')} onClick={onClose} />
+              <Button label={approving ? t('decision.approve') : t('decision.declineBtn')} variant={approving ? 'primary' : 'destructive'} onClick={confirm} />
             </HStack>
           </LayoutFooter>
         }
