@@ -21,7 +21,10 @@ import {
 } from '@heroicons/react/24/solid';
 import {todayISO} from './lib/dates';
 import {upcomingOnBoard} from './lib/rules';
+import {useState} from 'react';
 import {hrefFor, useRoute, type View} from './lib/route';
+import {SignInDialog} from './components/SignInDialog';
+import {GUEST} from './lib/seed';
 import {PlannerProvider, usePlanner} from './state/store';
 import {I18nProvider, useI18n} from './i18n/I18nProvider';
 import {LANGS, type Lang} from './i18n/format';
@@ -32,15 +35,28 @@ import {TeamView} from './views/TeamView';
 import {TimeOffView} from './views/TimeOffView';
 
 function Navigation({view}: {view: View}) {
-  const {data, viewerId, isManager, dispatch} = usePlanner();
+  const {data, viewerId, viewer, isManager, unlocked, dispatch} = usePlanner();
   const {t, lang, setLang} = useI18n();
+  const [signingIn, setSigningIn] = useState<string | null>(null);
   const pending = data.timeOff.filter((t) => t.status === 'pending').length;
   const open = upcomingOnBoard(data.shifts, todayISO()).length;
-  const viewerOptions = [...data.staff]
+  const viewerOptions = [
+    {value: GUEST, label: t('viewer.guest'), description: t('viewer.guestDesc')},
+    ...[...data.staff]
     .sort((a, b) => Number(b.role === 'admin') - Number(a.role === 'admin') || a.name.localeCompare(b.name))
-    .map((s) => ({value: s.id, label: s.name, description: t(`role.${s.role}`)}));
+    .map((s) => ({value: s.id, label: s.name, description: t(`role.${s.role}`)})),
+  ];
+  const viewerNote = isManager ? t('viewer.descManager') : viewer ? t('viewer.descStaff') : t('viewer.descGuest');
+
+  function chooseViewer(value: string) {
+    const target = data.staff.find((s) => s.id === value);
+    // An administrator needs the password, unless this session is already signed in.
+    if (target?.role === 'admin' && !unlocked) setSigningIn(value);
+    else dispatch({type: 'viewer/set', viewerId: value});
+  }
 
   return (
+    <>
     <SideNav
       aria-label={t('nav.label')}
       collapsible
@@ -50,11 +66,11 @@ function Navigation({view}: {view: View}) {
           <Selector label={t('lang.label')} options={LANGS.map((l) => ({value: l.code, label: l.name}))} value={lang} onChange={(value) => setLang(value as Lang)} />
           <Selector
             label={t('viewer.label')}
-            description={isManager ? t('viewer.descManager') : t('viewer.descStaff')}
+            description={viewerNote}
             options={viewerOptions}
             value={viewerId}
             hasSearch
-            onChange={(value) => dispatch({type: 'viewer/set', viewerId: value})}
+            onChange={chooseViewer}
           />
         </VStack>
       }>
@@ -84,6 +100,8 @@ function Navigation({view}: {view: View}) {
         )}
       </SideNavSection>
     </SideNav>
+    {signingIn && <SignInDialog adminId={signingIn} onClose={() => setSigningIn(null)} />}
+    </>
   );
 }
 

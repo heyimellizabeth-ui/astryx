@@ -1,12 +1,14 @@
 import {createContext, useContext, useEffect, useMemo, useReducer, type Dispatch, type ReactNode} from 'react';
 import {addDays, startOfWeek, todayISO, weekDates} from '../lib/dates';
-import {DEFAULT_VIEWER, buildSeed} from '../lib/seed';
+import {GUEST, buildSeed} from '../lib/seed';
 import {type ISODate, type LeaveStatus, type PlannerData, type Settings, type Shift, type Staff, type TimeOff} from '../types';
 
 export interface PlannerState {
   data: PlannerData;
-  /** The staff id of the person the app is being used as. */
+  /** The staff id of the person the app is being used as, or GUEST. */
   viewerId: string;
+  /** True once the administrator password was accepted in this browser session. */
+  unlocked: boolean;
 }
 
 export type Action =
@@ -23,6 +25,8 @@ export type Action =
   | {type: 'week/copy'; from: ISODate; to: ISODate}
   | {type: 'week/clear'; weekStart: ISODate}
   | {type: 'viewer/set'; viewerId: string}
+  /** Dispatched only after the administrator password was verified. */
+  | {type: 'viewer/signIn'; viewerId: string}
   | {type: 'reset'};
 
 let counter = 0;
@@ -68,14 +72,14 @@ export function reduce(state: PlannerState, action: Action): PlannerState {
       const admins = data.staff.filter((s) => s.role === 'admin');
       // The roster always keeps at least one administrator.
       if (!target || (target.role === 'admin' && admins.length <= 1)) return state;
-      const remaining = data.staff.filter((s) => s.id !== action.id);
       return {
         ...next({
         staff: data.staff.filter((s) => s.id !== action.id),
         timeOff: data.timeOff.filter((t) => t.staffId !== action.id),
         shifts: data.shifts.map((s) => (s.staffId === action.id ? {...s, staffId: null, offered: false} : s)),
       }),
-        viewerId: state.viewerId === action.id ? (remaining.find((s) => s.role === 'admin')?.id ?? DEFAULT_VIEWER) : state.viewerId,
+        viewerId: state.viewerId === action.id ? GUEST : state.viewerId,
+        unlocked: state.viewerId === action.id ? false : state.unlocked,
       };
     }
     case 'settings/save':
@@ -96,10 +100,16 @@ export function reduce(state: PlannerState, action: Action): PlannerState {
       const days = new Set(weekDates(action.weekStart));
       return next({shifts: data.shifts.filter((s) => !days.has(s.date))});
     }
-    case 'viewer/set':
-      return {...state, viewerId: action.viewerId};
+    case 'viewer/set': {
+      const target = data.staff.find((s) => s.id === action.viewerId);
+      if (target?.role === 'admin') return state.unlocked ? {...state, viewerId: target.id} : state;
+      // Leaving administrator mode locks it again. Coming back asks for the password.
+      return {...state, viewerId: target ? target.id : GUEST, unlocked: false};
+    }
+    case 'viewer/signIn':
+      return data.staff.some((s) => s.id === action.viewerId && s.role === 'admin') ? {...state, viewerId: action.viewerId, unlocked: true} : state;
     case 'reset':
-      return {data: buildSeed(), viewerId: DEFAULT_VIEWER};
+      return {...state, data: buildSeed()};
   }
 }
 
@@ -108,16 +118,29 @@ function weeksBetween(from: ISODate, to: ISODate): number {
 }
 
 const STORAGE_KEY = 'mise.planner.v2';
+const UNLOCK_KEY = 'mise.unlocked';
+
+function readUnlocked(): boolean {
+  try {
+    return window.sessionStorage.getItem(UNLOCK_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
 
 function load(): PlannerState {
-  const fresh: PlannerState = {data: buildSeed(), viewerId: DEFAULT_VIEWER};
+  const fresh: PlannerState = {data: buildSeed(), viewerId: GUEST, unlocked: false};
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return fresh;
     const parsed = JSON.parse(raw) as Partial<PlannerState>;
     const d = parsed.data;
     if (!d || !Array.isArray(d.staff) || !Array.isArray(d.shifts) || !Array.isArray(d.timeOff) || !d.settings) return fresh;
-    return {data: d, viewerId: typeof parsed.viewerId === 'string' ? parsed.viewerId : DEFAULT_VIEWER};
+    // Administrator mode never survives a new browser session, so a saved admin viewer drops to guest.
+    const unlocked = readUnlocked();
+    const saved = typeof parsed.viewerId === 'string' ? parsed.viewerId : GUEST;
+    const admin = d.staff.some((s) => s.id === saved && s.role === 'admin');
+    return {data: d, viewerId: admin && !unlocked ? GUEST : saved, unlocked: unlocked && admin};
   } catch {
     return fresh;
   }
@@ -134,7 +157,9 @@ export function PlannerProvider({children}: {children: ReactNode}) {
 
   useEffect(() => {
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({data: state.data, viewerId: state.viewerId}));
+      if (state.unlocked) window.sessionStorage.setItem(UNLOCK_KEY, '1');
+      else window.sessionStorage.removeItem(UNLOCK_KEY);
     } catch {
       // Storage can be unavailable (private window, quota). The planner still works for this visit.
     }
@@ -148,9 +173,9 @@ export function usePlanner() {
   const ctx = useContext(PlannerContext);
   if (!ctx) throw new Error('usePlanner must be used inside PlannerProvider');
   const {state, dispatch} = ctx;
-  const viewer = state.data.staff.find((s) => s.id === state.viewerId) ?? state.data.staff.find((s) => s.role === 'admin') ?? null;
-  const isManager = viewer?.role === 'admin';
-  return {data: state.data, viewerId: viewer?.id ?? state.viewerId, viewer, isManager, dispatch};
+  const viewer = state.data.staff.find((s) => s.id === state.viewerId) ?? null;
+  const isManager = state.unlocked && viewer?.role === 'admin';
+  return {data: state.data, viewerId: viewer?.id ?? GUEST, viewer, isManager, unlocked: state.unlocked, dispatch};
 }
 
 export {startOfWeek, todayISO};

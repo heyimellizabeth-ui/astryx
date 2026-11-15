@@ -67,7 +67,8 @@ const STAFF: Staff[] = [
   person('st-maria', 'Maria Z.', 'employee', 'bar', 'Bartender', 16, 15, 10, [1, 2]),
 ];
 
-export const DEFAULT_VIEWER = 'st-soula';
+/** The signed-out viewer: can read the roster, cannot edit or act as anyone. */
+export const GUEST = 'guest';
 
 /** Day index (0 = Monday) to template, per person. Monday is closed. */
 const PATTERN: Record<string, Partial<Record<number, TemplateKey>>> = {

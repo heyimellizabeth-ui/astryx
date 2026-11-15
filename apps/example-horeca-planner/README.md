@@ -35,6 +35,18 @@ The grid flags problems on the shift itself, and lists them above the grid:
 
 The rules are pure functions in `src/lib/rules.ts`, covered by `tests/`.
 
+## Signing in
+
+A visitor starts as a **Guest** who can read the roster and nothing else. Choosing an administrator (Soula or Lizzy) in **Viewing as** asks for the administrator password. Once it is accepted, the administrator can edit for the rest of that browser session. Switching to an employee or to Guest locks editing again, five wrong attempts lock the form for 30 seconds, and a saved administrator in `localStorage` never skips the prompt.
+
+Employees can be chosen without a password, because none was set for them. They can request time off and take shifts as that person.
+
+This is a gate against casual edits, **not security**. The app has no server, so the check runs in the browser: the salted PBKDF2 hash in `src/lib/auth.ts` ships to every visitor, and a short password can be cracked offline from it. The password itself is not stored anywhere in the code. Real access control needs a backend that checks the password and owns the data. To change the password, generate a new record and replace `ADMIN_PASSWORD`:
+
+```bash
+ADMIN_PW='new password' node -e "const c=require('crypto');const s=c.randomBytes(16);console.log(JSON.stringify({salt:s.toString('base64'),iterations:210000,hash:c.pbkdf2Sync(process.env.ADMIN_PW,s,210000,32,'sha256').toString('base64')}))"
+```
+
 ## Languages
 
 Pick **English**, **Nederlands** or **Ελληνικά** in the side nav. The choice is remembered, and the first visit follows the browser language. Everything switches: labels, dates, weekday names, numbers, money, the sentences the roster rules write, and Astryx's own strings (date pickers, "Optional", "Required") through its `nl-NL` and `el-GR` catalogs.

@@ -79,7 +79,9 @@ export function TimeOffView() {
         )}
       </HStack>
 
-      {tab === 'requests' &&
+      {!isManager && !viewer && <EmptyState title={t('off.guestTitle')} description={t('off.guestDesc')} />}
+
+      {(isManager || viewer) && tab === 'requests' &&
         (requestRows.length === 0 ? (
           <EmptyState title={t('off.emptyTitle')} description={filter === 'pending' ? t('off.emptyPending') : t('off.emptyOther')} />
         ) : (
@@ -163,7 +165,7 @@ export function TimeOffView() {
           />
         ))}
 
-      {tab === 'balances' && (
+      {(isManager || viewer) && tab === 'balances' && (
         <Table<BalanceRow>
           data={balanceRows}
           idKey="id"
