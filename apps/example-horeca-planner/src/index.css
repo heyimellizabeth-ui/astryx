@@ -1,0 +1,15 @@
+/* Hallmark · checked: 2026-11-15 · genre: modern-minimal (inferred)
+ * built: the project · v2.0.0 */
+/* Hallmark · waive 26b · no :active or :disabled rule in this file, no aria-disabled in the markup · the Astryx components style their own pressed and disabled states from the library */
+/* Hallmark · waive 39b · clickable shift tokens measure 17px and add-shift icon buttons 20px · a week grid of nineteen people has to stay dense, so the project keeps compact Astryx tokens and icon buttons and relies on the cell spacing around them for touch */
+@import '@astryxdesign/core/reset.css';
+
+html,
+body {
+  overflow-x: clip;
+}
+
+a:focus-visible {
+  outline: var(--focus-outline-width) var(--focus-outline-style) var(--focus-outline-color);
+  outline-offset: var(--focus-outline-offset);
+}
