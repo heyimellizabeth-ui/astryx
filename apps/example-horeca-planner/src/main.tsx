@@ -1,0 +1,17 @@
+import {StrictMode} from 'react';
+import {createRoot} from 'react-dom/client';
+import {Theme} from '@astryxdesign/core/theme';
+import {themes, defaultThemeSlug} from './astryx-themes';
+import './index.css';
+import App from './App';
+
+const root = document.getElementById('root');
+if (!root) throw new Error('Missing #root element');
+
+createRoot(root).render(
+  <StrictMode>
+    <Theme theme={themes[defaultThemeSlug]}>
+      <App />
+    </Theme>
+  </StrictMode>,
+);
