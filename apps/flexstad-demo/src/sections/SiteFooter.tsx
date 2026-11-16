@@ -36,8 +36,8 @@ export function SiteFooter() {
           </Grid>
           <Divider />
           <Text type="supporting" color="secondary">
-            Onofficieel migratieprototype. Tekst en gegevens komen van de
-            openbare site flexstad.com.
+            Onofficieel migratieprototype op basis van de openbare site
+            flexstad.com. openbare site flexstad.com.
           </Text>
         </VStack>
       </footer>

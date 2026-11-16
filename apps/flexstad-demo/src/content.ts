@@ -1,6 +1,11 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
-/** Dutch copy for the prototype, taken from the public flexstad.com homepage. */
+/**
+ * Dutch copy for the prototype. Headings, button labels, audience titles,
+ * listing facts and the three FAQ entries are copied from the public
+ * flexstad.com homepage. The site has 14 FAQ entries; only these three were
+ * read verbatim, so the rest are left out instead of reworded.
+ */
 
 export type ListingStatus = 'available' | 'unavailable';
 
@@ -87,21 +92,15 @@ export interface FaqGroup {
   items: ReadonlyArray<{question: string; answer: string}>;
 }
 
-/** Shortened: the live site lists 14 questions in three groups. */
 export const FAQ: FaqGroup[] = [
   {
     id: 'zoekers',
     title: 'Ruimtezoekenden',
     items: [
       {
-        question: 'Hoe schrijf ik me in?',
+        question: 'Hoe kan ik mij inschrijven?',
         answer:
-          'Via de inschrijfpagina laat je weten welke ruimte je zoekt. Wij nemen contact met je op zodra er iets past.',
-      },
-      {
-        question: 'Voor hoe lang is een ruimte beschikbaar?',
-        answer:
-          'Tijdelijk en flexibel: de looptijd hangt af van het pand en de plannen van de eigenaar.',
+          'U kunt zich eenvoudig inschrijven via ons inschrijfformulier. Zodra er een ruimte beschikbaar komt die aansluit bij uw wensen, nemen wij contact met u op.',
       },
     ],
   },
@@ -112,12 +111,7 @@ export const FAQ: FaqGroup[] = [
       {
         question: 'Hoe helpt Flexstad bij leegstand?',
         answer:
-          'Wij activeren, beheren en exploiteren het pand met tijdelijke gebruikers, zodat het actief, veilig en van waarde blijft.',
-      },
-      {
-        question: 'Welke gebruikers komen in mijn pand?',
-        answer:
-          'Ondernemers, makers en maatschappelijke initiatieven, passend bij het pand.',
+          'Wij activeren leegstaand vastgoed door het tijdelijk beschikbaar te stellen aan zorgvuldig geselecteerde gebruikers. Zo blijft uw pand in gebruik, wordt het beter beveiligd en kan het rendement opleveren.',
       },
     ],
   },
@@ -126,8 +120,9 @@ export const FAQ: FaqGroup[] = [
     title: 'Algemeen',
     items: [
       {
-        question: 'In welke regio werkt Flexstad?',
-        answer: 'Op dit moment in Amsterdam, Alkmaar en Houten.',
+        question: 'In welke regio is Flexstad actief?',
+        answer:
+          'Flexstad is actief op meerdere locaties in Nederland. Ons aanbod wordt continu uitgebreid.',
       },
     ],
   },
