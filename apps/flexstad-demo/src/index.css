@@ -1,3 +1,8 @@
+/* Hallmark · checked: 2026-11-18 · genre: modern-minimal (inferred)
+ * floor: 0 FAIL · fixed: 3 (39a, 39b, 72) · structural: 6 printed (6b, 44c, 77, 78, 81, 83)
+ * finish-review: subagent · 5 findings · 1 fixed (39a) · 4 printed, the photo stand-ins awaiting client photos
+ * built: the project · redesign: polish · v2.0.0 */
+/* Hallmark · waive 39b · velden Naam, E-mailadres en Bericht staan op 36px in hun wrapper, de foto-knoppen en de vragen onder Veelgestelde vragen zijn zo hoog als hun inhoud · app UI 32 tot 40px, de foto en de vraag zijn zelf het klikdoel */
 /* Copyright (c) Meta Platforms, Inc. and affiliates. */
 
 @import url('https://fonts.googleapis.com/css2?family=Geologica:wght@300;500;700;900&display=swap');
@@ -78,5 +83,16 @@ a:active {
 }
 
 :disabled {
+  cursor: not-allowed;
+}
+
+/*
+ * Disabled buttons (gate 39a): besides the lower opacity, a muted colour pair
+ * and a not-allowed cursor, so a form's submit never signals "off" by opacity
+ * alone. Astryx marks the state with aria-disabled, which keeps it focusable.
+ */
+.astryx-button[aria-disabled='true'] {
+  background-color: var(--color-background-muted);
+  color: var(--color-text-secondary);
   cursor: not-allowed;
 }

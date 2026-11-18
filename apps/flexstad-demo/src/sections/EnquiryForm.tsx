@@ -50,6 +50,7 @@ export function EnquiryForm({listingName}: {listingName?: string}) {
           {isSent ? <NotConnectedNotice /> : null}
           <FormLayout>
             <TextInput
+              size="lg"
               label="Volledige naam"
               value={name}
               onChange={setName}
@@ -57,6 +58,7 @@ export function EnquiryForm({listingName}: {listingName?: string}) {
               htmlName="name"
             />
             <TextInput
+              size="lg"
               label="E-mailadres"
               type="email"
               value={email}
@@ -65,6 +67,7 @@ export function EnquiryForm({listingName}: {listingName?: string}) {
               htmlName="email"
             />
             <TextInput
+              size="lg"
               label="Telefoonnummer"
               type="tel"
               value={phone}
@@ -84,6 +87,7 @@ export function EnquiryForm({listingName}: {listingName?: string}) {
             </RadioList>
             {listingName ? (
               <TextInput
+                size="lg"
                 label="Ik reageer op"
                 value={listingName}
                 isReadOnly
@@ -91,6 +95,7 @@ export function EnquiryForm({listingName}: {listingName?: string}) {
               />
             ) : null}
             <Selector
+              size="lg"
               label="Mijn budget"
               options={BUDGETS}
               value={budget}
@@ -99,12 +104,14 @@ export function EnquiryForm({listingName}: {listingName?: string}) {
               htmlName="budget"
             />
             <DateInput
+              size="lg"
               label="Startdatum"
               value={start}
               onChange={setStart}
               isRequired
             />
             <DateInput
+              size="lg"
               label="Eventuele einddatum"
               value={end}
               onChange={setEnd}

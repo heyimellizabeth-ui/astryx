@@ -100,6 +100,7 @@ export function SignupForm() {
   return (
     <FormShell isValid={isValid} submitLabel="Inschrijven">
       <TextInput
+        size="lg"
         label="Voornaam"
         value={first}
         onChange={setFirst}
@@ -107,6 +108,7 @@ export function SignupForm() {
         htmlName="first-name"
       />
       <TextInput
+        size="lg"
         label="Achternaam"
         value={last}
         onChange={setLast}
@@ -114,6 +116,7 @@ export function SignupForm() {
         htmlName="last-name"
       />
       <TextInput
+        size="lg"
         label="E-mailadres"
         type="email"
         value={email}
@@ -122,6 +125,7 @@ export function SignupForm() {
         htmlName="email"
       />
       <TextInput
+        size="lg"
         label="Telefoonnummer"
         type="tel"
         value={phone}
@@ -130,6 +134,7 @@ export function SignupForm() {
         htmlName="phone"
       />
       <Selector
+        size="lg"
         label="Gewenste startdatum"
         options={toOptions(SIGNUP.starts)}
         value={start}
@@ -138,6 +143,7 @@ export function SignupForm() {
         htmlName="start"
       />
       <TextInput
+        size="lg"
         label="Gewenste regio / plaats"
         value={region}
         onChange={setRegion}
@@ -145,6 +151,7 @@ export function SignupForm() {
         htmlName="region"
       />
       <Selector
+        size="lg"
         label="Ik zoek"
         options={toOptions(SIGNUP.seeks)}
         value={seeks}
@@ -153,6 +160,7 @@ export function SignupForm() {
         htmlName="seeks"
       />
       <Selector
+        size="lg"
         label="Budget (per maand)"
         options={toOptions(SIGNUP.budgets)}
         value={budget}
@@ -161,6 +169,7 @@ export function SignupForm() {
         htmlName="budget"
       />
       <Selector
+        size="lg"
         label="Ik ben"
         options={toOptions(SIGNUP.who)}
         value={who}
@@ -170,6 +179,7 @@ export function SignupForm() {
       />
       {isParticulier ? (
         <Selector
+          size="lg"
           label="Aantal personen"
           options={toOptions(SIGNUP.persons)}
           value={persons}
@@ -181,6 +191,7 @@ export function SignupForm() {
       {isBusiness ? (
         <>
           <TextInput
+            size="lg"
             label="Bedrijfsnaam"
             value={company}
             onChange={setCompany}
@@ -188,6 +199,7 @@ export function SignupForm() {
             htmlName="company"
           />
           <TextInput
+            size="lg"
             label="Branche"
             value={sector}
             onChange={setSector}
@@ -195,6 +207,7 @@ export function SignupForm() {
             htmlName="sector"
           />
           <TextInput
+            size="lg"
             label="Aantal medewerkers"
             value={staff}
             onChange={setStaff}
@@ -225,6 +238,7 @@ export function ContactForm() {
   return (
     <FormShell isValid={isValid} submitLabel="Verstuur bericht">
       <TextInput
+        size="lg"
         label="Naam"
         value={name}
         onChange={setName}
@@ -232,6 +246,7 @@ export function ContactForm() {
         htmlName="name"
       />
       <TextInput
+        size="lg"
         label="Emailadres"
         type="email"
         value={email}
@@ -240,6 +255,7 @@ export function ContactForm() {
         htmlName="email"
       />
       <TextInput
+        size="lg"
         label="Onderwerp"
         value={subject}
         onChange={setSubject}
@@ -263,6 +279,7 @@ export function SubscribeForm() {
   return (
     <FormShell isValid={email.includes('@')} submitLabel="Aanmelden">
       <TextInput
+        size="lg"
         label="E-mailadres"
         type="email"
         value={email}
