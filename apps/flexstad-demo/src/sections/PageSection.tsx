@@ -3,6 +3,7 @@
 import * as stylex from '@stylexjs/stylex';
 import type {ReactNode} from 'react';
 import {Section} from '@astryxdesign/core/Section';
+import {bandStyles} from './bandStyles';
 
 const styles = stylex.create({
   centered: {
@@ -10,9 +11,8 @@ const styles = stylex.create({
     marginInlineEnd: 'auto',
     width: '100%',
   },
-  wash: {
-    backgroundColor: 'var(--color-background-body)',
-  },
+  wash: {backgroundColor: 'var(--color-background-body)'},
+  band: {backgroundColor: 'var(--flex-band)'},
 });
 
 interface PageSectionProps {
@@ -20,6 +20,10 @@ interface PageSectionProps {
   variant?: 'section' | 'transparent' | 'muted';
   /** Paints the theme's page wash (lavender) behind the band. */
   isWashed?: boolean;
+  /** Paints the dark aubergine band and flips text tokens to light. */
+  isBand?: boolean;
+  paddingBlock?: 6 | 8 | 10;
+  maxWidth?: number;
   children: ReactNode;
 }
 
@@ -28,16 +32,25 @@ export function PageSection({
   id,
   variant = 'transparent',
   isWashed = false,
+  isBand = false,
+  paddingBlock = 10,
+  maxWidth = 1200,
   children,
 }: PageSectionProps) {
   return (
     <Section
       variant={variant}
       padding={0}
-      paddingBlock={10}
+      paddingBlock={paddingBlock}
       paddingInline={4}
-      xstyle={isWashed ? styles.wash : undefined}>
-      <div id={id} {...stylex.props(styles.centered)} style={{maxWidth: 1200}}>
+      xstyle={
+        isBand
+          ? [styles.band, bandStyles.onBand]
+          : isWashed
+            ? styles.wash
+            : undefined
+      }>
+      <div id={id} {...stylex.props(styles.centered)} style={{maxWidth}}>
         {children}
       </div>
     </Section>

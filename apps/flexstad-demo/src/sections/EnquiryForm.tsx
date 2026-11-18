@@ -17,7 +17,11 @@ import {PageSection} from './PageSection';
 type Use = 'wonen' | 'werken' | '';
 type IsoDate = ComponentProps<typeof DateInput>['value'];
 
-export function EnquiryForm() {
+/**
+ * "Reageren" form on a listing page. Field labels and order match the live
+ * form. Nothing is sent: submitting only shows the success message.
+ */
+export function EnquiryForm({listingName}: {listingName?: string}) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -28,8 +32,7 @@ export function EnquiryForm() {
   const [notes, setNotes] = useState('');
   const [isSent, setIsSent] = useState(false);
 
-  const isInvalid =
-    name.trim() === '' || email.trim() === '' || use === '' || !start;
+  const isInvalid = use === '' || !start;
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -39,7 +42,7 @@ export function EnquiryForm() {
   }
 
   return (
-    <PageSection id="reageren">
+    <PageSection id="reageren" maxWidth={720}>
       <form onSubmit={handleSubmit} noValidate>
         <VStack gap={6}>
           <Heading level={2}>Reageren</Heading>
@@ -56,7 +59,7 @@ export function EnquiryForm() {
               label="Volledige naam"
               value={name}
               onChange={setName}
-              isRequired
+              isOptional
               htmlName="name"
             />
             <TextInput
@@ -64,7 +67,7 @@ export function EnquiryForm() {
               type="email"
               value={email}
               onChange={setEmail}
-              isRequired
+              isOptional
               htmlName="email"
             />
             <TextInput
@@ -85,8 +88,16 @@ export function EnquiryForm() {
               <RadioListItem value="wonen" label="Wonen" />
               <RadioListItem value="werken" label="Werken" />
             </RadioList>
+            {listingName ? (
+              <TextInput
+                label="Ik reageer op"
+                value={listingName}
+                isReadOnly
+                htmlName="listing"
+              />
+            ) : null}
             <Selector
-              label="Mijn budget per maand"
+              label="Mijn budget"
               options={BUDGETS}
               value={budget}
               onChange={setBudget}

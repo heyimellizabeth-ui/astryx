@@ -6,3 +6,24 @@
 :root {
   --stylex-injection: 0;
 }
+
+/* Dark aubergine band used by the closing call-to-action and tinted panels. */
+:root {
+  --flex-band: oklch(0.314 0.097 312.6);
+  --flex-on-band: oklch(0.97 0.01 300);
+  --flex-on-band-muted: oklch(0.85 0.03 300);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --flex-band: oklch(0.17 0.05 310);
+  }
+}
+
+/* Long Dutch compounds must wrap instead of widening the page on phones. */
+h1,
+h2,
+h3 {
+  overflow-wrap: break-word;
+  hyphens: manual;
+}

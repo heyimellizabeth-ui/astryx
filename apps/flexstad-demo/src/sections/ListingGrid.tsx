@@ -1,66 +1,20 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 import * as stylex from '@stylexjs/stylex';
-import {AspectRatio} from '@astryxdesign/core/AspectRatio';
-import {Badge} from '@astryxdesign/core/Badge';
 import {Button} from '@astryxdesign/core/Button';
-import {ClickableCard} from '@astryxdesign/core/ClickableCard';
-import {Grid} from '@astryxdesign/core/Grid';
+import {Carousel} from '@astryxdesign/core/Carousel';
 import {Heading} from '@astryxdesign/core/Heading';
 import {HStack, VStack} from '@astryxdesign/core/Layout';
-import {MetadataList, MetadataListItem} from '@astryxdesign/core/MetadataList';
-import {Text} from '@astryxdesign/core/Text';
 import {Token} from '@astryxdesign/core/Token';
-import {LISTINGS, TAGS, type Listing} from '../content';
+import {LISTINGS, TAGS} from '../content';
+import {ListingCard} from './ListingCard';
 import {PageSection} from './PageSection';
 
 const styles = stylex.create({
-  imagePlaceholder: {
-    width: '100%',
-    height: '100%',
-    backgroundImage:
-      'linear-gradient(135deg, var(--color-accent), var(--color-background-muted))',
-  },
+  slide: {width: 300, flexShrink: 0, display: 'flex', alignSelf: 'stretch'},
 });
 
-function ListingCard({listing}: {listing: Listing}) {
-  const isAvailable = listing.status === 'available';
-  return (
-    <ClickableCard
-      label={`${listing.name}, ${listing.city}`}
-      href={`/aanbod/${listing.slug}/`}
-      padding={0}
-      elevation="low">
-      <VStack gap={0}>
-        <AspectRatio ratio={4 / 3}>
-          <div {...stylex.props(styles.imagePlaceholder)} />
-        </AspectRatio>
-        <VStack gap={3} padding={4}>
-          <VStack gap={2} align="start">
-            <Badge
-              variant={isAvailable ? 'success' : 'neutral'}
-              label={isAvailable ? 'Beschikbaar' : 'Niet beschikbaar'}
-            />
-            <VStack gap={0.5}>
-              <Heading level={3}>{listing.name}</Heading>
-              <Text type="supporting" color="secondary">
-                {listing.city}
-              </Text>
-            </VStack>
-          </VStack>
-          <MetadataList>
-            {listing.facts.map(fact => (
-              <MetadataListItem key={fact.label} label={fact.label}>
-                {fact.value}
-              </MetadataListItem>
-            ))}
-          </MetadataList>
-        </VStack>
-      </VStack>
-    </ClickableCard>
-  );
-}
-
+/** Homepage listings as a snap carousel (the full grid lives on /aanbod/). */
 export function ListingGrid() {
   return (
     <PageSection>
@@ -76,11 +30,13 @@ export function ListingGrid() {
           </VStack>
           <Button label="Bekijk alles" variant="ghost" href="/aanbod/" />
         </HStack>
-        <Grid columns={{minWidth: 260, repeat: 'fill'}} gap={4}>
+        <Carousel gap={4} hasButtons hasSnap>
           {LISTINGS.map(listing => (
-            <ListingCard key={listing.slug} listing={listing} />
+            <div key={listing.slug} {...stylex.props(styles.slide)}>
+              <ListingCard listing={listing} />
+            </div>
           ))}
-        </Grid>
+        </Carousel>
       </VStack>
     </PageSection>
   );
