@@ -71,16 +71,13 @@ export function Audience({slug}: {slug: string}) {
         ]}
         ctas={[page.cta]}
         isAsidePhoto={photo !== undefined}
-        aside={photo ? <PhotoImage photo={photo} isFilled /> : undefined}
+        aside={
+          photo ? <PhotoImage photo={photo} isFilled isPriority /> : undefined
+        }
       />
       <PageSection>
         <LeadIntro paragraphs={page.intro} isPlate={photo === undefined} />
       </PageSection>
-      {page.bullets ? (
-        <PageSection isWashed>
-          <RowsSection title={page.bulletsTitle ?? ''} items={page.bullets} />
-        </PageSection>
-      ) : null}
       {page.sections ? (
         <PageSection>
           <Grid
@@ -96,6 +93,11 @@ export function Audience({slug}: {slug: string}) {
               </div>
             ))}
           </Grid>
+        </PageSection>
+      ) : null}
+      {page.bullets ? (
+        <PageSection isWashed>
+          <RowsSection title={page.bulletsTitle ?? ''} items={page.bullets} />
         </PageSection>
       ) : null}
       {page.closing ? (
