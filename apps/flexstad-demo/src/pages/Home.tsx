@@ -46,6 +46,17 @@ const styles = stylex.create({
     },
     minHeight: {default: 0, '@media (min-width: 900px)': 320},
     maxHeight: {default: 'none', '@media (min-width: 900px)': 760},
+    // A light aubergine tint cools the lit canal toward the brand; no text
+    // sits on the photograph, so this is colour only.
+    '::after': {
+      content: '""',
+      position: 'absolute',
+      inset: 0,
+      backgroundColor: 'var(--flex-band)',
+      opacity: 0.22,
+      mixBlendMode: 'multiply',
+      pointerEvents: 'none',
+    },
   },
   heroInner: {
     boxSizing: 'border-box',
@@ -61,6 +72,8 @@ const styles = stylex.create({
     columnGap: 40,
     rowGap: 20,
   },
+  // The question and its answer break onto their own lines.
+  headLine: {display: 'block'},
   heroLine: {maxWidth: '46ch'},
   split: {
     display: 'grid',
@@ -172,10 +185,19 @@ export function Home() {
           <Reveal>
             <VStack gap={5} align="start">
               <Heading level={1} type="display-1">
-                Leegstaand vastgoed? Wij activeren, beheren en exploiteren
+                <span {...stylex.props(styles.headLine)}>
+                  Leegstaand vastgoed?
+                </span>{' '}
+                <span {...stylex.props(styles.headLine)}>
+                  Wij activeren, beheren en exploiteren
+                </span>
               </Heading>
               <div {...stylex.props(styles.heroFoot)}>
-                <Text type="large" color="secondary" xstyle={styles.heroLine}>
+                <Text
+                  type="large"
+                  weight="normal"
+                  color="secondary"
+                  xstyle={styles.heroLine}>
                   {HOME_COPY.hero}
                 </Text>
                 <HStack gap={3} wrap="wrap">

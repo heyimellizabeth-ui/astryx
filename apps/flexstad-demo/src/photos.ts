@@ -23,8 +23,8 @@ export const PHOTOS: Record<string, Photo> = {
     width: 1920,
     height: 1280,
     alt: 'Verlichte stenen bruggen over een Amsterdamse gracht in de schemering, met grachtenpanden op de achtergrond',
-    objectPosition: '50% 55%',
-    credit: 'Massimo Catarinella, CC BY-SA 3.0',
+    objectPosition: '50% 82%',
+    credit: 'Massimo Catarinella, CC BY-SA 3.0, bijgesneden en getint',
     licence: 'CC BY-SA 3.0',
     sourceUrl:
       'https://commons.wikimedia.org/wiki/File:KeizersgrachtReguliersgrachtAmsterdam.jpg',
