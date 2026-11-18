@@ -6,7 +6,7 @@ import {Heading} from '@astryxdesign/core/Heading';
 import {Link} from '@astryxdesign/core/Link';
 import {Text} from '@astryxdesign/core/Text';
 import {VStack} from '@astryxdesign/core/Layout';
-import {CONTACT, NAV_ABOUT, NAV_FOR_WHO} from '../content';
+import {CONTACT, HOME_COPY, NAV_ABOUT, NAV_FOR_WHO} from '../content';
 import {PageSection} from './PageSection';
 
 const styles = stylex.create({
@@ -38,9 +38,7 @@ export function SiteFooter() {
             <Text size="3xl" weight="bold">
               Flexstad
             </Text>
-            <Text color="secondary">
-              Flexstad houdt leegstand actief, veilig en van waarde.
-            </Text>
+            <Text color="secondary">{HOME_COPY.footerLine}</Text>
           </VStack>
           <div>
             <div {...stylex.props(styles.row)}>
@@ -70,9 +68,14 @@ export function SiteFooter() {
               </div>
             </div>
             <div {...stylex.props(styles.row)}>
+              <Heading level={3}>Kantoor</Heading>
+              <Text color="secondary">
+                {CONTACT.address}. {CONTACT.kvk}.
+              </Text>
+            </div>
+            <div {...stylex.props(styles.row)}>
               <Heading level={3}>Contact</Heading>
               <Text color="secondary">
-                {CONTACT.address}.{' '}
                 <Link href={CONTACT.phoneHref}>{CONTACT.phone}</Link>,{' '}
                 <Link href={`mailto:${CONTACT.email}`}>{CONTACT.email}</Link>,{' '}
                 <Link href={CONTACT.linkedin} isExternalLink>
@@ -85,7 +88,7 @@ export function SiteFooter() {
           <Divider />
           <Text type="supporting" color="secondary">
             Onofficiële herbouw van de openbare site flexstad.com met Astryx.
-            Foto’s zijn plaatshouders.
+            Foto’s zijn plaatshouders. {HOME_COPY.copyright}
           </Text>
         </VStack>
       </footer>

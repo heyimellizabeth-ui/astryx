@@ -6,7 +6,7 @@ import {ClickableCard} from '@astryxdesign/core/ClickableCard';
 import {Heading} from '@astryxdesign/core/Heading';
 import {HStack, VStack} from '@astryxdesign/core/Layout';
 import {Text} from '@astryxdesign/core/Text';
-import {ABOUT, AUDIENCES, AUDIENCE_PAGES} from '../content';
+import {ABOUT, AUDIENCES, AUDIENCE_PAGES, HOME_COPY} from '../content';
 import {bandStyles} from '../sections/bandStyles';
 import {Faq} from '../sections/Faq';
 import {ListingGrid} from '../sections/ListingGrid';
@@ -31,6 +31,16 @@ const styles = stylex.create({
     minHeight: 'clamp(280px, 34dvh, 360px)',
     marginInline: 'auto',
     paddingBlock: 'clamp(24px, 3dvh, 40px)',
+  },
+  heroLine: {maxWidth: '60ch'},
+  split: {
+    display: 'grid',
+    gap: 24,
+    alignItems: 'start',
+    gridTemplateColumns: {
+      default: 'minmax(0, 1fr)',
+      '@media (min-width: 900px)': 'minmax(0, 5fr) minmax(0, 7fr)',
+    },
   },
   // The statement and the 2.000+ figure share one row, so the whole figure
   // sits on the first screen; the reasons follow as rows below it.
@@ -134,6 +144,9 @@ export function Home() {
               <Heading level={1} type="display-1">
                 Leegstaand vastgoed? Wij activeren, beheren en exploiteren
               </Heading>
+              <Text type="large" color="secondary" xstyle={styles.heroLine}>
+                {HOME_COPY.hero}
+              </Text>
               <HStack gap={3} wrap="wrap">
                 <Button
                   label="Bekijk ons aanbod"
@@ -179,6 +192,10 @@ export function Home() {
       <PageSection isWashed>
         <VStack gap={6}>
           <Heading level={2}>Voor wie</Heading>
+          <div {...stylex.props(styles.split)}>
+            <Heading level={3}>{HOME_COPY.discoverTitle}</Heading>
+            <Text color="secondary">{HOME_COPY.discover}</Text>
+          </div>
           <div {...stylex.props(styles.bento)}>
             {AUDIENCES.map((audience, index) => {
               const tile = TILES[index];
@@ -236,8 +253,21 @@ export function Home() {
 
       <ListingGrid />
 
+      <PageSection>
+        <div {...stylex.props(styles.split)}>
+          <Heading level={2}>{HOME_COPY.valueTitle}</Heading>
+          <VStack gap={4}>
+            {HOME_COPY.value.map(text => (
+              <Text key={text} color="secondary">
+                {text}
+              </Text>
+            ))}
+          </VStack>
+        </div>
+      </PageSection>
+
       <Faq />
-      <CtaBand />
+      <CtaBand body={HOME_COPY.interest} />
     </>
   );
 }

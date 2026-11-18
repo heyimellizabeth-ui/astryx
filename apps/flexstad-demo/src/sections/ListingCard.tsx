@@ -14,6 +14,8 @@ const styles = stylex.create({
   fill: {flexGrow: 1},
   // Room for three fact rows, so a card with fewer facts is as tall as the rest.
   facts: {minHeight: '5.5rem'},
+  // Room for the two feature lines the live cards carry.
+  features: {minHeight: '3rem'},
   media: {aspectRatio: '4 / 3'},
 });
 
@@ -55,6 +57,13 @@ export function ListingCard({listing}: {listing: Listing}) {
                 </MetadataListItem>
               ))}
             </MetadataList>
+          </div>
+          <div {...stylex.props(styles.features)}>
+            {(listing.features ?? []).map(line => (
+              <Text key={line} as="p" type="supporting" color="secondary">
+                {line}
+              </Text>
+            ))}
           </div>
         </VStack>
       </VStack>

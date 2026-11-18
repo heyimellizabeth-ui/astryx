@@ -10,6 +10,8 @@ export type ListingStatus = 'available' | 'soon' | 'unavailable';
 
 export interface Listing {
   slug: string;
+  /** Feature lines the live homepage cards carry under the facts. */
+  features?: ReadonlyArray<string>;
   name: string;
   city: string;
   status: ListingStatus;
@@ -45,6 +47,7 @@ export const TAGS = ['Tijdelijk', 'Flexibel', 'Betaalbaar'] as const;
 export const LISTINGS: Listing[] = [
   {
     slug: 'roemer-visscherstraat',
+    features: ['Meerdere units beschikbaar'],
     name: 'Roemer Visscherstraat',
     city: 'Amsterdam',
     status: 'available',
@@ -56,6 +59,7 @@ export const LISTINGS: Listing[] = [
   },
   {
     slug: 'de-molen',
+    features: ['Meerdere units beschikbaar', 'Volledige invulling mogelijk'],
     name: 'De Molen',
     city: 'Houten',
     status: 'available',
@@ -91,6 +95,7 @@ export const CONTACT = {
   email: 'info@flexstad.com',
   linkedin: 'https://www.linkedin.com/company/flexstad-com',
   address: 'Winkelwaard 494, 1824 HX Alkmaar',
+  kvk: 'KVK: 97494828',
 } as const;
 
 export interface FaqGroup {
@@ -579,3 +584,21 @@ export const SIGNUP = {
   who: ['Particulier', "ZZP'er", 'Bedrijf'],
   persons: ['1', '2', '3', '4+'],
 };
+
+/** Homepage texts from the live flexstad.com, kept word for word. */
+export const HOME_COPY = {
+  hero: 'Flexstad activeert leegstaand vastgoed met flexibele invulling door ondernemers, makers en maatschappelijke initiatieven.',
+  discoverTitle: 'Ontdek kansen met Flexstad',
+  discover:
+    'Flexstad signaleert, activeert en beheert leegstaand vastgoed met oog voor veiligheid, rendement en maatschappelijke waarde. Door professioneel beheer, tijdelijke invulling en flexibele overeenkomsten, blijft vastgoed veilig en in gebruik. Dat levert niet alleen direct rendement, maar ontzorgt eigenaren, biedt kansen voor ontwikkelaars en creëert maatschappelijke meerwaarde voor locaties én hun omgeving.',
+  valueTitle: 'Van leegstand naar meerwaarde',
+  value: [
+    'Flexstad is de ondernemende leegstandsbeheerder die vastgoed actief, veilig en van waarde houdt. Wij verbinden vastgoedeigenaren, ondernemers, gemeenten en projectontwikkelaars.',
+    'Met tijdelijke invulling zorgen wij dat panden niet stil komen te staan. Ondernemers en maatschappelijke initiatieven krijgen ruimte om te groeien, eigenaren beperken risico’s en gemeenten krijgen oplossingen voor actuele huisvestingsvraagstukken.',
+  ],
+  interest:
+    'Benieuwd wat Flexstad voor uw pand, locatie of ruimtebehoefte kan betekenen? Wij denken graag mee over tijdelijke invulling, beheer en ontwikkelkansen.',
+  footerLine:
+    'Flexstad houdt leegstaand vastgoed actief, veilig en van waarde.',
+  copyright: 'Copyright © 2026 Flexstad',
+} as const;
