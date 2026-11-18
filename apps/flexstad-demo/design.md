@@ -29,14 +29,14 @@ The locked system. Every Hallmark run reads this first and pages share it. Chang
 }
 ```
 
-Dark mode values sit beside each colour in `flexstadTheme.ts` (paper L 0.17, surface 0.21, muted 0.25, all chroma 0.012 to 0.016 at hue 310). The paper moved from a blue lavender (L 0.953, hue 280) to a lighter, warmer one; neutrals are one family tinted toward it. Orange is no longer used for the `2.000+` figure (it is ink); the orange audience tile on `/` is still to be recomposed.
+Dark mode values sit beside each colour in `flexstadTheme.ts` (paper L 0.17, surface 0.21, muted 0.25, all chroma 0.012 to 0.016 at hue 310). The paper moved from a blue lavender (L 0.953, hue 280) to a lighter, warmer one; neutrals are one family tinted toward it. Orange is no longer used for the `2.000+` figure (it is ink); the audience tiles on `/` are aubergine, muted or surface, never orange.
 
 ## Type scale
 
 Geologica, base 17px, ratio 1.25, headings bold, one colour.
 
 - Home head, `display-1`: clamp(38px, 11px + 3.95vw, 72px), 68px at 1440, leading 1.08 (two lines at 1200px; the photograph carries the screen)
-- Inner page head, `display-2`: clamp(36px, 14px + 3.5vw, 68px), 64px at 1440, leading 1.1
+- Inner page head, `display-2`: clamp(28px, 14px + 3.5vw, 68px), 64px at 1440, leading 1.1
 - **Section head, `h2` (`--text-heading-2-size`): clamp(30px, 16px + 1.95vw, 48px), 44px at 1440, leading 1.15**
 - Item title `h3`, body 17px, labels one step down, sentence case, untracked
 
@@ -58,7 +58,9 @@ Geologica, base 17px, ratio 1.25, headings bold, one colour.
 - Ratios: `wide` 21/9 across, `landscape` 3/2, `portrait` 4/5 beside text, `square` 1/1 in pairs (`PHOTO_RATIOS`). The hero fills a box sized by flex, so layout never waits for the image (CLS 0).
 - Treatment on every photograph: `saturate(0.94)`, and `brightness(0.9)` in dark mode. Photographs take at most a third of the page below the hero and never lead two sections in a row.
 - **Overlay rule: text on a photograph sits on a solid plate of `--flex-band` with `bandStyles.onBand` (aubergine, light text), 8px radius inside a 16px frame, never on a scrim or the bare image.** Contrast is then a colour pair: 12.4:1 (muted line 8.5:1) in light, 17.7:1 (12.1:1) in dark, the same over every pixel. The hero carries no text on its photograph.
-- Remaining stand-ins: gradient slots stay labelled "Foto volgt" where no photograph fits (the 81 waiver in `index.css`); the listing detail gallery keeps its four labelled slots until the client supplies photos. Listing cards and audience tiles are rebuilt in later phases.
+- Photographs in use: `heroCanal` (hero), `ownersEntrance` and `makersAtticStudio` (the two wide audience tiles on `/`). Municipalities have no photograph and `developersShell` is too weak a mood to pass the deletion test, so those two audience tiles are type-led. The footer credits exactly these three (`USED_PHOTOS`, `PHOTO_CREDITS_LINE`, `data-credits`).
+- Listing cards are type-led: no picture, no gradient; the street name is the largest thing on the card (24 to 30px), then the city, status, facts and feature lines. Four across from 1100px, a snap rail below.
+- Remaining stand-ins (stated once, the 81 waiver in `index.css`): the four gallery slots on each listing detail and the team slot on `/over-ons/` stay labelled "Foto volgt" until the client supplies photographs.
 
 ## Motion
 

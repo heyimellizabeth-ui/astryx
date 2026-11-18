@@ -99,6 +99,8 @@ const styles = stylex.create({
       '@media (min-width: 900px)': '"head stat" "story stat"',
     },
   },
+  // Air between the photograph's headline block and the statement.
+  introLead: {paddingTop: 24},
   introHead: {gridArea: 'head'},
   introStat: {gridArea: 'stat'},
   introStory: {gridArea: 'story', maxWidth: '65ch'},
@@ -238,8 +240,8 @@ export function Home() {
         </div>
       </section>
 
-      <PageSection id="intro" paddingBlock={8}>
-        <VStack gap={10}>
+      <PageSection id="intro" paddingBlock={10}>
+        <VStack gap={10} xstyle={styles.introLead}>
           <div {...stylex.props(styles.intro)}>
             <div {...stylex.props(styles.introHead)}>
               <Heading level={2}>{ABOUT.heading}</Heading>

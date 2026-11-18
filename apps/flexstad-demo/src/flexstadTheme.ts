@@ -52,7 +52,7 @@ export const flexstadTheme = defineTheme({
     //                                set one notch above the inner pages
     '--text-heading-2-size': 'clamp(30px, 16px + 1.95vw, 48px)',
     '--text-heading-2-leading': '1.15',
-    '--text-display-2-size': 'clamp(36px, 14px + 3.5vw, 68px)',
+    '--text-display-2-size': 'clamp(28px, 14px + 3.5vw, 68px)',
     '--text-display-2-leading': '1.1',
     '--text-display-1-size': 'clamp(38px, 11px + 3.95vw, 72px)',
     '--text-display-1-leading': '1.08',
