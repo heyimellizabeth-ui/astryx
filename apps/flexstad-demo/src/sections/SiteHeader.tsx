@@ -1,12 +1,12 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 import {useState} from 'react';
+import * as stylex from '@stylexjs/stylex';
 import {Button} from '@astryxdesign/core/Button';
 import {Icon} from '@astryxdesign/core/Icon';
 import {IconButton} from '@astryxdesign/core/IconButton';
 import {HStack, VStack} from '@astryxdesign/core/Layout';
 import {MobileNav} from '@astryxdesign/core/MobileNav';
-import {Heading} from '@astryxdesign/core/Heading';
 import {Link} from '@astryxdesign/core/Link';
 import {Text} from '@astryxdesign/core/Text';
 import {
@@ -18,6 +18,19 @@ import {
 import {useIsNarrow} from '../hooks';
 import {usePath} from '../router';
 import {NAV_ABOUT, NAV_FOR_WHO} from '../content';
+
+const styles = stylex.create({
+  // Three-part bar on the content column: the wordmark starts where the page
+  // content starts and the action ends where it ends (one left axis).
+  bar: {
+    boxSizing: 'border-box',
+    width: 'min(100% - 32px, 1200px)',
+    minHeight: 72,
+    marginInline: 'auto',
+    paddingInline: 0,
+  },
+  wordmark: {paddingInlineStart: 0},
+});
 
 function PortalIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -39,8 +52,15 @@ function DesktopHeader() {
   return (
     <TopNav
       label="Hoofdnavigatie"
-      heading={<TopNavHeading heading="Flexstad" headingHref="/" />}
-      startContent={
+      xstyle={styles.bar}
+      heading={
+        <TopNavHeading
+          heading="Flexstad"
+          headingHref="/"
+          xstyle={styles.wordmark}
+        />
+      }
+      centerContent={
         <>
           <TopNavItem
             label="Aanbod"
@@ -98,7 +118,9 @@ function PhoneHeader() {
         paddingBlock={2}
         gap={2}>
         <Link href="/" hasUnderline={false}>
-          <Heading level={2}>Flexstad</Heading>
+          <Text type="large" weight="bold">
+            Flexstad
+          </Text>
         </Link>
         <HStack gap={2} align="center">
           <Button label="Inschrijven" variant="primary" href="/inschrijven/" />
@@ -115,7 +137,11 @@ function PhoneHeader() {
         onOpenChange={setIsOpen}
         label="Menu"
         side="end"
-        header={<Heading level={2}>Flexstad</Heading>}>
+        header={
+          <Text type="large" weight="bold">
+            Flexstad
+          </Text>
+        }>
         <VStack
           gap={5}
           padding={4}

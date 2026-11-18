@@ -8,18 +8,18 @@ import {Text} from '@astryxdesign/core/Text';
 import {ABOUT} from '../content';
 import {bandStyles} from '../sections/bandStyles';
 import {PageSection} from '../sections/PageSection';
-import {BulletList, CtaBand, PageHero, Paragraphs} from '../sections/ui';
+import {CtaBand, PageHero, Photo, RowsSection} from '../sections/ui';
 
 const styles = stylex.create({
-  // The whole story sits in one reading measure under the tagline.
-  measure: {maxWidth: '65ch'},
+  // The statement is a text object at the section token, ten columns wide.
+  statement: {maxWidth: '22em'},
   panel: {
-    padding: 28,
+    padding: 32,
     borderRadius: 'var(--radius-container)',
     backgroundColor: 'var(--color-background-muted)',
   },
   band: {
-    padding: 28,
+    padding: 32,
     borderRadius: 'var(--radius-container)',
     backgroundColor: 'var(--flex-band)',
   },
@@ -31,17 +31,22 @@ export function OverOns() {
       <PageHero
         title="Over Flexstad"
         trail={[{title: 'Home', href: '/'}, {title: 'Over ons'}]}
-        photoLabel="Het Flexstad-team"
-        seed={3}
       />
+      <PageSection isWashed paddingBlock={6}>
+        <Photo label="Het Flexstad-team" seed={3} ratio="21 / 8" />
+      </PageSection>
       <PageSection paddingBlock={10}>
         <VStack gap={8}>
-          <Heading level={2} type="display-1">
-            {ABOUT.heading}
-          </Heading>
-          <div {...stylex.props(styles.measure)}>
-            <Paragraphs items={ABOUT.story} />
+          <div {...stylex.props(styles.statement)}>
+            <Heading level={2}>{ABOUT.heading}</Heading>
           </div>
+          <Grid columns={{minWidth: 280, repeat: 'fit'}} gap={8} align="start">
+            {ABOUT.story.map(text => (
+              <Text key={text} color="secondary">
+                {text}
+              </Text>
+            ))}
+          </Grid>
         </VStack>
       </PageSection>
       <PageSection isWashed>
@@ -61,13 +66,7 @@ export function OverOns() {
         </Grid>
       </PageSection>
       <PageSection>
-        <Grid columns={{minWidth: 280, repeat: 'fit'}} gap={8} align="start">
-          <Heading level={2}>{ABOUT.reasonsTitle}</Heading>
-          <Grid columns={{minWidth: 220, repeat: 'fit'}} gap={6}>
-            <BulletList items={ABOUT.reasons.slice(0, 3)} />
-            <BulletList items={ABOUT.reasons.slice(3)} />
-          </Grid>
-        </Grid>
+        <RowsSection title={ABOUT.reasonsTitle} items={ABOUT.reasons} />
       </PageSection>
       <CtaBand title={ABOUT.meetTitle} body={ABOUT.meet} />
     </>

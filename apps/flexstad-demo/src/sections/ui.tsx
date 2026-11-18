@@ -37,19 +37,49 @@ const styles = stylex.create({
     lineHeight: 1.6,
   },
   prose: {maxWidth: '65ch'},
-  heroGrid: {
+  rows: {
+    margin: 0,
+    padding: 0,
+    listStyleType: 'none',
+    borderTopWidth: 1,
+    borderTopStyle: 'solid',
+    borderTopColor: 'var(--color-border-emphasized)',
+  },
+  row: {
+    paddingBlock: 16,
+    borderBottomWidth: 1,
+    borderBottomStyle: 'solid',
+    borderBottomColor: 'var(--color-border-emphasized)',
+  },
+  rowsLayout: {
     display: 'grid',
-    gap: 48,
-    alignItems: 'center',
+    gap: 24,
+    alignItems: 'start',
     gridTemplateColumns: {
-      default: '1fr',
-      '@media (min-width: 900px)': '1.5fr 1fr',
+      default: 'minmax(0, 1fr)',
+      '@media (min-width: 900px)': 'minmax(0, 5fr) minmax(0, 7fr)',
     },
   },
+  bandTop: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    gap: 32,
+  },
+  bandLinks: {
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopStyle: 'solid',
+    borderTopColor: 'color-mix(in oklch, var(--flex-on-band) 28%, transparent)',
+  },
+  measure: {maxWidth: '55ch'},
+  prose2: {maxWidth: '65ch'},
   photo: {
     borderRadius: 'var(--radius-container)',
     overflow: 'hidden',
   },
+  photoFill: {display: 'flex', height: '100%'},
 });
 
 /** Reveals content once on load; static under reduced motion. */
@@ -84,13 +114,17 @@ export function Photo({
   label,
   seed,
   ratio,
+  isFilled = false,
 }: {
   label: string;
   seed?: number;
   ratio?: string;
+  /** Stretch to the height of the cell the slot sits in. */
+  isFilled?: boolean;
 }) {
   return (
-    <div {...stylex.props(styles.photo)}>
+    <div
+      {...stylex.props(styles.photo, isFilled ? styles.photoFill : undefined)}>
       <Placeholder label={label} seed={seed} ratio={ratio} />
     </div>
   );
@@ -120,59 +154,78 @@ interface PageHeroProps {
   title: string;
   intro?: string;
   ctas?: ReadonlyArray<Cta>;
-  photoLabel?: string;
-  seed?: number;
-  /** Larger display headline for the homepage. */
-  isHome?: boolean;
 }
 
-/** Asymmetric split: text left, tall photo slot right. Collapses on phones. */
-export function PageHero({
-  trail,
-  title,
-  intro,
-  ctas,
-  photoLabel,
-  seed = 0,
-  isHome = false,
-}: PageHeroProps) {
+/**
+ * Inner-page hero, Banner posture: trail, the head at the display token, an
+ * optional line and the actions, set across the content column. No picture
+ * slot; pages that wait for photographs carry one as their first section.
+ */
+export function PageHero({trail, title, intro, ctas}: PageHeroProps) {
   return (
-    <PageSection isWashed paddingBlock={isHome ? 10 : 8}>
-      <VStack gap={5}>
+    <PageSection isWashed paddingBlock={8}>
+      <VStack gap={5} align="start">
         {trail ? <Crumbs trail={trail} /> : null}
-        <div {...stylex.props(photoLabel ? styles.heroGrid : undefined)}>
-          <Reveal>
-            <VStack gap={5} align="start">
-              <Heading level={1} type="display-2">
-                {title}
-              </Heading>
-              {intro ? (
-                <Text type="supporting" color="secondary">
-                  {intro}
-                </Text>
-              ) : null}
-              {ctas && ctas.length > 0 ? (
-                <HStack gap={3} wrap="wrap">
-                  {ctas.map((cta, index) => (
-                    <Button
-                      key={cta.label}
-                      label={cta.label}
-                      href={cta.href}
-                      size="lg"
-                      variant={index === 0 ? 'primary' : 'secondary'}
-                    />
-                  ))}
-                </HStack>
-              ) : null}
-            </VStack>
-          </Reveal>
-          {photoLabel ? (
-            <Photo label={photoLabel} seed={seed} ratio="4 / 5" />
-          ) : null}
-        </div>
+        <Reveal>
+          <VStack gap={5} align="start">
+            <Heading level={1} type="display-2">
+              {title}
+            </Heading>
+            {intro ? (
+              <Text type="supporting" color="secondary" xstyle={styles.prose2}>
+                {intro}
+              </Text>
+            ) : null}
+            {ctas && ctas.length > 0 ? (
+              <HStack gap={3} wrap="wrap">
+                {ctas.map((cta, index) => (
+                  <Button
+                    key={cta.label}
+                    label={cta.label}
+                    href={cta.href}
+                    size="lg"
+                    variant={index === 0 ? 'primary' : 'ghost'}
+                  />
+                ))}
+              </HStack>
+            ) : null}
+          </VStack>
+        </Reveal>
       </VStack>
     </PageSection>
   );
+}
+
+/** A title on the left and its items as hairline rows on the right. */
+export function RowsSection({
+  title,
+  items,
+  aside,
+}: {
+  title: string;
+  items: ReadonlyArray<string>;
+  aside?: ReactNode;
+}) {
+  return (
+    <div {...stylex.props(styles.rowsLayout)}>
+      <VStack gap={4} align="start">
+        <Heading level={2}>{title}</Heading>
+        {aside}
+      </VStack>
+      <ul {...stylex.props(styles.rows)}>
+        {items.map(item => (
+          <li key={item} {...stylex.props(styles.row)}>
+            <Text type="large">{item}</Text>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/** First sentence of a paragraph (existing copy, reused as a short lead). */
+export function firstSentence(text: string) {
+  return text.split(/(?<=[.?!])\s/)[0];
 }
 
 /** The "Interesse?" band that closes the page. */
@@ -187,10 +240,20 @@ export function CtaBand({
 }) {
   return (
     <PageSection isBand paddingBlock={10}>
-      <HStack justify="between" align="center" wrap="wrap" gap={6}>
-        <VStack gap={2}>
-          <Heading level={2}>{title}</Heading>
-          {body ? <Text color="secondary">{body}</Text> : null}
+      <VStack gap={8}>
+        <div {...stylex.props(styles.bandTop)}>
+          <VStack gap={3} xstyle={styles.measure}>
+            <Heading level={2}>{title}</Heading>
+            {body ? <Text color="secondary">{body}</Text> : null}
+          </VStack>
+          <Button
+            label={cta.label}
+            href={cta.href}
+            variant="primary"
+            size="lg"
+          />
+        </div>
+        <div {...stylex.props(styles.bandLinks)}>
           <HStack gap={2} wrap="wrap">
             <Button
               label={CONTACT.phone}
@@ -204,9 +267,8 @@ export function CtaBand({
             />
             <Button label="LinkedIn" href={CONTACT.linkedin} variant="ghost" />
           </HStack>
-        </VStack>
-        <Button label={cta.label} href={cta.href} variant="primary" size="lg" />
-      </HStack>
+        </div>
+      </VStack>
     </PageSection>
   );
 }

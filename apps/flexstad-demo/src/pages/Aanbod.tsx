@@ -8,6 +8,7 @@ import {Drawer} from '@astryxdesign/core/Drawer';
 import {Heading} from '@astryxdesign/core/Heading';
 import {HStack, VStack} from '@astryxdesign/core/Layout';
 import {Text} from '@astryxdesign/core/Text';
+import {Token} from '@astryxdesign/core/Token';
 import {LISTINGS, LOCATIONS, STATUSES} from '../content';
 import {useIsNarrow} from '../hooks';
 import {replaceSearch, useSearch} from '../router';
@@ -16,21 +17,18 @@ import {PageSection} from '../sections/PageSection';
 import {CtaBand, PageHero} from '../sections/ui';
 
 const styles = stylex.create({
-  // The auto-fill columns exist only from 900px, where the content column is
-  // wide enough for two tracks; a two-column span below that would add an
-  // implicit column and overflow phones.
+  // Uniform cards: one column, two from 1000px, where the column beside the
+  // filters is wide enough for two equal tracks.
   catalogue: {
     display: 'grid',
     gap: 16,
     gridTemplateColumns: {
       default: 'minmax(0, 1fr)',
-      '@media (min-width: 900px)': 'repeat(auto-fill, minmax(260px, 1fr))',
+      '@media (min-width: 1000px)': 'repeat(2, minmax(0, 1fr))',
     },
   },
   cell: {display: 'flex'},
-  lead: {
-    gridColumn: {default: 'auto', '@media (min-width: 900px)': 'span 2'},
-  },
+  chips: {display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center'},
 });
 
 function Filters({
@@ -124,22 +122,54 @@ export function Aanbod() {
                 />
               ) : null}
             </HStack>
+            {hasFilters ? (
+              <div {...stylex.props(styles.chips)}>
+                {locations.map(value => (
+                  <Token
+                    key={`locatie-${value}`}
+                    label={value}
+                    onRemove={() =>
+                      setFilter(
+                        'locatie',
+                        locations.filter(item => item !== value),
+                      )
+                    }
+                  />
+                ))}
+                {statuses.map(value => (
+                  <Token
+                    key={`status-${value}`}
+                    label={
+                      STATUSES.find(item => item.value === value)?.label ??
+                      value
+                    }
+                    onRemove={() =>
+                      setFilter(
+                        'status',
+                        statuses.filter(item => item !== value),
+                      )
+                    }
+                  />
+                ))}
+                {visible.length > 0 ? (
+                  <Button
+                    label="Wis filters"
+                    variant="ghost"
+                    onClick={() => replaceSearch(new URLSearchParams())}
+                  />
+                ) : null}
+              </div>
+            ) : null}
             {visible.length > 0 ? (
               <div {...stylex.props(styles.catalogue)}>
-                {visible.map((listing, index) => {
-                  const isLead = index === 0 && listing.status === 'available';
-                  return (
-                    <div
-                      key={listing.slug}
-                      data-reveal=""
-                      {...stylex.props(
-                        styles.cell,
-                        isLead ? styles.lead : undefined,
-                      )}>
-                      <ListingCard listing={listing} isFeatured={isLead} />
-                    </div>
-                  );
-                })}
+                {visible.map(listing => (
+                  <div
+                    key={listing.slug}
+                    data-reveal=""
+                    {...stylex.props(styles.cell)}>
+                    <ListingCard listing={listing} />
+                  </div>
+                ))}
               </div>
             ) : (
               <VStack gap={3} align="start">

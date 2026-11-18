@@ -43,7 +43,7 @@ export function EnquiryForm({listingName}: {listingName?: string}) {
   }
 
   return (
-    <PageSection id="reageren" maxWidth={720}>
+    <PageSection id="reageren" measure={720}>
       <form onSubmit={handleSubmit} noValidate>
         <VStack gap={6}>
           <Heading level={2}>Reageren</Heading>

@@ -37,6 +37,21 @@ export const flexstadTheme = defineTheme({
   tokens: {
     // One 16px corner for every card, tile, panel and photo frame.
     '--radius-container': '16px',
+    // Heading scale, one rung per role (hallmark gate 78: section heads at
+    // 40px or more at 1440). Each clamp lands on the rung's 1440px size and
+    // shrinks on phones so Dutch compounds stay on the line.
+    //   h2 (section head)            44px at 1440, 48px cap
+    //   display-2 (inner page head)  64px at 1440, 68px cap
+    //   display-1 (homepage head)    83px at 1440, 88px cap
+    '--text-heading-2-size': 'clamp(30px, 16px + 1.95vw, 48px)',
+    '--text-heading-2-leading': '1.15',
+    '--text-display-2-size': 'clamp(36px, 14px + 3.5vw, 68px)',
+    '--text-display-2-leading': '1.1',
+    '--text-display-1-size': 'clamp(40px, 8px + 5.2vw, 88px)',
+    '--text-display-1-leading': '1.08',
+    // Large controls (hero and closing actions, form fields) stand 48px tall:
+    // hallmark's marketing range is 44 to 52px (gate 39b).
+    '--size-element-lg': '48px',
     '--color-accent': [ORANGE, 'oklch(0.74 0.17 40)'],
     '--color-on-accent': [AUBERGINE_DEEP, AUBERGINE_DEEP],
     '--color-text-accent': [ORANGE_TEXT, 'oklch(0.78 0.15 45)'],

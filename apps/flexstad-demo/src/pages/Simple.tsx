@@ -22,11 +22,17 @@ export function Contact() {
       <PageSection>
         <Grid columns={{minWidth: 300, repeat: 'fit'}} gap={8} align="start">
           <VStack gap={3}>
-            <Link href={`mailto:${CONTACT.email}`}>{CONTACT.email}</Link>
-            <Link href={CONTACT.phoneHref}>{CONTACT.phone}</Link>
-            <Link href={CONTACT.linkedin} isExternalLink>
-              LinkedIn
-            </Link>
+            <Text type="large">
+              <Link href={`mailto:${CONTACT.email}`}>{CONTACT.email}</Link>
+            </Text>
+            <Text type="large">
+              <Link href={CONTACT.phoneHref}>{CONTACT.phone}</Link>
+            </Text>
+            <Text type="large">
+              <Link href={CONTACT.linkedin} isExternalLink>
+                LinkedIn
+              </Link>
+            </Text>
           </VStack>
           <ContactForm />
         </Grid>
@@ -39,11 +45,11 @@ export function Inschrijven() {
   return (
     <>
       <PageHero title="Inschrijven" trail={[HOME, {title: 'Inschrijven'}]} />
-      <PageSection maxWidth={720}>
-        <VStack gap={6}>
+      <PageSection>
+        <Grid columns={{minWidth: 300, repeat: 'fit'}} gap={8} align="start">
           <Heading level={2}>Jouw gegevens</Heading>
           <SignupForm />
-        </VStack>
+        </Grid>
       </PageSection>
       <CtaBand />
     </>
@@ -54,7 +60,7 @@ export function Abonneren() {
   return (
     <>
       <PageHero title="Aanmelden" trail={[HOME, {title: 'Aanmelden'}]} />
-      <PageSection maxWidth={720}>
+      <PageSection measure={720}>
         <SubscribeForm />
       </PageSection>
     </>
@@ -66,7 +72,7 @@ export function MijnFlexstad() {
   return (
     <>
       <PageHero title="MijnFlexstad" trail={[HOME, {title: 'MijnFlexstad'}]} />
-      <PageSection maxWidth={720}>
+      <PageSection measure={720}>
         <VStack gap={4} align="start">
           <Banner status="info" title="Inloggen volgt" collapsible={false}>
             Het inlogscherm van het klantportaal wordt pas gekoppeld zodra
@@ -83,7 +89,7 @@ export function Vacatures() {
   return (
     <>
       <PageHero title="Vacatures" trail={[HOME, {title: 'Vacatures'}]} />
-      <PageSection maxWidth={960}>
+      <PageSection measure={960}>
         <VStack gap={8}>
           <VStack gap={3}>
             <Heading level={2}>{VACANCY.title}</Heading>
@@ -135,14 +141,9 @@ export function Dienst({slug}: {slug: string}) {
   }
   return (
     <>
-      <PageHero
-        title={service.title}
-        trail={[HOME, {title: service.title}]}
-        photoLabel={service.title}
-        seed={4}
-      />
-      <PageSection maxWidth={860}>
-        <VStack gap={8}>
+      <PageHero title={service.title} trail={[HOME, {title: service.title}]} />
+      <PageSection>
+        <Grid columns={{minWidth: 280, repeat: 'fit'}} gap={8} align="start">
           <VStack gap={3}>
             <Heading level={2}>{service.heading}</Heading>
             <Paragraphs items={[service.body]} />
@@ -153,7 +154,7 @@ export function Dienst({slug}: {slug: string}) {
             <BulletList items={service.bullets} />
             <Paragraphs items={[service.closing]} />
           </VStack>
-        </VStack>
+        </Grid>
       </PageSection>
       <CtaBand />
     </>

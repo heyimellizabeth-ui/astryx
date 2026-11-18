@@ -19,19 +19,27 @@ import {BulletList, Crumbs, CtaBand, Paragraphs} from '../sections/ui';
 import {NotFound} from './NotFound';
 
 const styles = stylex.create({
-  // Photo 1 is the lead image across the full width; the others sit under it.
+  // One large slot and three smaller ones: two tracks from 900px with the
+  // small slots stacked beside the large one, a single column on phones.
   gallery: {
     display: 'grid',
     gap: 12,
     gridTemplateColumns: {
-      default: 'repeat(3, minmax(0, 1fr))',
-      '@media (min-width: 900px)': 'repeat(5, minmax(0, 1fr))',
+      default: 'minmax(0, 1fr)',
+      '@media (min-width: 900px)': 'minmax(0, 2fr) minmax(0, 1fr)',
+    },
+    gridTemplateRows: {
+      default: 'none',
+      '@media (min-width: 900px)': 'repeat(3, minmax(0, 1fr))',
     },
   },
-  lead: {gridColumn: '1 / -1'},
+  lead: {
+    gridRow: {default: 'auto', '@media (min-width: 900px)': '1 / span 3'},
+  },
   shot: {
     display: 'block',
     width: '100%',
+    height: '100%',
     cursor: 'zoom-in',
     borderWidth: 0,
     padding: 0,
@@ -73,14 +81,7 @@ const styles = stylex.create({
   },
 });
 
-const GALLERY_LABELS = [
-  'Voorgevel',
-  'Ontvangstruimte',
-  'Werkruimte',
-  'Tuin',
-  'Entree',
-  'Pantry',
-];
+const GALLERY_LABELS = ['Voorgevel', 'Ontvangstruimte', 'Werkruimte', 'Tuin'];
 
 export function ListingDetail({slug}: {slug: string}) {
   const listing = LISTINGS.find(item => item.slug === slug);
@@ -97,8 +98,6 @@ export function ListingDetail({slug}: {slug: string}) {
 
   const rest = media.slice(1);
 
-  const name = listing.name;
-
   function shot(index: number) {
     return (
       <button
@@ -108,9 +107,10 @@ export function ListingDetail({slug}: {slug: string}) {
         onClick={() => setLightbox(index)}
         {...stylex.props(styles.shot, index === 0 ? styles.lead : undefined)}>
         <Photo
-          label={`${name}, ${GALLERY_LABELS[index]}`}
+          label={GALLERY_LABELS[index]}
           seed={seed + index}
-          ratio={index === 0 ? '16 / 8' : '4 / 3'}
+          ratio={index === 0 ? '16 / 10' : '16 / 7'}
+          isFilled={index !== 0}
         />
       </button>
     );

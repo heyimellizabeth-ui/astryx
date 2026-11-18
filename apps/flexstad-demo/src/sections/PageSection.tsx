@@ -26,6 +26,8 @@ interface PageSectionProps {
   isBand?: boolean;
   paddingBlock?: 6 | 8 | 10;
   maxWidth?: number;
+  /** Keeps the content to a reading measure, left-aligned on the column edge. */
+  measure?: number;
   children: ReactNode;
 }
 
@@ -37,6 +39,7 @@ export function PageSection({
   isBand = false,
   paddingBlock = 6,
   maxWidth = 1200,
+  measure,
   children,
 }: PageSectionProps) {
   return (
@@ -56,7 +59,7 @@ export function PageSection({
         id={id}
         {...stylex.props(styles.centered, styles.rhythm)}
         style={{maxWidth}}>
-        {children}
+        {measure ? <div style={{maxWidth: measure}}>{children}</div> : children}
       </div>
     </Section>
   );

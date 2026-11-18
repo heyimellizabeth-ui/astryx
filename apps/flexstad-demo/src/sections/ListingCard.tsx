@@ -15,24 +15,13 @@ const styles = stylex.create({
   // Room for three fact rows, so a card with fewer facts is as tall as the rest.
   facts: {minHeight: '5.5rem'},
   media: {aspectRatio: '4 / 3'},
-  // A featured card spans two columns at 900px and up; the wider ratio keeps
-  // its image the same height as its neighbours.
-  mediaFeatured: {
-    aspectRatio: {default: '4 / 3', '@media (min-width: 900px)': '2.76 / 1'},
-  },
 });
 
 export function statusLabel(status: Listing['status']) {
   return STATUSES.find(item => item.value === status)?.label ?? '';
 }
 
-export function ListingCard({
-  listing,
-  isFeatured = false,
-}: {
-  listing: Listing;
-  isFeatured?: boolean;
-}) {
+export function ListingCard({listing}: {listing: Listing}) {
   const seed = LISTINGS.findIndex(item => item.slug === listing.slug);
   return (
     <ClickableCard
@@ -42,8 +31,7 @@ export function ListingCard({
       xstyle={styles.fill}
       elevation="low">
       <VStack gap={0}>
-        <div
-          {...stylex.props(isFeatured ? styles.mediaFeatured : styles.media)}>
+        <div {...stylex.props(styles.media)}>
           <Placeholder label={listing.name} seed={seed} />
         </div>
         <VStack gap={3} padding={4}>
