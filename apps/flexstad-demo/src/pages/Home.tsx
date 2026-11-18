@@ -12,13 +12,7 @@ import {bandStyles} from '../sections/bandStyles';
 import {Faq} from '../sections/Faq';
 import {ListingGrid} from '../sections/ListingGrid';
 import {PageSection} from '../sections/PageSection';
-import {
-  CtaBand,
-  firstSentence,
-  PhotoImage,
-  Reveal,
-  RowsSection,
-} from '../sections/ui';
+import {CtaBand, firstSentence, PhotoImage, Reveal} from '../sections/ui';
 
 const styles = stylex.create({
   // Ledge hero: the photograph is a tall field across the whole screen and
@@ -101,6 +95,33 @@ const styles = stylex.create({
   },
   // Air between the photograph's headline block and the statement.
   introLead: {paddingTop: 24},
+  // The five reasons: ruled, large, three across over two across, so the set
+  // fills six columns with no empty cell.
+  reasons: {
+    listStyleType: 'none',
+    margin: 0,
+    padding: 0,
+    display: 'grid',
+    columnGap: 32,
+    rowGap: 32,
+    gridTemplateColumns: {
+      default: 'minmax(0, 1fr)',
+      '@media (min-width: 900px)': 'repeat(6, minmax(0, 1fr))',
+    },
+  },
+  reason: {
+    paddingTop: 16,
+    borderTopWidth: 2,
+    borderTopStyle: 'solid',
+    borderTopColor: 'var(--color-text-primary)',
+    minWidth: 0,
+  },
+  reasonThird: {
+    gridColumn: {default: 'auto', '@media (min-width: 900px)': 'span 2'},
+  },
+  reasonHalf: {
+    gridColumn: {default: 'auto', '@media (min-width: 900px)': 'span 3'},
+  },
   introHead: {gridArea: 'head'},
   introStat: {gridArea: 'stat'},
   introStory: {gridArea: 'story', maxWidth: '65ch'},
@@ -161,12 +182,27 @@ const styles = stylex.create({
     fontWeight: 700,
   },
   // "Van leegstand naar meerwaarde": the first paragraph as a statement.
+  valueLayout: {
+    display: 'grid',
+    columnGap: 64,
+    rowGap: 32,
+    alignItems: 'center',
+    gridTemplateColumns: {
+      default: 'minmax(0, 1fr)',
+      '@media (min-width: 900px)': 'minmax(0, 7fr) minmax(0, 5fr)',
+    },
+  },
+  valuePhoto: {
+    position: 'relative',
+    height: {default: 240, '@media (min-width: 900px)': 480},
+  },
+  // The head leads: the first paragraph is set a size below it.
   statement: {
-    maxWidth: 'min(100%, 28em)',
+    maxWidth: '32ch',
     minWidth: 0,
     overflowWrap: 'break-word',
-    fontSize: 'var(--text-heading-2-size)',
-    lineHeight: 'var(--text-heading-2-leading)',
+    fontSize: 'clamp(22px, 1vw + 14px, 28px)',
+    lineHeight: 1.25,
     fontWeight: 700,
   },
   statementRest: {maxWidth: '65ch'},
@@ -256,10 +292,23 @@ export function Home() {
               <Text color="secondary">{ABOUT.story[2]}</Text>
             </div>
           </div>
-          <RowsSection
-            title={ABOUT.reasonsTitle}
-            items={ABOUT.reasons.slice(1)}
-          />
+          <VStack gap={6}>
+            <Heading level={2}>{ABOUT.reasonsTitle}</Heading>
+            <ul {...stylex.props(styles.reasons)}>
+              {ABOUT.reasons.slice(1).map((reason, index) => (
+                <li
+                  key={reason}
+                  {...stylex.props(
+                    styles.reason,
+                    index < 3 ? styles.reasonThird : styles.reasonHalf,
+                  )}>
+                  <Text type="large" weight="bold" color="primary">
+                    {reason}
+                  </Text>
+                </li>
+              ))}
+            </ul>
+          </VStack>
         </VStack>
       </PageSection>
 
@@ -328,15 +377,20 @@ export function Home() {
       <ListingGrid />
 
       <PageSection>
-        <VStack gap={8} align="start">
-          <Heading level={2}>{HOME_COPY.valueTitle}</Heading>
-          <Text as="p" xstyle={styles.statement}>
-            {HOME_COPY.value[0]}
-          </Text>
-          <Text as="p" color="secondary" xstyle={styles.statementRest}>
-            {HOME_COPY.value[1]}
-          </Text>
-        </VStack>
+        <div {...stylex.props(styles.valueLayout)}>
+          <VStack gap={6} align="start">
+            <Heading level={2}>{HOME_COPY.valueTitle}</Heading>
+            <Text as="p" xstyle={styles.statement}>
+              {HOME_COPY.value[0]}
+            </Text>
+            <Text as="p" color="secondary" xstyle={styles.statementRest}>
+              {HOME_COPY.value[1]}
+            </Text>
+          </VStack>
+          <div {...stylex.props(styles.valuePhoto)}>
+            <PhotoImage photo={PHOTOS.aboutWindowsill} isFilled />
+          </div>
+        </div>
       </PageSection>
 
       <Faq />

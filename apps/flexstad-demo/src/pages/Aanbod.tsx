@@ -94,6 +94,7 @@ export function Aanbod() {
   return (
     <>
       <PageHero
+        paddingBlock={6}
         title="Actueel aanbod"
         trail={[{title: 'Home', href: '/'}, {title: 'Aanbod'}]}
         ctas={[{label: 'Schrijf je nu in!', href: '/inschrijven/'}]}

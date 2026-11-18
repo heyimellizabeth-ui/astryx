@@ -248,6 +248,8 @@ interface PageHeroProps {
   title: string;
   intro?: string;
   ctas?: ReadonlyArray<Cta>;
+  /** Less padding under the head, for pages whose content follows at once. */
+  paddingBlock?: 6 | 8 | 10;
 }
 
 /**
@@ -255,9 +257,15 @@ interface PageHeroProps {
  * optional line and the actions, set across the content column. No picture
  * slot; pages that wait for photographs carry one as their first section.
  */
-export function PageHero({trail, title, intro, ctas}: PageHeroProps) {
+export function PageHero({
+  trail,
+  title,
+  intro,
+  ctas,
+  paddingBlock = 8,
+}: PageHeroProps) {
   return (
-    <PageSection isWashed paddingBlock={8}>
+    <PageSection isWashed paddingBlock={paddingBlock}>
       <VStack gap={5} align="start">
         {trail ? <Crumbs trail={trail} /> : null}
         <Reveal>

@@ -97,6 +97,7 @@ export const USED_PHOTOS: ReadonlyArray<Photo> = [
   PHOTOS.heroCanal,
   PHOTOS.ownersEntrance,
   PHOTOS.makersAtticStudio,
+  PHOTOS.aboutWindowsill,
 ];
 
 export const PHOTO_CREDITS_LINE: string =

@@ -20,10 +20,14 @@ const styles = stylex.create({
     fontWeight: 700,
   },
   nameRoom: {minHeight: '2.24em'},
-  // Room for three fact rows, so a card with fewer facts is as tall as the rest.
-  facts: {minHeight: '5.5rem'},
-  // Room for the two feature lines the live cards carry.
-  features: {minHeight: '3rem'},
+  // The card foot: a hairline and the word that says the card opens.
+  foot: {
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopStyle: 'solid',
+    borderTopColor: 'var(--color-border)',
+  },
+  cue: {color: 'var(--color-text-accent)'},
 });
 
 export function statusLabel(status: Listing['status']) {
@@ -50,7 +54,7 @@ export function ListingCard({
       padding={0}
       xstyle={styles.fill}
       elevation="low">
-      <VStack gap={5} padding={5} xstyle={styles.body}>
+      <VStack gap={5} padding={5} justify="between" xstyle={styles.body}>
         <VStack gap={3} align="start">
           <Badge
             variant={listing.status === 'available' ? 'success' : 'neutral'}
@@ -65,7 +69,7 @@ export function ListingCard({
             <Text color="secondary">{listing.city}</Text>
           </VStack>
         </VStack>
-        <div {...stylex.props(styles.facts)}>
+        <VStack gap={4}>
           <MetadataList>
             {listing.facts.map(fact => (
               <MetadataListItem key={fact.label} label={fact.label}>
@@ -73,13 +77,20 @@ export function ListingCard({
               </MetadataListItem>
             ))}
           </MetadataList>
-        </div>
-        <VStack gap={1} xstyle={styles.features}>
-          {(listing.features ?? []).map(line => (
-            <Text key={line} as="p" type="supporting" color="secondary">
-              {line}
+          {listing.features && listing.features.length > 0 ? (
+            <VStack gap={1}>
+              {listing.features.map(line => (
+                <Text key={line} as="p" type="supporting" color="secondary">
+                  {line}
+                </Text>
+              ))}
+            </VStack>
+          ) : null}
+          <div {...stylex.props(styles.foot)}>
+            <Text weight="medium" xstyle={styles.cue}>
+              Bekijk
             </Text>
-          ))}
+          </div>
         </VStack>
       </VStack>
     </ClickableCard>

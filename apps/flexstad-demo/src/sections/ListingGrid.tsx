@@ -4,7 +4,7 @@ import * as stylex from '@stylexjs/stylex';
 import {Button} from '@astryxdesign/core/Button';
 import {Heading} from '@astryxdesign/core/Heading';
 import {HStack, VStack} from '@astryxdesign/core/Layout';
-import {Token} from '@astryxdesign/core/Token';
+import {Text} from '@astryxdesign/core/Text';
 import {LISTINGS, TAGS} from '../content';
 import {ListingCard} from './ListingCard';
 import {PageSection} from './PageSection';
@@ -41,11 +41,13 @@ export function ListingGrid() {
         <HStack justify="between" align="end" wrap="wrap" gap={4}>
           <VStack gap={3}>
             <Heading level={2}>Actueel aanbod</Heading>
-            <HStack gap={2} wrap="wrap">
-              {TAGS.map(tag => (
-                <Token key={tag} label={tag} />
-              ))}
-            </HStack>
+            <Text color="secondary">
+              {TAGS.map(
+                (tag, index) =>
+                  (index === 0 ? tag : tag.toLowerCase()) +
+                  (index < TAGS.length - 1 ? ', ' : '.'),
+              )}
+            </Text>
           </VStack>
           <Button
             label="Bekijk alles"
