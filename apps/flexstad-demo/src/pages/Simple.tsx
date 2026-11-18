@@ -62,6 +62,10 @@ const styles = stylex.create({
     backgroundColor: 'var(--flex-band)',
   },
   more: {paddingTop: 32},
+  desktopOnly: {
+    display: {default: 'none', '@media (min-width: 900px)': 'block'},
+  },
+  phoneOnly: {display: {default: 'block', '@media (min-width: 900px)': 'none'}},
   panel: {
     padding: {default: 24, '@media (min-width: 900px)': 56},
     borderRadius: 'var(--radius-container)',
@@ -187,44 +191,55 @@ export function Contact() {
 export function Inschrijven() {
   const answer = FAQ[0].items[0].answer;
   const more = [FAQ[0].items[2], FAQ[0].items[4]];
+  // The aside is rendered twice, one copy per breakpoint (the other is
+  // display: none, so it leaves the accessibility tree and the tab order):
+  // beside the form from 900px, after the form on phones.
+  const aside = (
+    <>
+      <div {...stylex.props(styles.plate, bandStyles.onBand)}>
+        <VStack gap={5} align="start">
+          <Heading level={2}>Jouw gegevens</Heading>
+          <Text color="secondary">{answer}</Text>
+          <HStack gap={2} wrap="wrap">
+            <Button
+              label={CONTACT.phone}
+              href={CONTACT.phoneHref}
+              variant="ghost"
+              size="lg"
+            />
+            <Button
+              label={CONTACT.email}
+              href={`mailto:${CONTACT.email}`}
+              variant="ghost"
+              size="lg"
+            />
+          </HStack>
+        </VStack>
+      </div>
+      <VStack gap={5} xstyle={styles.more}>
+        {more.map(item => (
+          <VStack key={item.question} gap={2} align="start">
+            <Heading level={3}>{item.question}</Heading>
+            <Text color="secondary">{item.answer}</Text>
+          </VStack>
+        ))}
+      </VStack>
+    </>
+  );
   return (
     <>
       <PageHero title="Inschrijven" trail={[HOME, {title: 'Inschrijven'}]} />
       <PageSection>
         <div {...stylex.props(styles.split)}>
-          <div {...stylex.props(styles.sticky)}>
-            <div {...stylex.props(styles.plate, bandStyles.onBand)}>
-              <VStack gap={5} align="start">
-                <Heading level={2}>Jouw gegevens</Heading>
-                <Text color="secondary">{answer}</Text>
-                <HStack gap={2} wrap="wrap">
-                  <Button
-                    label={CONTACT.phone}
-                    href={CONTACT.phoneHref}
-                    variant="ghost"
-                    size="lg"
-                  />
-                  <Button
-                    label={CONTACT.email}
-                    href={`mailto:${CONTACT.email}`}
-                    variant="ghost"
-                    size="lg"
-                  />
-                </HStack>
-              </VStack>
-            </div>
-            <VStack gap={5} xstyle={styles.more}>
-              {more.map(item => (
-                <VStack key={item.question} gap={2} align="start">
-                  <Heading level={3}>{item.question}</Heading>
-                  <Text color="secondary">{item.answer}</Text>
-                </VStack>
-              ))}
-            </VStack>
+          <div {...stylex.props(styles.sticky, styles.desktopOnly)}>
+            {aside}
           </div>
-          <FormPanel>
-            <SignupForm />
-          </FormPanel>
+          <VStack gap={8}>
+            <FormPanel>
+              <SignupForm />
+            </FormPanel>
+            <div {...stylex.props(styles.phoneOnly)}>{aside}</div>
+          </VStack>
         </div>
       </PageSection>
     </>
@@ -275,7 +290,7 @@ function VacancyList({items}: {items: ReadonlyArray<string>}) {
     <ul {...stylex.props(styles.items)}>
       {items.map(item => (
         <li key={item} {...stylex.props(styles.item)}>
-          <Text weight="normal">{item}</Text>
+          <Text color="secondary">{item}</Text>
         </li>
       ))}
     </ul>
