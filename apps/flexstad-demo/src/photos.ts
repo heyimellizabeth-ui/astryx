@@ -92,9 +92,14 @@ export const PHOTOS: Record<string, Photo> = {
   },
 };
 
+/** The photographs the pages actually show; the footer credits exactly these. */
+export const USED_PHOTOS: ReadonlyArray<Photo> = [
+  PHOTOS.heroCanal,
+  PHOTOS.ownersEntrance,
+  PHOTOS.makersAtticStudio,
+];
+
 export const PHOTO_CREDITS_LINE: string =
   "Foto's: " +
-  Object.values(PHOTOS)
-    .map(p => p.credit)
-    .join('; ') +
+  USED_PHOTOS.map(p => p.credit).join('; ') +
   ' (Wikimedia Commons).';

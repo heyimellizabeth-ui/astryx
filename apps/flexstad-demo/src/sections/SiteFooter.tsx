@@ -7,6 +7,7 @@ import {Link} from '@astryxdesign/core/Link';
 import {Text} from '@astryxdesign/core/Text';
 import {VStack} from '@astryxdesign/core/Layout';
 import {CONTACT, HOME_COPY, NAV_ABOUT, NAV_FOR_WHO} from '../content';
+import {PHOTO_CREDITS_LINE} from '../photos';
 import {PageSection} from './PageSection';
 
 const styles = stylex.create({
@@ -86,10 +87,15 @@ export function SiteFooter() {
             </div>
           </div>
           <Divider />
-          <Text type="supporting" color="secondary">
-            Onofficiële herbouw van de openbare site flexstad.com met Astryx.
-            Foto’s zijn plaatshouders. {HOME_COPY.copyright}
-          </Text>
+          <VStack gap={2}>
+            <Text type="supporting" color="secondary">
+              Onofficiële herbouw van de openbare site flexstad.com met Astryx.
+              Foto’s zijn plaatshouders. {HOME_COPY.copyright}
+            </Text>
+            <Text type="supporting" color="secondary" data-credits="">
+              {PHOTO_CREDITS_LINE}
+            </Text>
+          </VStack>
         </VStack>
       </footer>
     </PageSection>

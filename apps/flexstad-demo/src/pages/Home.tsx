@@ -15,7 +15,6 @@ import {PageSection} from '../sections/PageSection';
 import {
   CtaBand,
   firstSentence,
-  Photo,
   PhotoImage,
   Reveal,
   RowsSection,
@@ -112,31 +111,28 @@ const styles = stylex.create({
     color: 'var(--color-text-primary)',
     overflowWrap: 'break-word',
   },
+  // Four audience tiles on six columns, 4 and 2 over 2 and 4, no empty cell:
+  // the two photograph tiles are the wide ones, the type-led tiles the narrow.
   bento: {
     display: 'grid',
     gap: 16,
     gridTemplateColumns: {
       default: 'minmax(0, 1fr)',
-      '@media (min-width: 768px)': 'repeat(6, minmax(0, 1fr))',
+      '@media (min-width: 900px)': 'repeat(6, minmax(0, 1fr))',
     },
   },
   wide: {
-    gridColumn: {default: 'auto', '@media (min-width: 768px)': 'span 4'},
+    gridColumn: {default: 'auto', '@media (min-width: 900px)': 'span 4'},
   },
   narrow: {
-    gridColumn: {default: 'auto', '@media (min-width: 768px)': 'span 2'},
+    gridColumn: {default: 'auto', '@media (min-width: 900px)': 'span 2'},
   },
   cell: {display: 'flex'},
   card: {flexGrow: 1},
-  tileAccent: {backgroundColor: 'var(--color-accent)'},
-  // Text on the orange tile uses the on-accent colour in both colour modes.
-  onAccent: {
-    '--color-text-primary': 'var(--color-on-accent)',
-    color: 'var(--color-on-accent)',
-  },
   tileBand: {backgroundColor: 'var(--flex-band)'},
   tileMuted: {backgroundColor: 'var(--color-background-muted)'},
-  // A wide tile: slot beside the words on desktop, above them on phones.
+  // A wide tile: the photograph beside the words on desktop, above them on
+  // phones. The photograph fills its half edge to edge.
   tileSplit: {
     display: 'grid',
     height: '100%',
@@ -145,26 +141,48 @@ const styles = stylex.create({
       '@media (min-width: 900px)': 'minmax(0, 1fr) minmax(0, 1fr)',
     },
   },
-  tileSlot: {minHeight: {default: 180, '@media (min-width: 900px)': 280}},
+  tileSlot: {
+    position: 'relative',
+    minHeight: {default: 200, '@media (min-width: 900px)': 300},
+  },
+  slotFirst: {order: {default: 0, '@media (min-width: 900px)': 0}},
+  slotLast: {order: {default: 0, '@media (min-width: 900px)': 1}},
   tileBody: {
     height: '100%',
     boxSizing: 'border-box',
     padding: 28,
   },
+  // Type-led tiles: the audience's own title is the largest thing on them.
+  tileTitle: {
+    fontSize: 'clamp(24px, 1vw + 16px, 32px)',
+    lineHeight: 1.12,
+    fontWeight: 700,
+  },
+  // "Van leegstand naar meerwaarde": the first paragraph as a statement.
+  statement: {
+    maxWidth: 'min(100%, 28em)',
+    minWidth: 0,
+    overflowWrap: 'break-word',
+    fontSize: 'var(--text-heading-2-size)',
+    lineHeight: 'var(--text-heading-2-leading)',
+    fontWeight: 700,
+  },
+  statementRest: {maxWidth: '65ch'},
 });
 
-// Two tiles carry a labelled photo slot, two carry the audience page's own
-// first sentence on a plain surface; none is a title in an empty box.
+// Order on the page: owners (photograph) and municipalities, developers and
+// entrepreneurs (photograph). Municipalities have no photograph and developers'
+// timber shell is too weak a mood to earn a place, so both are type-led.
 const TILES = [
-  {span: styles.wide, tone: styles.tileAccent, withPhoto: true, onBand: false},
+  {index: 0, span: styles.wide, photo: PHOTOS.ownersEntrance, tone: undefined},
+  {index: 2, span: styles.narrow, photo: undefined, tone: styles.tileBand},
+  {index: 3, span: styles.narrow, photo: undefined, tone: styles.tileMuted},
   {
-    span: styles.narrow,
-    tone: styles.tileMuted,
-    withPhoto: false,
-    onBand: false,
+    index: 1,
+    span: styles.wide,
+    photo: PHOTOS.makersAtticStudio,
+    tone: undefined,
   },
-  {span: styles.narrow, tone: styles.tileBand, withPhoto: false, onBand: true},
-  {span: styles.wide, tone: styles.tileMuted, withPhoto: true, onBand: false},
 ];
 
 const AUDIENCE_SLUGS = [
@@ -251,20 +269,22 @@ export function Home() {
             <Text color="secondary">{HOME_COPY.discover}</Text>
           </div>
           <div {...stylex.props(styles.bento)}>
-            {AUDIENCES.map((audience, index) => {
-              const tile = TILES[index];
+            {TILES.map(tile => {
+              const audience = AUDIENCES[tile.index];
               const sentence = firstSentence(
-                AUDIENCE_PAGES[AUDIENCE_SLUGS[index]].intro[0],
+                AUDIENCE_PAGES[AUDIENCE_SLUGS[tile.index]].intro[0],
               );
+              const isBand = tile.tone === styles.tileBand;
               const words = (
-                <VStack gap={3} align="start" xstyle={styles.tileBody}>
-                  <Heading level={3}>{audience.title}</Heading>
-                  <Text
-                    color={
-                      tile.tone === styles.tileMuted ? 'secondary' : 'primary'
-                    }>
-                    {sentence}
-                  </Text>
+                <VStack
+                  gap={3}
+                  align="start"
+                  justify={tile.photo ? 'center' : 'end'}
+                  xstyle={styles.tileBody}>
+                  <Heading level={3} xstyle={styles.tileTitle}>
+                    {audience.title}
+                  </Heading>
+                  <Text color="secondary">{sentence}</Text>
                 </VStack>
               );
               return (
@@ -279,20 +299,18 @@ export function Home() {
                     xstyle={[tile.tone, styles.card]}>
                     <div
                       {...stylex.props(
-                        tile.onBand
-                          ? bandStyles.onBand
-                          : tile.tone === styles.tileAccent
-                            ? styles.onAccent
-                            : undefined,
-                        tile.withPhoto ? styles.tileSplit : undefined,
+                        isBand ? bandStyles.onBand : undefined,
+                        tile.photo ? styles.tileSplit : undefined,
                       )}>
-                      {tile.withPhoto ? (
-                        <div {...stylex.props(styles.tileSlot)}>
-                          <Photo
-                            label={audience.title}
-                            seed={index + 2}
-                            isFilled
-                          />
+                      {tile.photo ? (
+                        <div
+                          {...stylex.props(
+                            styles.tileSlot,
+                            tile.index === 1
+                              ? styles.slotLast
+                              : styles.slotFirst,
+                          )}>
+                          <PhotoImage photo={tile.photo} isBleed isFilled />
                         </div>
                       ) : null}
                       {words}
@@ -308,16 +326,15 @@ export function Home() {
       <ListingGrid />
 
       <PageSection>
-        <div {...stylex.props(styles.split)}>
+        <VStack gap={8} align="start">
           <Heading level={2}>{HOME_COPY.valueTitle}</Heading>
-          <VStack gap={4}>
-            {HOME_COPY.value.map(text => (
-              <Text key={text} color="secondary">
-                {text}
-              </Text>
-            ))}
-          </VStack>
-        </div>
+          <Text as="p" xstyle={styles.statement}>
+            {HOME_COPY.value[0]}
+          </Text>
+          <Text as="p" color="secondary" xstyle={styles.statementRest}>
+            {HOME_COPY.value[1]}
+          </Text>
+        </VStack>
       </PageSection>
 
       <Faq />

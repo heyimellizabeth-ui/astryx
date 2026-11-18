@@ -7,24 +7,42 @@ import {Heading} from '@astryxdesign/core/Heading';
 import {VStack} from '@astryxdesign/core/Layout';
 import {MetadataList, MetadataListItem} from '@astryxdesign/core/MetadataList';
 import {Text} from '@astryxdesign/core/Text';
-import {LISTINGS, STATUSES, type Listing} from '../content';
-import {Placeholder} from './Placeholder';
+import {STATUSES, type Listing} from '../content';
 
 const styles = stylex.create({
   fill: {flexGrow: 1},
+  body: {flexGrow: 1, boxSizing: 'border-box'},
+  // The street name carries the card: set large, two lines of room so a long
+  // name and a short one leave the facts on the same line across the row.
+  name: {
+    fontSize: 'clamp(24px, 1.2vw + 14px, 30px)',
+    lineHeight: 1.12,
+    fontWeight: 700,
+  },
+  nameRoom: {minHeight: '2.24em'},
   // Room for three fact rows, so a card with fewer facts is as tall as the rest.
   facts: {minHeight: '5.5rem'},
   // Room for the two feature lines the live cards carry.
   features: {minHeight: '3rem'},
-  media: {aspectRatio: '4 / 3'},
 });
 
 export function statusLabel(status: Listing['status']) {
   return STATUSES.find(item => item.value === status)?.label ?? '';
 }
 
-export function ListingCard({listing}: {listing: Listing}) {
-  const seed = LISTINGS.findIndex(item => item.slug === listing.slug);
+/**
+ * A type-led card: no picture, because no photograph of the building exists
+ * yet. The street name is the largest thing on it, then the city, the status,
+ * the facts and the feature lines.
+ */
+export function ListingCard({
+  listing,
+  isRail = false,
+}: {
+  listing: Listing;
+  /** Reserve two name lines so a row of cards lines up (the four-up row). */
+  isRail?: boolean;
+}) {
   return (
     <ClickableCard
       label={`${listing.name}, ${listing.city}`}
@@ -32,39 +50,36 @@ export function ListingCard({listing}: {listing: Listing}) {
       padding={0}
       xstyle={styles.fill}
       elevation="low">
-      <VStack gap={0}>
-        <div {...stylex.props(styles.media)}>
-          <Placeholder label={listing.name} seed={seed} />
-        </div>
-        <VStack gap={3} padding={4}>
-          <VStack gap={2} align="start">
-            <Badge
-              variant={listing.status === 'available' ? 'success' : 'neutral'}
-              label={statusLabel(listing.status)}
-            />
-            <VStack gap={0.5}>
-              <Heading level={3}>{listing.name}</Heading>
-              <Text type="supporting" color="secondary">
-                {listing.city}
-              </Text>
-            </VStack>
+      <VStack gap={5} padding={5} xstyle={styles.body}>
+        <VStack gap={3} align="start">
+          <Badge
+            variant={listing.status === 'available' ? 'success' : 'neutral'}
+            label={statusLabel(listing.status)}
+          />
+          <VStack gap={1}>
+            <Heading
+              level={3}
+              xstyle={[styles.name, isRail ? styles.nameRoom : undefined]}>
+              {listing.name}
+            </Heading>
+            <Text color="secondary">{listing.city}</Text>
           </VStack>
-          <div {...stylex.props(styles.facts)}>
-            <MetadataList>
-              {listing.facts.map(fact => (
-                <MetadataListItem key={fact.label} label={fact.label}>
-                  {fact.value}
-                </MetadataListItem>
-              ))}
-            </MetadataList>
-          </div>
-          <div {...stylex.props(styles.features)}>
-            {(listing.features ?? []).map(line => (
-              <Text key={line} as="p" type="supporting" color="secondary">
-                {line}
-              </Text>
+        </VStack>
+        <div {...stylex.props(styles.facts)}>
+          <MetadataList>
+            {listing.facts.map(fact => (
+              <MetadataListItem key={fact.label} label={fact.label}>
+                {fact.value}
+              </MetadataListItem>
             ))}
-          </div>
+          </MetadataList>
+        </div>
+        <VStack gap={1} xstyle={styles.features}>
+          {(listing.features ?? []).map(line => (
+            <Text key={line} as="p" type="supporting" color="secondary">
+              {line}
+            </Text>
+          ))}
         </VStack>
       </VStack>
     </ClickableCard>

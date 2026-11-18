@@ -61,7 +61,7 @@ export function ListingGrid() {
             {...stylex.props(styles.rail)}>
             {LISTINGS.map(listing => (
               <div key={listing.slug} {...stylex.props(styles.slide)}>
-                <ListingCard listing={listing} />
+                <ListingCard listing={listing} isRail />
               </div>
             ))}
           </div>
