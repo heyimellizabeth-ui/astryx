@@ -8,6 +8,7 @@ import {Heading} from '@astryxdesign/core/Heading';
 import {HStack, VStack} from '@astryxdesign/core/Layout';
 import {Text} from '@astryxdesign/core/Text';
 import {CONTACT, type Cta} from '../content';
+import type {Photo as PhotoData} from '../photos';
 import {PageSection} from './PageSection';
 import {Placeholder} from './Placeholder';
 
@@ -92,7 +93,42 @@ const styles = stylex.create({
     overflow: 'hidden',
   },
   photoFill: {display: 'flex', height: '100%'},
+  // A credited photograph. The frame is the shared 16px container corner, the
+  // image fills it (object-fit: cover, the position stored with the photo) and
+  // carries one treatment: a touch less saturation so the library photographs
+  // sit together, a little dimmer in dark mode so they do not glare.
+  picture: {
+    position: 'relative',
+    overflow: 'hidden',
+    width: '100%',
+    backgroundColor: 'var(--color-background-muted)',
+    borderRadius: 'var(--radius-container)',
+  },
+  pictureBleed: {borderRadius: 0},
+  // Fills the nearest positioned box, so a box sized by flex or by its
+  // neighbours (the hero) sets the crop and the image never sets the layout.
+  pictureFill: {position: 'absolute', inset: 0, height: '100%'},
+  pictureImage: {
+    position: 'absolute',
+    inset: 0,
+    display: 'block',
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    filter: {
+      default: 'saturate(0.94)',
+      '@media (prefers-color-scheme: dark)': 'saturate(0.94) brightness(0.9)',
+    },
+  },
 });
+
+/** The frame shapes photographs take; the hero fills its own box instead. */
+export const PHOTO_RATIOS = {
+  wide: '21 / 9',
+  landscape: '3 / 2',
+  portrait: '4 / 5',
+  square: '1 / 1',
+} as const;
 
 /** Reveals content once on load; static under reduced motion. */
 export function Reveal({children}: {children: ReactNode}) {
@@ -138,6 +174,52 @@ export function Photo({
     <div
       {...stylex.props(styles.photo, isFilled ? styles.photoFill : undefined)}>
       <Placeholder label={label} seed={seed} ratio={ratio} />
+    </div>
+  );
+}
+
+/**
+ * A credited library photograph (see `photos.ts`): the real `<img>` with its
+ * width, height, Dutch alt text and stored crop. It fills `ratio`, or the
+ * height of the box it sits in. Only the hero image is `isPriority`
+ * (fetchpriority high, eager, the likely LCP); every other image is lazy.
+ * Text over a photograph never sits on the image itself: put it on a plate
+ * (`--flex-band` with `bandStyles.onBand`, aubergine and light text).
+ */
+export function PhotoImage({
+  photo,
+  ratio,
+  isPriority = false,
+  isBleed = false,
+  isFilled = false,
+}: {
+  photo: PhotoData;
+  ratio?: keyof typeof PHOTO_RATIOS;
+  isPriority?: boolean;
+  /** Full-bleed across the page: no corner radius. */
+  isBleed?: boolean;
+  /** Fill the nearest positioned box instead of taking a ratio. */
+  isFilled?: boolean;
+}) {
+  return (
+    <div
+      {...stylex.props(
+        styles.picture,
+        isBleed ? styles.pictureBleed : undefined,
+        isFilled ? styles.pictureFill : undefined,
+      )}
+      style={ratio ? {aspectRatio: PHOTO_RATIOS[ratio]} : undefined}>
+      <img
+        src={photo.src}
+        width={photo.width}
+        height={photo.height}
+        alt={photo.alt}
+        decoding={isPriority ? 'sync' : 'async'}
+        fetchPriority={isPriority ? 'high' : undefined}
+        loading={isPriority ? undefined : 'lazy'}
+        {...stylex.props(styles.pictureImage)}
+        style={{objectPosition: photo.objectPosition}}
+      />
     </div>
   );
 }

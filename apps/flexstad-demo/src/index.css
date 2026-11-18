@@ -1,9 +1,8 @@
 /* Hallmark · shape: Manifesto · job: join (Aanmelden subscribes; Inschrijven and Contact sign up after viewing the listings) · genre: modern-minimal (inferred) · theme: brand · redesign: full
- * paper: oklch(0.953 0.009 280) · accent: oklch(0.7 0.19 38) · display: Geologica · body: Geologica · hero: Banner (/, /over-ons/, /voor-wie/, /vastgoedeigenaren/, /ondernemers/, /gemeenten/, /ontwikkelaars/, /vacatures/, /dienst/*), Banner with a 720px form column (/contact/, /inschrijven/, /abonneren/, /mijnflexstad/), Index (/aanbod/, the filters and the four listings lead under a small head), Showcase (/aanbod/<slug>/, the gallery is the hero) · nav: three-part, on the content column · footer: colophon block (wordmark and line, three hairline rows of links, the address as one paragraph) · signature: the client's 2.000+ set at 120px beside the statement, whole on the first screen
- * sections: statement with the 2.000+ figure and the reasons as rows (/), bento of four audience tiles (two photo slots, two with the audience page's first sentence), four listing cards in one row, FAQ as three ruled lists, closing band, rows for reasons and bullets on inner pages
- * axes: light/geometric-sans/warm · posture: Banner · contrast: pass · fold: pass · draw: ab3bec (nav swapped from masthead) · v2.0.0 */
-/* Hallmark · pre-emit critique: P pass · H pass · E pass · S pass · R pass · V pass · weakest: the hero is type only, so the right quarter of the first screen is empty on purpose; the picture slots wait for the client's photos */
-/* Hallmark · waive 44c · the homepage hero is a Banner, about half the screen, so the statement with the 2.000+ figure shows above the fold · the headline is set big across the column and the next section starts where the first screen ends */
+ * paper: oklch(0.975 0.006 25) · accent: oklch(0.7 0.19 38) · display: Geologica · body: Geologica · hero: Ledge (/), Banner (/over-ons/, /voor-wie/, /vastgoedeigenaren/, /ondernemers/, /gemeenten/, /ontwikkelaars/, /vacatures/, /dienst/*), Banner with a 720px form column (/contact/, /inschrijven/, /abonneren/, /mijnflexstad/), Index (/aanbod/, the filters and the four listings lead under a small head), Showcase (/aanbod/<slug>/, the gallery is the hero) · nav: three-part, on the content column, on paper above the photograph · footer: colophon block (wordmark and line, three hairline rows of links, the address as one paragraph) · signature: the Amsterdam canal photograph, full width and the largest thing on the first screen, the client's headline resting under it
+ * sections: Ledge hero (a library photograph, then the headline, the sentence and the actions), statement with the 2.000+ figure and the reasons as rows (/), bento of four audience tiles (two photo slots, two with the audience page's first sentence), four listing cards in one row, FAQ as three ruled lists, closing band, rows for reasons and bullets on inner pages
+ * axes: light/geometric-sans/warm · posture: Ledge · contrast: pass · fold: pass · draw: ab3bec (nav swapped from masthead) · v2.0.0 */
+/* Hallmark · pre-emit critique: P pass · H pass · E pass · S pass · R pass · V pass · weakest: the photograph is a library stand-in of Amsterdam canals, a mood and not a Flexstad building, so no caption or claim sits on it and the client's own photograph replaces it */
 /* Hallmark · waive 85 · "Aanmelden" is the page that subscribes, so its one e-mail field with the "Aanmelden" button is the page's own job · the stamp names job: join, which a URL run cannot read */
 /* Hallmark · waive 77 · "Aanmelden" holds one e-mail field and "MijnFlexstad" one notice and a disabled "Inloggen", each a single-action page whose whole body is that action · a longer page would need copy the client has not given */
 /* Hallmark · dismissed 77 · the form and short pages (Contact, Inschrijven, Aanbod, Vacatures, Dienst, the audience pages) hold four sections because each has one subject: its form, its list or its text · "Interesse?" closes them */
@@ -18,7 +17,11 @@
   --stylex-injection: 0;
 }
 
-/* Dark aubergine band used by the closing call-to-action and tinted panels. */
+/* Dark aubergine band used by the closing call-to-action and tinted panels.
+   It is also the one overlay rule for text on a photograph: the words sit on
+   a solid plate of this band (never on a gradient scrim or the bare image), so
+   their contrast is a plain colour pair, the same over every pixel and in both
+   colour modes. The photograph itself never carries text in the hero. */
 :root {
   --flex-band: oklch(0.314 0.097 312.6);
   --flex-on-band: oklch(0.97 0.01 300);
@@ -35,7 +38,8 @@
 h1,
 h2,
 h3 {
-  overflow-wrap: anywhere;
+  min-width: 0;
+  overflow-wrap: break-word;
   hyphens: manual;
   text-wrap: balance;
 }

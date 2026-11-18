@@ -7,6 +7,7 @@ import {Heading} from '@astryxdesign/core/Heading';
 import {HStack, VStack} from '@astryxdesign/core/Layout';
 import {Text} from '@astryxdesign/core/Text';
 import {ABOUT, AUDIENCES, AUDIENCE_PAGES, HOME_COPY} from '../content';
+import {PHOTOS} from '../photos';
 import {bandStyles} from '../sections/bandStyles';
 import {Faq} from '../sections/Faq';
 import {ListingGrid} from '../sections/ListingGrid';
@@ -15,24 +16,52 @@ import {
   CtaBand,
   firstSentence,
   Photo,
+  PhotoImage,
   Reveal,
   RowsSection,
 } from '../sections/ui';
 
 const styles = stylex.create({
-  // Banner hero (about half the screen): the client's headline set at the
-  // display size across the whole content column, then the two actions.
-  hero: {backgroundColor: 'var(--color-background-body)'},
+  // Ledge hero: the photograph is a tall field across the whole screen and
+  // the client's headline rests on paper beneath it. The photograph takes
+  // whatever height the headline and actions leave, so nav, photograph,
+  // headline, sentence and the primary action all sit on the first screen.
+  hero: {
+    display: 'flex',
+    flexDirection: 'column',
+    backgroundColor: 'var(--color-background-body)',
+    minHeight: {
+      default: 'auto',
+      '@media (min-width: 900px)': 'calc(100dvh - 72px)',
+    },
+  },
+  heroPhoto: {
+    position: 'relative',
+    flexGrow: 1,
+    flexShrink: 0,
+    flexBasis: 'auto',
+    height: {
+      default: 'clamp(240px, 62vw, 420px)',
+      '@media (min-width: 900px)': 'auto',
+    },
+    minHeight: {default: 0, '@media (min-width: 900px)': 320},
+    maxHeight: {default: 'none', '@media (min-width: 900px)': 760},
+  },
   heroInner: {
     boxSizing: 'border-box',
-    display: 'flex',
-    alignItems: 'center',
     width: 'min(100% - 32px, 1200px)',
-    minHeight: 'clamp(280px, 34dvh, 360px)',
     marginInline: 'auto',
-    paddingBlock: 'clamp(24px, 3dvh, 40px)',
+    paddingBlock: 'clamp(20px, 3.4dvh, 36px)',
   },
-  heroLine: {maxWidth: '60ch'},
+  heroFoot: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    columnGap: 40,
+    rowGap: 20,
+  },
+  heroLine: {maxWidth: '46ch'},
   split: {
     display: 'grid',
     gap: 24,
@@ -58,8 +87,6 @@ const styles = stylex.create({
       '@media (min-width: 900px)': '"head stat" "story stat"',
     },
   },
-  // A little air under the hero, still inside the first screen.
-  introLift: {marginTop: 32},
   introHead: {gridArea: 'head'},
   introStat: {gridArea: 'stat'},
   introStory: {gridArea: 'story', maxWidth: '65ch'},
@@ -69,7 +96,7 @@ const styles = stylex.create({
     fontWeight: 700,
     lineHeight: 1,
     whiteSpace: 'nowrap',
-    color: 'var(--color-text-accent)',
+    color: 'var(--color-text-primary)',
     overflowWrap: 'break-word',
   },
   bento: {
@@ -138,36 +165,41 @@ export function Home() {
   return (
     <>
       <section {...stylex.props(styles.hero)}>
+        <div {...stylex.props(styles.heroPhoto)}>
+          <PhotoImage photo={PHOTOS.heroCanal} isPriority isBleed isFilled />
+        </div>
         <div {...stylex.props(styles.heroInner)}>
           <Reveal>
             <VStack gap={5} align="start">
               <Heading level={1} type="display-1">
                 Leegstaand vastgoed? Wij activeren, beheren en exploiteren
               </Heading>
-              <Text type="large" color="secondary" xstyle={styles.heroLine}>
-                {HOME_COPY.hero}
-              </Text>
-              <HStack gap={3} wrap="wrap">
-                <Button
-                  label="Bekijk ons aanbod"
-                  href="/aanbod/"
-                  size="lg"
-                  variant="primary"
-                />
-                <Button
-                  label="Ontdek onze mogelijkheden"
-                  href="#intro"
-                  size="lg"
-                  variant="ghost"
-                />
-              </HStack>
+              <div {...stylex.props(styles.heroFoot)}>
+                <Text type="large" color="secondary" xstyle={styles.heroLine}>
+                  {HOME_COPY.hero}
+                </Text>
+                <HStack gap={3} wrap="wrap">
+                  <Button
+                    label="Bekijk ons aanbod"
+                    href="/aanbod/"
+                    size="lg"
+                    variant="primary"
+                  />
+                  <Button
+                    label="Ontdek onze mogelijkheden"
+                    href="#intro"
+                    size="lg"
+                    variant="ghost"
+                  />
+                </HStack>
+              </div>
             </VStack>
           </Reveal>
         </div>
       </section>
 
       <PageSection id="intro" paddingBlock={8}>
-        <VStack gap={10} xstyle={styles.introLift}>
+        <VStack gap={10}>
           <div {...stylex.props(styles.intro)}>
             <div {...stylex.props(styles.introHead)}>
               <Heading level={2}>{ABOUT.heading}</Heading>
