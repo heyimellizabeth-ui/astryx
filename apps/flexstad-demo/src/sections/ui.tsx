@@ -88,6 +88,18 @@ const styles = stylex.create({
     lineHeight: 'var(--text-heading-2-leading)',
   },
   prose2: {maxWidth: '65ch'},
+  // A banner with something beside its head: the head on the left, the aside
+  // on the right, both sitting on one baseline row from 900px.
+  heroSplit: {
+    display: 'grid',
+    columnGap: 64,
+    rowGap: 32,
+    alignItems: 'end',
+    gridTemplateColumns: {
+      default: 'minmax(0, 1fr)',
+      '@media (min-width: 900px)': 'minmax(0, 1fr) minmax(0, 380px)',
+    },
+  },
   photo: {
     borderRadius: 'var(--radius-container)',
     overflow: 'hidden',
@@ -250,6 +262,8 @@ interface PageHeroProps {
   ctas?: ReadonlyArray<Cta>;
   /** Less padding under the head, for pages whose content follows at once. */
   paddingBlock?: 6 | 8 | 10;
+  /** Set beside the head from 900px (an index of the page's content). */
+  aside?: ReactNode;
 }
 
 /**
@@ -263,37 +277,48 @@ export function PageHero({
   intro,
   ctas,
   paddingBlock = 8,
+  aside,
 }: PageHeroProps) {
+  const head = (
+    <VStack gap={5} align="start">
+      {trail ? <Crumbs trail={trail} /> : null}
+      <Reveal>
+        <VStack gap={5} align="start">
+          <Heading level={1} type="display-2">
+            {title}
+          </Heading>
+          {intro ? (
+            <Text type="supporting" color="secondary" xstyle={styles.prose2}>
+              {intro}
+            </Text>
+          ) : null}
+          {ctas && ctas.length > 0 ? (
+            <HStack gap={3} wrap="wrap">
+              {ctas.map((cta, index) => (
+                <Button
+                  key={cta.label}
+                  label={cta.label}
+                  href={cta.href}
+                  size="lg"
+                  variant={index === 0 ? 'primary' : 'ghost'}
+                />
+              ))}
+            </HStack>
+          ) : null}
+        </VStack>
+      </Reveal>
+    </VStack>
+  );
   return (
     <PageSection isWashed paddingBlock={paddingBlock}>
-      <VStack gap={5} align="start">
-        {trail ? <Crumbs trail={trail} /> : null}
-        <Reveal>
-          <VStack gap={5} align="start">
-            <Heading level={1} type="display-2">
-              {title}
-            </Heading>
-            {intro ? (
-              <Text type="supporting" color="secondary" xstyle={styles.prose2}>
-                {intro}
-              </Text>
-            ) : null}
-            {ctas && ctas.length > 0 ? (
-              <HStack gap={3} wrap="wrap">
-                {ctas.map((cta, index) => (
-                  <Button
-                    key={cta.label}
-                    label={cta.label}
-                    href={cta.href}
-                    size="lg"
-                    variant={index === 0 ? 'primary' : 'ghost'}
-                  />
-                ))}
-              </HStack>
-            ) : null}
-          </VStack>
-        </Reveal>
-      </VStack>
+      {aside ? (
+        <div {...stylex.props(styles.heroSplit)}>
+          {head}
+          {aside}
+        </div>
+      ) : (
+        head
+      )}
     </PageSection>
   );
 }

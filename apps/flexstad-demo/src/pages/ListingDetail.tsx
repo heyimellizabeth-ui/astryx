@@ -9,29 +9,55 @@ import {VStack} from '@astryxdesign/core/Layout';
 import {Lightbox} from '@astryxdesign/core/Lightbox';
 import {MetadataList, MetadataListItem} from '@astryxdesign/core/MetadataList';
 import {Text} from '@astryxdesign/core/Text';
-import {LISTINGS, LISTING_ADDRESS, ROEMER_DETAIL} from '../content';
+import {
+  LISTINGS,
+  LISTING_ADDRESS,
+  ROEMER_DETAIL,
+  type Listing,
+} from '../content';
 import {EnquiryForm} from '../sections/EnquiryForm';
 import {statusLabel} from '../sections/ListingCard';
 import {PageSection} from '../sections/PageSection';
-import {placeholderSrc} from '../sections/Placeholder';
-import {Photo} from '../sections/ui';
+import {PendingPhoto, placeholderSrc} from '../sections/Placeholder';
 import {BulletList, Crumbs, CtaBand, Paragraphs} from '../sections/ui';
 import {NotFound} from './NotFound';
 
 const styles = stylex.create({
-  // One large slot and three smaller ones: two tracks from 900px with the
-  // small slots stacked beside the large one, a single column on phones.
+  // The head: the street name, its address and status on the left, the facts
+  // as the lead under a hairline, with the one action at the end of the row.
+  factsRow: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    columnGap: 48,
+    rowGap: 24,
+    paddingTop: 24,
+    borderTopWidth: 1,
+    borderTopStyle: 'solid',
+    borderTopColor: 'var(--color-border-emphasized)',
+  },
+  factValue: {
+    fontSize: 'clamp(22px, 14px + 1.1vw, 30px)',
+    lineHeight: 1.15,
+    fontWeight: 700,
+    whiteSpace: 'nowrap',
+  },
+  // "Photos follow": one quiet treatment for the four slots. A lead frame
+  // and three beside it from 900px, kept low so the empty frames never
+  // outweigh the facts; a two-by-two grid of the same frames on phones.
   gallery: {
     display: 'grid',
     gap: 12,
     gridTemplateColumns: {
-      default: 'minmax(0, 1fr)',
+      default: 'repeat(2, minmax(0, 1fr))',
       '@media (min-width: 900px)': 'minmax(0, 2fr) minmax(0, 1fr)',
     },
     gridTemplateRows: {
-      default: 'none',
+      default: 'repeat(2, 120px)',
       '@media (min-width: 900px)': 'repeat(3, minmax(0, 1fr))',
     },
+    height: {default: 'auto', '@media (min-width: 900px)': 336},
   },
   lead: {
     gridRow: {default: 'auto', '@media (min-width: 900px)': '1 / span 3'},
@@ -40,57 +66,119 @@ const styles = stylex.create({
     display: 'block',
     width: '100%',
     height: '100%',
-    cursor: 'zoom-in',
-    borderWidth: 0,
+    minWidth: 0,
     padding: 0,
-    backgroundColor: 'transparent',
-    // The lightbox button needs a visible ring around the photo frame.
+    borderWidth: 0,
     borderRadius: 'var(--radius-container)',
+    backgroundColor: 'transparent',
+    color: 'inherit',
+    font: 'inherit',
+    cursor: 'zoom-in',
+    transitionProperty: 'opacity',
+    transitionDuration: '0.15s',
+    opacity: {default: 1, ':hover': 0.85, ':active': 0.75},
+    outlineStyle: {default: 'none', ':focus-visible': 'solid'},
+    outlineWidth: 'var(--focus-outline-width)',
+    outlineColor: 'var(--focus-outline-color)',
+    outlineOffset: 'var(--focus-outline-offset)',
   },
-  // Phones: one column in reading order. Desktop: text left, panel right.
+  // Roemer Visscherstraat: the text at a reading measure on the left, the
+  // facts and the action held in view on the right from 900px.
   body: {
     display: 'grid',
-    gap: {default: 32, '@media (min-width: 900px)': 48},
+    gap: {default: 40, '@media (min-width: 900px)': 64},
     alignItems: 'start',
     gridTemplateColumns: {
       default: 'minmax(0, 1fr)',
-      '@media (min-width: 900px)': 'minmax(0, 1fr) 360px',
+      '@media (min-width: 900px)': 'minmax(0, 1fr) 320px',
     },
   },
-  // A listing without a long description: the facts panel runs full width.
-  bodySingle: {width: '100%'},
-  detailInner: {display: 'flex', flexDirection: 'column', gap: 20},
-  singleInner: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-    gap: 32,
+  text: {maxWidth: '65ch'},
+  headline: {maxWidth: '22em'},
+  lede: {
+    fontSize: 20,
+    lineHeight: 1.5,
+    maxWidth: '40em',
   },
-  singleFacts: {flexGrow: 1, maxWidth: 560},
-  text: {
-    gridColumn: {default: 'auto', '@media (min-width: 900px)': '1'},
-    gridRow: {default: 'auto', '@media (min-width: 900px)': '1'},
-    maxWidth: '65ch',
-  },
+  // At least twice the space above each section head as under it.
+  part: {paddingTop: 48},
   panel: {
-    gridColumn: {default: 'auto', '@media (min-width: 900px)': '2'},
-    gridRow: {default: 'auto', '@media (min-width: 900px)': '1'},
-    padding: 32,
-    minHeight: 240,
+    padding: 24,
     boxSizing: 'border-box',
     borderRadius: 'var(--radius-container)',
-    backgroundColor: 'var(--color-background-card)',
+    backgroundColor: 'var(--color-background-surface)',
     borderWidth: 1,
     borderStyle: 'solid',
-    borderColor: 'var(--color-border-emphasized)',
-    // Facts and the call to action stay in view while the text scrolls.
+    borderColor: 'var(--color-border)',
     position: {default: 'static', '@media (min-width: 900px)': 'sticky'},
     top: 24,
+  },
+  // Under "Reageren": what the visitor reacts to, as a framed recap.
+  recap: {
+    padding: 24,
+    boxSizing: 'border-box',
+    borderRadius: 'var(--radius-container)',
+    backgroundColor: 'var(--color-background-surface)',
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderColor: 'var(--color-border)',
+  },
+  recapName: {
+    fontSize: 'clamp(22px, 1vw + 14px, 28px)',
+    lineHeight: 1.15,
+    fontWeight: 700,
   },
 });
 
 const GALLERY_LABELS = ['Voorgevel', 'Ontvangstruimte', 'Werkruimte', 'Tuin'];
+
+function Facts({
+  listing,
+  isLarge = false,
+}: {
+  listing: Listing;
+  isLarge?: boolean;
+}) {
+  return (
+    <MetadataList
+      orientation={isLarge ? 'horizontal' : 'vertical'}
+      label={isLarge ? undefined : {position: 'start'}}>
+      {listing.facts.map(fact => (
+        <MetadataListItem key={fact.label} label={fact.label}>
+          {isLarge ? (
+            <Text xstyle={styles.factValue}>{fact.value}</Text>
+          ) : (
+            fact.value
+          )}
+        </MetadataListItem>
+      ))}
+    </MetadataList>
+  );
+}
+
+function Features({listing}: {listing: Listing}) {
+  if (!listing.features || listing.features.length === 0) {
+    return null;
+  }
+  return (
+    <VStack gap={1}>
+      {listing.features.map(line => (
+        <Text key={line} as="p" color="secondary">
+          {line}
+        </Text>
+      ))}
+    </VStack>
+  );
+}
+
+function StatusBadge({listing}: {listing: Listing}) {
+  return (
+    <Badge
+      variant={listing.status === 'available' ? 'success' : 'neutral'}
+      label={statusLabel(listing.status)}
+    />
+  );
+}
 
 export function ListingDetail({slug}: {slug: string}) {
   const listing = LISTINGS.find(item => item.slug === slug);
@@ -98,117 +186,135 @@ export function ListingDetail({slug}: {slug: string}) {
   if (!listing) {
     return <NotFound />;
   }
-  const seed = LISTINGS.indexOf(listing);
-  const media = GALLERY_LABELS.map((label, index) => ({
-    src: placeholderSrc(`${listing.name}, ${label}`, seed + index),
+  const address = LISTING_ADDRESS[listing.slug];
+  const media = GALLERY_LABELS.map(label => ({
+    src: placeholderSrc(label),
     alt: `Fotoplaats: ${listing.name}, ${label}`,
   }));
   const detail = slug === 'roemer-visscherstraat' ? ROEMER_DETAIL : null;
 
-  const rest = media.slice(1);
-
-  function shot(index: number) {
-    return (
-      <button
-        key={media[index].alt}
-        type="button"
-        aria-label={`Open foto ${index + 1} van ${media.length}`}
-        onClick={() => setLightbox(index)}
-        {...stylex.props(styles.shot, index === 0 ? styles.lead : undefined)}>
-        <Photo
-          label={GALLERY_LABELS[index]}
-          seed={seed + index}
-          ratio={index === 0 ? '16 / 10' : '16 / 7'}
-          isFilled={index !== 0}
-        />
-      </button>
-    );
-  }
-
   return (
     <>
-      <PageSection paddingBlock={8}>
-        <VStack gap={6}>
-          <Crumbs
-            trail={[
-              {title: 'Home', href: '/'},
-              {title: 'Aanbod', href: '/aanbod/'},
-              {title: listing.name},
-            ]}
-          />
-          <VStack gap={3} align="start">
-            <Badge
-              variant={listing.status === 'available' ? 'success' : 'neutral'}
-              label={statusLabel(listing.status)}
+      <PageSection isWashed paddingBlock={8}>
+        <VStack gap={8}>
+          <VStack gap={6}>
+            <Crumbs
+              trail={[
+                {title: 'Home', href: '/'},
+                {title: 'Aanbod', href: '/aanbod/'},
+                {title: listing.name},
+              ]}
             />
-            <Heading level={1} type="display-2">
-              {listing.name}
-            </Heading>
-            <Text color="secondary">{LISTING_ADDRESS[listing.slug]}</Text>
+            <VStack gap={3} align="start">
+              <StatusBadge listing={listing} />
+              <Heading level={1} type="display-2">
+                {listing.name}
+              </Heading>
+              <Text type="large" color="secondary">
+                {address}
+              </Text>
+            </VStack>
           </VStack>
+          <div {...stylex.props(styles.factsRow)}>
+            <VStack gap={3}>
+              <Facts listing={listing} isLarge />
+              <Features listing={listing} />
+            </VStack>
+            <Button
+              label="Ik heb interesse!"
+              href="#reageren"
+              variant="primary"
+              size="lg"
+            />
+          </div>
           <div {...stylex.props(styles.gallery)}>
-            {shot(0)}
-            {rest.map((_, index) => shot(index + 1))}
+            {GALLERY_LABELS.map((label, index) => (
+              <button
+                key={label}
+                type="button"
+                aria-label={`Open foto ${index + 1} van ${media.length}`}
+                onClick={() => setLightbox(index)}
+                {...stylex.props(
+                  styles.shot,
+                  index === 0 ? styles.lead : undefined,
+                )}>
+                <PendingPhoto label={label} />
+              </button>
+            ))}
           </div>
         </VStack>
       </PageSection>
 
-      <PageSection isWashed paddingBlock={8}>
-        <div {...stylex.props(detail ? styles.body : styles.bodySingle)}>
-          <aside {...stylex.props(styles.panel)}>
-            <div
-              {...stylex.props(
-                detail ? styles.detailInner : styles.singleInner,
-              )}>
-              <div {...stylex.props(detail ? undefined : styles.singleFacts)}>
-                <MetadataList>
-                  {listing.facts.map(fact => (
-                    <MetadataListItem key={fact.label} label={fact.label}>
-                      {fact.value}
-                    </MetadataListItem>
-                  ))}
-                </MetadataList>
-              </div>
-              <Button
-                label="Ik heb interesse!"
-                href="#reageren"
-                variant="primary"
-                size="lg"
-              />
-            </div>
-          </aside>
-          {detail ? (
-            <div {...stylex.props(styles.text)}>
-              <VStack gap={8}>
-                <VStack gap={3}>
-                  <Heading level={2}>{detail.headline}</Heading>
-                  <Text color="secondary">{detail.lead}</Text>
-                  <Paragraphs items={detail.intro} />
-                </VStack>
-                {detail.sections.map(section => (
-                  <VStack key={section.title} gap={3}>
-                    <Heading level={3}>{section.title}</Heading>
-                    <Paragraphs items={section.body} />
-                    {'list' in section && section.list ? (
-                      <VStack gap={2}>
-                        {section.listTitle ? (
-                          <Text weight="medium">{section.listTitle}</Text>
-                        ) : null}
-                        <BulletList items={section.list} />
-                      </VStack>
-                    ) : null}
-                    {'after' in section && section.after ? (
-                      <Paragraphs items={[section.after]} />
-                    ) : null}
-                  </VStack>
-                ))}
+      {detail ? (
+        <PageSection paddingBlock={10}>
+          <div {...stylex.props(styles.body)}>
+            <article {...stylex.props(styles.text)}>
+              <VStack gap={5}>
+                <Heading level={2} xstyle={styles.headline}>
+                  {detail.headline}
+                </Heading>
+                <Text as="p" xstyle={styles.lede}>
+                  {detail.lead}
+                </Text>
+                <Paragraphs items={detail.intro} />
               </VStack>
-            </div>
-          ) : null}
-        </div>
-      </PageSection>
+              {detail.sections.map(section => (
+                <VStack key={section.title} gap={3} xstyle={styles.part}>
+                  <Heading level={3}>{section.title}</Heading>
+                  <Paragraphs items={section.body} />
+                  {'list' in section && section.list ? (
+                    <VStack gap={2}>
+                      {section.listTitle ? (
+                        <Text weight="medium">{section.listTitle}</Text>
+                      ) : null}
+                      <BulletList items={section.list} />
+                    </VStack>
+                  ) : null}
+                  {'after' in section && section.after ? (
+                    <Paragraphs items={[section.after]} />
+                  ) : null}
+                </VStack>
+              ))}
+            </article>
+            <aside {...stylex.props(styles.panel)}>
+              <VStack gap={5}>
+                <VStack gap={1}>
+                  <Text weight="bold">{listing.name}</Text>
+                  <Text type="supporting">{address}</Text>
+                </VStack>
+                <Facts listing={listing} />
+                <Button
+                  label="Ik heb interesse!"
+                  href="#reageren"
+                  variant="primary"
+                  size="lg"
+                />
+              </VStack>
+            </aside>
+          </div>
+        </PageSection>
+      ) : null}
 
-      <EnquiryForm listingName={listing.name} />
+      <EnquiryForm
+        listingName={listing.name}
+        aside={
+          <div {...stylex.props(styles.recap)}>
+            <VStack gap={4} align="start">
+              <StatusBadge listing={listing} />
+              <VStack gap={1}>
+                <Text xstyle={styles.recapName}>{listing.name}</Text>
+                <Text color="secondary">{address}</Text>
+              </VStack>
+              {detail ? null : (
+                <>
+                  <Facts listing={listing} />
+                  <Features listing={listing} />
+                </>
+              )}
+            </VStack>
+          </div>
+        }
+      />
       <CtaBand />
       <Lightbox
         isOpen={lightbox !== null}

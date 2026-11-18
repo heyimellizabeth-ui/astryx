@@ -550,7 +550,7 @@ export const ROEMER_DETAIL = {
 };
 
 export const LISTING_ADDRESS: Record<string, string> = {
-  'roemer-visscherstraat': 'Roemer Visscherstraat 24, Amsterdam',
+  'roemer-visscherstraat': 'Roemer Visscherstraat 24, 1054 EX Amsterdam',
   'de-molen': 'De Molen 8, 3994 DB Houten',
   'winkelwaard-494': 'Winkelwaard 494, 1824 HX Alkmaar',
   linnaeusstraat: 'Linnaeusstraat 98-H, 1092 CP Amsterdam',

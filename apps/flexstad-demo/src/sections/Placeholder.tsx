@@ -52,9 +52,66 @@ export function Placeholder({
   );
 }
 
-/** A data-URI image, for components that need a `src` (Lightbox). */
-export function placeholderSrc(label: string, seed = 0) {
-  const hue = HUES[Math.abs(seed) % HUES.length];
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1067" viewBox="0 0 1600 1067"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="oklch(0.78 0.14 ${hue})"/><stop offset="1" stop-color="oklch(0.46 0.12 312)"/></linearGradient></defs><rect width="1600" height="1067" fill="url(#g)"/><text x="60" y="1000" font-family="sans-serif" font-size="40" fill="#2a1038">Foto volgt: ${label}</text></svg>`;
+/**
+ * A data-URI image, for components that need a `src` (Lightbox). Flat and
+ * quiet, the same treatment as `PendingPhoto`: the warm paper well, a hairline
+ * frame and the caption, never a colour field pretending to be a photograph.
+ */
+export function placeholderSrc(label: string) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1067" viewBox="0 0 1600 1067"><rect width="1600" height="1067" fill="oklch(0.94 0.008 20)"/><rect x="24" y="24" width="1552" height="1019" rx="16" fill="none" stroke="oklch(0.56 0.025 310)" stroke-opacity="0.35" stroke-width="2"/><text x="72" y="960" font-family="Geologica, sans-serif" font-size="44" font-weight="700" fill="oklch(0.314 0.097 312.6)">${label}</text><text x="72" y="1012" font-family="Geologica, sans-serif" font-size="32" fill="oklch(0.42 0.025 310)">Foto volgt</text></svg>`;
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
+
+/**
+ * A photograph the client has not sent yet, drawn as what it is: the muted
+ * paper well inside a hairline frame, with the room it will show and
+ * "Foto volgt" as a two-line caption that never wraps. No gradient, no
+ * stand-in picture. Fills the cell it sits in; `PHOTO_RATIOS` or the grid
+ * decides its shape.
+ */
+export function PendingPhoto({label}: {label: string}) {
+  return (
+    <span {...stylex.props(pending.frame)}>
+      <span {...stylex.props(pending.caption)}>
+        <span {...stylex.props(pending.room)}>{label}</span>
+        <span {...stylex.props(pending.note)}>Foto volgt</span>
+      </span>
+    </span>
+  );
+}
+
+const pending = stylex.create({
+  frame: {
+    position: 'relative',
+    display: 'flex',
+    alignItems: 'flex-end',
+    width: '100%',
+    height: '100%',
+    boxSizing: 'border-box',
+    padding: 16,
+    borderRadius: 'var(--radius-container)',
+    backgroundColor: 'var(--color-background-muted)',
+    outlineWidth: 1,
+    outlineStyle: 'solid',
+    outlineColor: 'var(--color-border)',
+    outlineOffset: -1,
+    textAlign: 'start',
+  },
+  caption: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 2,
+    minWidth: 0,
+    lineHeight: 1.3,
+    whiteSpace: 'nowrap',
+  },
+  room: {
+    color: 'var(--color-text-primary)',
+    fontSize: 15,
+    fontWeight: 500,
+  },
+  note: {
+    color: 'var(--color-text-secondary)',
+    fontSize: 14,
+  },
+});

@@ -29,7 +29,66 @@ const styles = stylex.create({
   },
   cell: {display: 'flex'},
   chips: {display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center'},
+  // The banner's index: each place the listings are in, with how many, as
+  // hairline rows that set the filter. It anchors the head to the catalogue.
+  index: {
+    margin: 0,
+    padding: 0,
+    listStyleType: 'none',
+    borderTopWidth: 1,
+    borderTopStyle: 'solid',
+    borderTopColor: 'var(--color-border-emphasized)',
+  },
+  indexRow: {
+    borderBottomWidth: 1,
+    borderBottomStyle: 'solid',
+    borderBottomColor: 'var(--color-border-emphasized)',
+  },
+  indexLink: {
+    display: 'flex',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+    gap: 16,
+    minHeight: 48,
+    paddingBlock: 10,
+    boxSizing: 'border-box',
+    color: 'var(--color-text-primary)',
+    textDecoration: 'none',
+    fontSize: 20,
+    fontWeight: 500,
+    transitionProperty: 'color',
+    transitionDuration: '0.15s',
+    ':hover': {color: 'var(--color-text-accent)'},
+  },
+  indexCount: {
+    fontVariantNumeric: 'tabular-nums',
+    fontWeight: 700,
+  },
 });
+
+/** Each place with listings, and how many, as links that set the filter. */
+function PlaceIndex() {
+  const places = LOCATIONS.map(city => ({
+    city,
+    count: LISTINGS.filter(listing => listing.city === city).length,
+  })).sort((a, b) => b.count - a.count);
+  return (
+    <nav aria-label="Aanbod per plaats">
+      <ul {...stylex.props(styles.index)}>
+        {places.map(({city, count}) => (
+          <li key={city} {...stylex.props(styles.indexRow)}>
+            <a
+              href={`/aanbod/?locatie=${encodeURIComponent(city)}`}
+              {...stylex.props(styles.indexLink)}>
+              <span>{city}</span>
+              <span {...stylex.props(styles.indexCount)}>{count}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
 
 function Filters({
   locations,
@@ -98,6 +157,7 @@ export function Aanbod() {
         title="Actueel aanbod"
         trail={[{title: 'Home', href: '/'}, {title: 'Aanbod'}]}
         ctas={[{label: 'Schrijf je nu in!', href: '/inschrijven/'}]}
+        aside={<PlaceIndex />}
       />
       <PageSection>
         <div

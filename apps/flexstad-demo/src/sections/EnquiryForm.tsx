@@ -1,10 +1,15 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
-import {useState, type ComponentProps, type FormEvent} from 'react';
+import * as stylex from '@stylexjs/stylex';
+import {
+  useState,
+  type ComponentProps,
+  type FormEvent,
+  type ReactNode,
+} from 'react';
 import {Button} from '@astryxdesign/core/Button';
 import {DateInput} from '@astryxdesign/core/DateInput';
 import {FormLayout} from '@astryxdesign/core/FormLayout';
-import {Grid} from '@astryxdesign/core/Grid';
 import {Heading} from '@astryxdesign/core/Heading';
 import {VStack} from '@astryxdesign/core/Layout';
 import {RadioList, RadioListItem} from '@astryxdesign/core/RadioList';
@@ -15,6 +20,24 @@ import {BUDGETS} from '../content';
 import {NotConnectedNotice} from './Forms';
 import {PageSection} from './PageSection';
 
+const styles = stylex.create({
+  // The head and what the visitor reacts to on the left (five of twelve
+  // columns, held in view while the form scrolls), the form on the right.
+  layout: {
+    display: 'grid',
+    gap: {default: 32, '@media (min-width: 900px)': 64},
+    alignItems: 'start',
+    gridTemplateColumns: {
+      default: 'minmax(0, 1fr)',
+      '@media (min-width: 900px)': 'minmax(0, 5fr) minmax(0, 7fr)',
+    },
+  },
+  side: {
+    position: {default: 'static', '@media (min-width: 900px)': 'sticky'},
+    top: 24,
+  },
+});
+
 type Use = 'wonen' | 'werken' | '';
 type IsoDate = ComponentProps<typeof DateInput>['value'];
 
@@ -23,7 +46,14 @@ type IsoDate = ComponentProps<typeof DateInput>['value'];
  * form. Nothing is sent: submitting only shows a notice that the form is
  * not connected.
  */
-export function EnquiryForm({listingName}: {listingName?: string}) {
+export function EnquiryForm({
+  listingName,
+  aside,
+}: {
+  listingName?: string;
+  /** What the visitor reacts to, set under the head in the left column. */
+  aside?: ReactNode;
+}) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -44,10 +74,13 @@ export function EnquiryForm({listingName}: {listingName?: string}) {
   }
 
   return (
-    <PageSection id="reageren">
+    <PageSection id="reageren" variant="muted">
       <form onSubmit={handleSubmit} noValidate>
-        <Grid columns={{minWidth: 300, repeat: 'fit'}} gap={8} align="start">
-          <Heading level={2}>Reageren</Heading>
+        <div {...stylex.props(styles.layout)}>
+          <VStack gap={6} xstyle={styles.side}>
+            <Heading level={2}>Reageren</Heading>
+            {aside}
+          </VStack>
           <VStack gap={6}>
             {isSent ? <NotConnectedNotice /> : null}
             <FormLayout>
@@ -138,7 +171,7 @@ export function EnquiryForm({listingName}: {listingName?: string}) {
               />
             </div>
           </VStack>
-        </Grid>
+        </div>
       </form>
     </PageSection>
   );
