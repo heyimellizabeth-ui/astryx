@@ -1,7 +1,14 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 import * as stylex from '@stylexjs/stylex';
-import {useState, type FormEvent, type ReactNode} from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type ReactNode,
+  type RefObject,
+} from 'react';
 import {Banner} from '@astryxdesign/core/Banner';
 import {Button} from '@astryxdesign/core/Button';
 import {FormLayout} from '@astryxdesign/core/FormLayout';
@@ -37,30 +44,74 @@ export function NotConnectedNotice() {
   );
 }
 
+/** What a field shows when it is the one that failed. */
+export type FieldError = string | undefined;
+
 /**
- * Wrapper shared by the page forms. Nothing is sent anywhere yet: a valid
- * submit only shows a notice that the form is not connected.
+ * Submit handling shared by every form. The submit button is never disabled:
+ * pressing it validates, every failing field shows its message, and focus
+ * moves to the first one. Nothing is sent anywhere yet: a valid submit only
+ * shows a notice that the form is not connected.
  */
-function FormShell({
-  isValid,
-  submitLabel,
-  children,
-}: {
-  isValid: boolean;
-  submitLabel: string;
-  children: ReactNode;
-}) {
+export function useFormSubmit(hasErrors: boolean): {
+  formRef: RefObject<HTMLFormElement | null>;
+  isSent: boolean;
+  handleSubmit: (event: FormEvent) => void;
+  /** The status prop for a field: its message once a submit was tried. */
+  status: (message: FieldError) => {type: 'error'; message: string} | undefined;
+} {
+  const formRef = useRef<HTMLFormElement>(null);
+  const [hasTried, setHasTried] = useState(false);
+  const [tries, setTries] = useState(0);
   const [isSent, setIsSent] = useState(false);
+
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    if (isValid) {
+    setHasTried(true);
+    if (hasErrors) {
+      setIsSent(false);
+      setTries(count => count + 1);
+    } else {
       setIsSent(true);
     }
   }
+
+  // The messages land on the render after the press, so focus moves here.
+  useEffect(() => {
+    if (tries === 0) {
+      return;
+    }
+    const first = formRef.current?.querySelector<HTMLElement>(
+      '[aria-invalid="true"]',
+    );
+    if (first) {
+      first.focus();
+    }
+  }, [tries]);
+
+  return {
+    formRef,
+    isSent,
+    handleSubmit,
+    status: message =>
+      hasTried && message ? {type: 'error', message} : undefined,
+  };
+}
+
+/** Wrapper shared by the page forms. */
+function FormShell({
+  form,
+  submitLabel,
+  children,
+}: {
+  form: ReturnType<typeof useFormSubmit>;
+  submitLabel: string;
+  children: ReactNode;
+}) {
   return (
-    <form onSubmit={handleSubmit} noValidate>
+    <form ref={form.formRef} onSubmit={form.handleSubmit} noValidate>
       <VStack gap={6}>
-        {isSent ? <NotConnectedNotice /> : null}
+        {form.isSent ? <NotConnectedNotice /> : null}
         <FormLayout>{children}</FormLayout>
         <div>
           <Button
@@ -68,12 +119,19 @@ function FormShell({
             type="submit"
             variant="primary"
             size="lg"
-            isDisabled={!isValid}
           />
         </div>
       </VStack>
     </form>
   );
+}
+
+/** An e-mail field's message: empty, or no "@" in it. */
+export function emailError(value: string): FieldError {
+  if (value.trim() === '') {
+    return 'Vul je e-mailadres in.';
+  }
+  return value.includes('@') ? undefined : 'Vul een geldig e-mailadres in.';
 }
 
 /** "Inschrijven": fields and options match the live sign-up form. */
@@ -95,24 +153,32 @@ export function SignupForm() {
 
   const isParticulier = who === 'Particulier';
   const isBusiness = who === "ZZP'er" || who === 'Bedrijf';
-  const isValid =
-    first.trim() !== '' &&
-    last.trim() !== '' &&
-    email.includes('@') &&
-    phone.trim() !== '' &&
-    !!start &&
-    region.trim() !== '' &&
-    !!seeks &&
-    !!budget &&
-    !!who &&
-    (isParticulier
-      ? !!persons
-      : isBusiness
-        ? company.trim() !== '' && sector.trim() !== '' && staff.trim() !== ''
-        : false);
+  const empty = (value: string, message: string): FieldError =>
+    value.trim() === '' ? message : undefined;
+  const errors = {
+    first: empty(first, 'Vul je voornaam in.'),
+    last: empty(last, 'Vul je achternaam in.'),
+    email: emailError(email),
+    phone: empty(phone, 'Vul je telefoonnummer in.'),
+    start: start ? undefined : 'Kies een optie bij Gewenste startdatum.',
+    region: empty(region, 'Vul je gewenste regio of plaats in.'),
+    seeks: seeks ? undefined : 'Kies een optie bij Ik zoek.',
+    budget: budget ? undefined : 'Kies een optie bij Budget (per maand).',
+    who: who ? undefined : 'Kies een optie bij Ik ben.',
+    persons:
+      isParticulier && !persons
+        ? 'Kies een optie bij Aantal personen.'
+        : undefined,
+    company: isBusiness ? empty(company, 'Vul je bedrijfsnaam in.') : undefined,
+    sector: isBusiness ? empty(sector, 'Vul je branche in.') : undefined,
+    staff: isBusiness
+      ? empty(staff, 'Vul het aantal medewerkers in.')
+      : undefined,
+  };
+  const form = useFormSubmit(Object.values(errors).some(Boolean));
 
   return (
-    <FormShell isValid={isValid} submitLabel="Inschrijven">
+    <FormShell form={form} submitLabel="Inschrijven">
       <TextInput
         size="lg"
         label="Voornaam"
@@ -120,6 +186,7 @@ export function SignupForm() {
         onChange={setFirst}
         isRequired
         htmlName="first-name"
+        status={form.status(errors.first)}
       />
       <TextInput
         size="lg"
@@ -128,6 +195,7 @@ export function SignupForm() {
         onChange={setLast}
         isRequired
         htmlName="last-name"
+        status={form.status(errors.last)}
       />
       <TextInput
         size="lg"
@@ -137,6 +205,7 @@ export function SignupForm() {
         onChange={setEmail}
         isRequired
         htmlName="email"
+        status={form.status(errors.email)}
       />
       <TextInput
         size="lg"
@@ -146,6 +215,7 @@ export function SignupForm() {
         onChange={setPhone}
         isRequired
         htmlName="phone"
+        status={form.status(errors.phone)}
       />
       <Selector
         size="lg"
@@ -155,6 +225,7 @@ export function SignupForm() {
         onChange={setStart}
         isRequired
         htmlName="start"
+        status={form.status(errors.start)}
       />
       <TextInput
         size="lg"
@@ -163,6 +234,7 @@ export function SignupForm() {
         onChange={setRegion}
         isRequired
         htmlName="region"
+        status={form.status(errors.region)}
       />
       <Selector
         size="lg"
@@ -172,6 +244,7 @@ export function SignupForm() {
         onChange={setSeeks}
         isRequired
         htmlName="seeks"
+        status={form.status(errors.seeks)}
       />
       <Selector
         size="lg"
@@ -181,6 +254,7 @@ export function SignupForm() {
         onChange={setBudget}
         isRequired
         htmlName="budget"
+        status={form.status(errors.budget)}
       />
       <Selector
         size="lg"
@@ -190,6 +264,7 @@ export function SignupForm() {
         onChange={setWho}
         isRequired
         htmlName="who"
+        status={form.status(errors.who)}
       />
       {isParticulier ? (
         <Selector
@@ -200,6 +275,7 @@ export function SignupForm() {
           onChange={setPersons}
           isRequired
           htmlName="persons"
+          status={form.status(errors.persons)}
         />
       ) : null}
       {isBusiness ? (
@@ -211,6 +287,7 @@ export function SignupForm() {
             onChange={setCompany}
             isRequired
             htmlName="company"
+            status={form.status(errors.company)}
           />
           <TextInput
             size="lg"
@@ -219,6 +296,7 @@ export function SignupForm() {
             onChange={setSector}
             isRequired
             htmlName="sector"
+            status={form.status(errors.sector)}
           />
           <TextInput
             size="lg"
@@ -227,6 +305,7 @@ export function SignupForm() {
             onChange={setStaff}
             isRequired
             htmlName="staff"
+            status={form.status(errors.staff)}
           />
         </>
       ) : null}
@@ -247,10 +326,14 @@ export function ContactForm() {
   const [email, setEmail] = useState('');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
-  const isValid =
-    name.trim() !== '' && email.includes('@') && message.trim() !== '';
+  const errors = {
+    name: name.trim() === '' ? 'Vul je naam in.' : undefined,
+    email: emailError(email),
+    message: message.trim() === '' ? 'Vul je bericht in.' : undefined,
+  };
+  const form = useFormSubmit(Object.values(errors).some(Boolean));
   return (
-    <FormShell isValid={isValid} submitLabel="Verstuur bericht">
+    <FormShell form={form} submitLabel="Verstuur bericht">
       <TextInput
         size="lg"
         label="Naam"
@@ -258,6 +341,7 @@ export function ContactForm() {
         onChange={setName}
         isRequired
         htmlName="name"
+        status={form.status(errors.name)}
       />
       <TextInput
         size="lg"
@@ -267,6 +351,7 @@ export function ContactForm() {
         onChange={setEmail}
         isRequired
         htmlName="email"
+        status={form.status(errors.email)}
       />
       <TextInput
         size="lg"
@@ -282,6 +367,7 @@ export function ContactForm() {
         onChange={setMessage}
         rows={6}
         isRequired
+        status={form.status(errors.message)}
       />
     </FormShell>
   );
@@ -290,8 +376,10 @@ export function ContactForm() {
 /** "Aanmelden": the live form is script-rendered, so only an e-mail field is assumed. */
 export function SubscribeForm() {
   const [email, setEmail] = useState('');
+  const error = emailError(email);
+  const form = useFormSubmit(error !== undefined);
   return (
-    <FormShell isValid={email.includes('@')} submitLabel="Aanmelden">
+    <FormShell form={form} submitLabel="Aanmelden">
       <TextInput
         size="lg"
         label="E-mailadres"
@@ -300,6 +388,7 @@ export function SubscribeForm() {
         onChange={setEmail}
         isRequired
         htmlName="email"
+        status={form.status(error)}
       />
     </FormShell>
   );

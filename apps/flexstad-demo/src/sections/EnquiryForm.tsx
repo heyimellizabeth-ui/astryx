@@ -1,12 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 import * as stylex from '@stylexjs/stylex';
-import {
-  useState,
-  type ComponentProps,
-  type FormEvent,
-  type ReactNode,
-} from 'react';
+import {useState, type ComponentProps, type ReactNode} from 'react';
 import {Button} from '@astryxdesign/core/Button';
 import {DateInput} from '@astryxdesign/core/DateInput';
 import {FormLayout} from '@astryxdesign/core/FormLayout';
@@ -17,7 +12,7 @@ import {Selector} from '@astryxdesign/core/Selector';
 import {TextArea} from '@astryxdesign/core/TextArea';
 import {TextInput} from '@astryxdesign/core/TextInput';
 import {BUDGETS} from '../content';
-import {NotConnectedNotice} from './Forms';
+import {NotConnectedNotice, useFormSubmit} from './Forms';
 import {PageSection} from './PageSection';
 
 const styles = stylex.create({
@@ -62,27 +57,22 @@ export function EnquiryForm({
   const [start, setStart] = useState<IsoDate>();
   const [end, setEnd] = useState<IsoDate>();
   const [notes, setNotes] = useState('');
-  const [isSent, setIsSent] = useState(false);
-
-  const isInvalid = use === '' || !start;
-
-  function handleSubmit(event: FormEvent) {
-    event.preventDefault();
-    if (!isInvalid) {
-      setIsSent(true);
-    }
-  }
+  const errors = {
+    use: use === '' ? 'Kies een optie bij Type gebruik.' : undefined,
+    start: start ? undefined : 'Vul een startdatum in.',
+  };
+  const form = useFormSubmit(Object.values(errors).some(Boolean));
 
   return (
     <PageSection id="reageren" variant="muted">
-      <form onSubmit={handleSubmit} noValidate>
+      <form ref={form.formRef} onSubmit={form.handleSubmit} noValidate>
         <div {...stylex.props(styles.layout)}>
           <VStack gap={6} xstyle={styles.side}>
             <Heading level={2}>Reageren</Heading>
             {aside}
           </VStack>
           <VStack gap={6}>
-            {isSent ? <NotConnectedNotice /> : null}
+            {form.isSent ? <NotConnectedNotice /> : null}
             <FormLayout>
               <TextInput
                 size="lg"
@@ -116,7 +106,8 @@ export function EnquiryForm({
                 onChange={value => setUse(value as Use)}
                 orientation="horizontal"
                 isRequired
-                htmlName="use">
+                htmlName="use"
+                status={form.status(errors.use)}>
                 <RadioListItem value="wonen" label="Wonen" />
                 <RadioListItem value="werken" label="Werken" />
               </RadioList>
@@ -144,6 +135,7 @@ export function EnquiryForm({
                 value={start}
                 onChange={setStart}
                 isRequired
+                status={form.status(errors.start)}
               />
               <DateInput
                 size="lg"
@@ -167,7 +159,6 @@ export function EnquiryForm({
                 type="submit"
                 variant="primary"
                 size="lg"
-                isDisabled={isInvalid}
               />
             </div>
           </VStack>
