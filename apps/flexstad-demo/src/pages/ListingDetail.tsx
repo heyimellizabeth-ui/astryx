@@ -4,10 +4,8 @@ import * as stylex from '@stylexjs/stylex';
 import {useState} from 'react';
 import {Badge} from '@astryxdesign/core/Badge';
 import {Button} from '@astryxdesign/core/Button';
-import {Carousel} from '@astryxdesign/core/Carousel';
-import {Grid} from '@astryxdesign/core/Grid';
 import {Heading} from '@astryxdesign/core/Heading';
-import {HStack, VStack} from '@astryxdesign/core/Layout';
+import {VStack} from '@astryxdesign/core/Layout';
 import {Lightbox} from '@astryxdesign/core/Lightbox';
 import {MetadataList, MetadataListItem} from '@astryxdesign/core/MetadataList';
 import {Text} from '@astryxdesign/core/Text';
@@ -21,13 +19,57 @@ import {BulletList, Crumbs, CtaBand, Paragraphs} from '../sections/ui';
 import {NotFound} from './NotFound';
 
 const styles = stylex.create({
-  slide: {
-    width: 'min(80vw, 420px)',
-    flexShrink: 0,
+  // Photo 1 is the lead image across the full width; the others sit under it.
+  gallery: {
+    display: 'grid',
+    gap: 12,
+    gridTemplateColumns: {
+      default: 'repeat(3, minmax(0, 1fr))',
+      '@media (min-width: 900px)': 'repeat(5, minmax(0, 1fr))',
+    },
+  },
+  lead: {gridColumn: '1 / -1'},
+  shot: {
+    display: 'block',
+    width: '100%',
     cursor: 'zoom-in',
     borderWidth: 0,
     padding: 0,
     backgroundColor: 'transparent',
+    // The lightbox button needs a visible ring around the photo frame.
+    borderRadius: 'var(--radius-container)',
+  },
+  // Phones: one column in reading order. Desktop: text left, panel right.
+  body: {
+    display: 'grid',
+    gap: {default: 32, '@media (min-width: 900px)': 48},
+    alignItems: 'start',
+    gridTemplateColumns: {
+      default: 'minmax(0, 1fr)',
+      '@media (min-width: 900px)': 'minmax(0, 1fr) 360px',
+    },
+  },
+  head: {
+    gridColumn: {default: 'auto', '@media (min-width: 900px)': '1'},
+    gridRow: {default: 'auto', '@media (min-width: 900px)': '1'},
+  },
+  text: {
+    gridColumn: {default: 'auto', '@media (min-width: 900px)': '1'},
+    gridRow: {default: 'auto', '@media (min-width: 900px)': '2'},
+    maxWidth: '65ch',
+  },
+  panel: {
+    gridColumn: {default: 'auto', '@media (min-width: 900px)': '2'},
+    gridRow: {default: 'auto', '@media (min-width: 900px)': '1 / span 2'},
+    padding: 24,
+    borderRadius: 'var(--radius-container)',
+    backgroundColor: 'var(--color-background-card)',
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderColor: 'var(--color-border-emphasized)',
+    // Facts and the call to action stay in view while the text scrolls.
+    position: {default: 'static', '@media (min-width: 900px)': 'sticky'},
+    top: 24,
   },
 });
 
@@ -53,6 +95,27 @@ export function ListingDetail({slug}: {slug: string}) {
   }));
   const detail = slug === 'roemer-visscherstraat' ? ROEMER_DETAIL : null;
 
+  const rest = media.slice(1);
+
+  const name = listing.name;
+
+  function shot(index: number) {
+    return (
+      <button
+        key={media[index].alt}
+        type="button"
+        aria-label={`Open foto ${index + 1} van ${media.length}`}
+        onClick={() => setLightbox(index)}
+        {...stylex.props(styles.shot, index === 0 ? styles.lead : undefined)}>
+        <Photo
+          label={`${name}, ${GALLERY_LABELS[index]}`}
+          seed={seed + index}
+          ratio={index === 0 ? '16 / 8' : '4 / 3'}
+        />
+      </button>
+    );
+  }
+
   return (
     <>
       <PageSection paddingBlock={8}>
@@ -64,7 +127,16 @@ export function ListingDetail({slug}: {slug: string}) {
               {title: listing.name},
             ]}
           />
-          <Grid columns={{minWidth: 300, repeat: 'fit'}} gap={6} align="end">
+          <div {...stylex.props(styles.gallery)}>
+            {shot(0)}
+            {rest.map((_, index) => shot(index + 1))}
+          </div>
+        </VStack>
+      </PageSection>
+
+      <PageSection isWashed paddingBlock={8}>
+        <div {...stylex.props(styles.body)}>
+          <div {...stylex.props(styles.head)}>
             <VStack gap={3} align="start">
               <Badge
                 variant={listing.status === 'available' ? 'success' : 'neutral'}
@@ -75,69 +147,54 @@ export function ListingDetail({slug}: {slug: string}) {
               </Heading>
               <Text color="secondary">{LISTING_ADDRESS[listing.slug]}</Text>
             </VStack>
-            <HStack gap={3} wrap="wrap" justify="end">
+          </div>
+          <aside {...stylex.props(styles.panel)}>
+            <VStack gap={5}>
+              <MetadataList>
+                {listing.facts.map(fact => (
+                  <MetadataListItem key={fact.label} label={fact.label}>
+                    {fact.value}
+                  </MetadataListItem>
+                ))}
+              </MetadataList>
               <Button
                 label="Ik heb interesse!"
                 href="#reageren"
                 variant="primary"
                 size="lg"
               />
-            </HStack>
-          </Grid>
-          <Carousel gap={3} hasButtons hasSnap>
-            {media.map((item, index) => (
-              <button
-                key={item.alt}
-                type="button"
-                aria-label={`Open foto ${index + 1} van ${media.length}`}
-                onClick={() => setLightbox(index)}
-                {...stylex.props(styles.slide)}>
-                <Photo
-                  label={`${listing.name}, ${GALLERY_LABELS[index]}`}
-                  seed={seed + index}
-                  ratio="4 / 3"
-                />
-              </button>
-            ))}
-          </Carousel>
-          <MetadataList>
-            {listing.facts.map(fact => (
-              <MetadataListItem key={fact.label} label={fact.label}>
-                {fact.value}
-              </MetadataListItem>
-            ))}
-          </MetadataList>
-        </VStack>
-      </PageSection>
-
-      {detail ? (
-        <PageSection isWashed maxWidth={860}>
-          <VStack gap={8}>
-            <VStack gap={3}>
-              <Heading level={2}>{detail.headline}</Heading>
-              <Text color="secondary">{detail.lead}</Text>
-              <Paragraphs items={detail.intro} />
             </VStack>
-            {detail.sections.map(section => (
-              <VStack key={section.title} gap={3}>
-                <Heading level={3}>{section.title}</Heading>
-                <Paragraphs items={section.body} />
-                {'list' in section && section.list ? (
-                  <VStack gap={2}>
-                    {section.listTitle ? (
-                      <Text weight="medium">{section.listTitle}</Text>
+          </aside>
+          {detail ? (
+            <div {...stylex.props(styles.text)}>
+              <VStack gap={8}>
+                <VStack gap={3}>
+                  <Heading level={2}>{detail.headline}</Heading>
+                  <Text color="secondary">{detail.lead}</Text>
+                  <Paragraphs items={detail.intro} />
+                </VStack>
+                {detail.sections.map(section => (
+                  <VStack key={section.title} gap={3}>
+                    <Heading level={3}>{section.title}</Heading>
+                    <Paragraphs items={section.body} />
+                    {'list' in section && section.list ? (
+                      <VStack gap={2}>
+                        {section.listTitle ? (
+                          <Text weight="medium">{section.listTitle}</Text>
+                        ) : null}
+                        <BulletList items={section.list} />
+                      </VStack>
                     ) : null}
-                    <BulletList items={section.list} />
+                    {'after' in section && section.after ? (
+                      <Paragraphs items={[section.after]} />
+                    ) : null}
                   </VStack>
-                ) : null}
-                {'after' in section && section.after ? (
-                  <Paragraphs items={[section.after]} />
-                ) : null}
+                ))}
               </VStack>
-            ))}
-          </VStack>
-        </PageSection>
-      ) : null}
+            </div>
+          ) : null}
+        </div>
+      </PageSection>
 
       <EnquiryForm listingName={listing.name} />
       <CtaBand />

@@ -8,26 +8,32 @@ import {VStack} from '@astryxdesign/core/Layout';
 import {Selector} from '@astryxdesign/core/Selector';
 import {TextArea} from '@astryxdesign/core/TextArea';
 import {TextInput} from '@astryxdesign/core/TextInput';
-import {SIGNUP} from '../content';
+import {CONTACT, SIGNUP} from '../content';
 
 const toOptions = (values: ReadonlyArray<string>) =>
   values.map(value => ({value, label: value}));
 
+/** Shown after a valid submit: no request is made, so it says so. */
+export function NotConnectedNotice() {
+  return (
+    <Banner status="warning" title="Er is niets verstuurd" collapsible={false}>
+      Dit formulier is nog niet gekoppeld. Mail naar {CONTACT.email} of bel{' '}
+      {CONTACT.phone}.
+    </Banner>
+  );
+}
+
 /**
  * Wrapper shared by the page forms. Nothing is sent anywhere yet: a valid
- * submit only shows the success message.
+ * submit only shows a notice that the form is not connected.
  */
 function FormShell({
   isValid,
   submitLabel,
-  successTitle,
-  successBody,
   children,
 }: {
   isValid: boolean;
   submitLabel: string;
-  successTitle: string;
-  successBody: string;
   children: ReactNode;
 }) {
   const [isSent, setIsSent] = useState(false);
@@ -40,11 +46,7 @@ function FormShell({
   return (
     <form onSubmit={handleSubmit} noValidate>
       <VStack gap={6}>
-        {isSent ? (
-          <Banner status="success" title={successTitle} collapsible={false}>
-            {successBody}
-          </Banner>
-        ) : null}
+        {isSent ? <NotConnectedNotice /> : null}
         <FormLayout>{children}</FormLayout>
         <div>
           <Button
@@ -96,11 +98,7 @@ export function SignupForm() {
         : false);
 
   return (
-    <FormShell
-      isValid={isValid}
-      submitLabel="Inschrijven"
-      successTitle="Bedankt voor je inschrijving"
-      successBody="Zodra er een ruimte beschikbaar komt die aansluit bij je wensen, nemen wij contact met je op.">
+    <FormShell isValid={isValid} submitLabel="Inschrijven">
       <TextInput
         label="Voornaam"
         value={first}
@@ -225,11 +223,7 @@ export function ContactForm() {
   const isValid =
     name.trim() !== '' && email.includes('@') && message.trim() !== '';
   return (
-    <FormShell
-      isValid={isValid}
-      submitLabel="Verstuur bericht"
-      successTitle="Bericht verstuurd"
-      successBody="Bedankt! We nemen zo snel mogelijk contact met je op.">
+    <FormShell isValid={isValid} submitLabel="Verstuur bericht">
       <TextInput
         label="Naam"
         value={name}
@@ -267,11 +261,7 @@ export function ContactForm() {
 export function SubscribeForm() {
   const [email, setEmail] = useState('');
   return (
-    <FormShell
-      isValid={email.includes('@')}
-      submitLabel="Aanmelden"
-      successTitle="Aangemeld"
-      successBody="Bedankt voor je aanmelding.">
+    <FormShell isValid={email.includes('@')} submitLabel="Aanmelden">
       <TextInput
         label="E-mailadres"
         type="email"

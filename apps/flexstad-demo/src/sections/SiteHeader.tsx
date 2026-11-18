@@ -2,6 +2,7 @@
 
 import {useState} from 'react';
 import {Button} from '@astryxdesign/core/Button';
+import {Icon} from '@astryxdesign/core/Icon';
 import {IconButton} from '@astryxdesign/core/IconButton';
 import {HStack, VStack} from '@astryxdesign/core/Layout';
 import {MobileNav} from '@astryxdesign/core/MobileNav';
@@ -29,21 +30,6 @@ function PortalIcon(props: React.SVGProps<SVGSVGElement>) {
       {...props}>
       <circle cx="12" cy="8" r="4" />
       <path d="M4 21c0-4 4-6 8-6s8 2 8 6" />
-    </svg>
-  );
-}
-
-function MenuIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      aria-hidden="true"
-      {...props}>
-      <path d="M4 7h16M4 12h16M4 17h16" />
     </svg>
   );
 }
@@ -118,7 +104,7 @@ function PhoneHeader() {
           <Button label="Inschrijven" variant="primary" href="/inschrijven/" />
           <IconButton
             label="Menu"
-            icon={<MenuIcon />}
+            icon={<Icon icon="menu" />}
             variant="ghost"
             onClick={() => setIsOpen(true)}
           />

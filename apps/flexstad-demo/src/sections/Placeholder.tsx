@@ -12,17 +12,20 @@ const styles = stylex.create({
     justifyContent: 'flex-start',
     padding: 16,
     boxSizing: 'border-box',
-    color: 'var(--color-on-accent)',
+    color: 'oklch(0.98 0.01 300)',
     fontSize: 13,
   },
 });
 
 const HUES = [38, 312, 28, 330, 50, 295];
 
-/** Gradient for slot number `seed`; uses the brand orange and aubergine. */
+/**
+ * Gradient for slot number `seed`; brand orange and aubergine, dark enough
+ * for the light label on top of it (4.5:1 along the whole gradient).
+ */
 export function placeholderGradient(seed: number) {
   const hue = HUES[Math.abs(seed) % HUES.length];
-  return `linear-gradient(145deg, oklch(0.78 0.14 ${hue}), oklch(0.46 0.12 312))`;
+  return `linear-gradient(145deg, oklch(0.54 0.14 ${hue}), oklch(0.32 0.1 312))`;
 }
 
 /** A labelled photo slot. Real photography replaces these once supplied. */

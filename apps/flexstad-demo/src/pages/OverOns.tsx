@@ -11,6 +11,8 @@ import {PageSection} from '../sections/PageSection';
 import {BulletList, CtaBand, PageHero, Paragraphs} from '../sections/ui';
 
 const styles = stylex.create({
+  // The whole story sits in one reading measure under the tagline.
+  measure: {maxWidth: '65ch'},
   panel: {
     padding: 28,
     borderRadius: 'var(--radius-container)',
@@ -28,13 +30,19 @@ export function OverOns() {
     <>
       <PageHero
         title="Over Flexstad"
-        intro={ABOUT.heading}
         trail={[{title: 'Home', href: '/'}, {title: 'Over ons'}]}
         photoLabel="Het Flexstad-team"
         seed={3}
       />
-      <PageSection>
-        <Paragraphs items={ABOUT.story} />
+      <PageSection paddingBlock={10}>
+        <VStack gap={8}>
+          <Heading level={2} type="display-1">
+            {ABOUT.heading}
+          </Heading>
+          <div {...stylex.props(styles.measure)}>
+            <Paragraphs items={ABOUT.story} />
+          </div>
+        </VStack>
       </PageSection>
       <PageSection isWashed>
         <Grid columns={{minWidth: 300, repeat: 'fit'}} gap={6} align="stretch">

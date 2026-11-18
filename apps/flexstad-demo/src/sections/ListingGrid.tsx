@@ -30,13 +30,15 @@ export function ListingGrid() {
           </VStack>
           <Button label="Bekijk alles" variant="ghost" href="/aanbod/" />
         </HStack>
-        <Carousel gap={4} hasButtons hasSnap>
-          {LISTINGS.map(listing => (
-            <div key={listing.slug} {...stylex.props(styles.slide)}>
-              <ListingCard listing={listing} />
-            </div>
-          ))}
-        </Carousel>
+        <div data-reveal="block">
+          <Carousel gap={4} hasButtons hasSnap>
+            {LISTINGS.map(listing => (
+              <div key={listing.slug} {...stylex.props(styles.slide)}>
+                <ListingCard listing={listing} />
+              </div>
+            ))}
+          </Carousel>
+        </div>
       </VStack>
     </PageSection>
   );

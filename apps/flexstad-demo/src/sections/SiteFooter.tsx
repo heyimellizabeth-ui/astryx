@@ -52,7 +52,7 @@ export function SiteFooter() {
           <Divider />
           <Text type="supporting" color="secondary">
             Onofficiële herbouw van de openbare site flexstad.com met Astryx.
-            Foto's zijn plaatshouders.
+            Foto’s zijn plaatshouders.
           </Text>
         </VStack>
       </footer>

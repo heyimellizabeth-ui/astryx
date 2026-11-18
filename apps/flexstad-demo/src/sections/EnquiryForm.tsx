@@ -1,7 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 import {useState, type ComponentProps, type FormEvent} from 'react';
-import {Banner} from '@astryxdesign/core/Banner';
 import {Button} from '@astryxdesign/core/Button';
 import {DateInput} from '@astryxdesign/core/DateInput';
 import {FormLayout} from '@astryxdesign/core/FormLayout';
@@ -12,6 +11,7 @@ import {Selector} from '@astryxdesign/core/Selector';
 import {TextArea} from '@astryxdesign/core/TextArea';
 import {TextInput} from '@astryxdesign/core/TextInput';
 import {BUDGETS} from '../content';
+import {NotConnectedNotice} from './Forms';
 import {PageSection} from './PageSection';
 
 type Use = 'wonen' | 'werken' | '';
@@ -19,7 +19,8 @@ type IsoDate = ComponentProps<typeof DateInput>['value'];
 
 /**
  * "Reageren" form on a listing page. Field labels and order match the live
- * form. Nothing is sent: submitting only shows the success message.
+ * form. Nothing is sent: submitting only shows a notice that the form is
+ * not connected.
  */
 export function EnquiryForm({listingName}: {listingName?: string}) {
   const [name, setName] = useState('');
@@ -46,14 +47,7 @@ export function EnquiryForm({listingName}: {listingName?: string}) {
       <form onSubmit={handleSubmit} noValidate>
         <VStack gap={6}>
           <Heading level={2}>Reageren</Heading>
-          {isSent ? (
-            <Banner
-              status="success"
-              title="Bericht verstuurd"
-              collapsible={false}>
-              Bedankt! We nemen binnen enkele werkdagen contact met je op.
-            </Banner>
-          ) : null}
+          {isSent ? <NotConnectedNotice /> : null}
           <FormLayout>
             <TextInput
               label="Volledige naam"

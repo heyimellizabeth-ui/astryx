@@ -26,4 +26,57 @@ h2,
 h3 {
   overflow-wrap: anywhere;
   hyphens: manual;
+  text-wrap: balance;
+}
+
+/* Astryx draws its own focus ring inside its components; links get the same
+   tokens so a bare anchor is never left without one. */
+a:focus-visible {
+  outline: var(--focus-outline-width) var(--focus-outline-style)
+    var(--focus-outline-color);
+  outline-offset: var(--focus-outline-offset);
+}
+
+/* Scroll reveal, dial 4. Only where the browser supports view timelines and
+   the visitor has not asked for less motion; otherwise nothing animates and
+   every element sits at full opacity. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes flex-reveal {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* Job: sequence. Audience tiles and listing cards arrive one after the
+       other as the page is read, instead of all being there at once. */
+    [data-reveal] {
+      animation: flex-reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 45%;
+    }
+
+    /* Job: hierarchy. The homepage carousel is one object, so it reveals as
+       a whole; its cards sit in a horizontal scroller that has no vertical
+       view progress of their own. */
+    [data-reveal='block'] {
+      animation-range: entry 0% entry 35%;
+    }
+  }
+}
+
+/* Pressed and disabled states for the bare links and native controls that
+   sit outside the Astryx components. */
+a:active {
+  opacity: 0.8;
+}
+
+:disabled {
+  cursor: not-allowed;
 }

@@ -31,10 +31,20 @@ const styles = stylex.create({
   cell: {display: 'flex'},
   card: {flexGrow: 1, minHeight: 140},
   tileAccent: {backgroundColor: 'var(--color-accent)'},
+  // Text on the orange tile uses the on-accent colour in both colour modes.
+  onAccent: {
+    '--color-text-primary': 'var(--color-on-accent)',
+    color: 'var(--color-on-accent)',
+  },
   tileBand: {backgroundColor: 'var(--flex-band)'},
   tileMuted: {backgroundColor: 'var(--color-background-muted)'},
+  panel: {
+    padding: 'clamp(24px, 5vw, 64px)',
+    borderRadius: 'var(--radius-container)',
+    backgroundColor: 'var(--color-background-card)',
+  },
   stat: {
-    fontSize: 'clamp(3.5rem, 9vw, 6rem)',
+    fontSize: 'clamp(4rem, 12vw, 9rem)',
     fontWeight: 700,
     lineHeight: 1,
     color: 'var(--color-text-accent)',
@@ -67,20 +77,22 @@ export function Home() {
       />
 
       <PageSection id="intro" paddingBlock={10}>
-        <Grid columns={{minWidth: 280, repeat: 'fit'}} gap={8} align="center">
-          <VStack gap={4}>
-            <Heading level={2} type="display-3">
-              {ABOUT.heading}
-            </Heading>
-            <Text color="secondary">{ABOUT.story[2]}</Text>
-          </VStack>
-          <VStack gap={2}>
-            <span {...stylex.props(styles.stat)}>2.000+</span>
-            <Text color="secondary">
-              bewoners en ondernemers geplaatst in leegstaande panden
-            </Text>
-          </VStack>
-        </Grid>
+        <div {...stylex.props(styles.panel)}>
+          <Grid columns={{minWidth: 280, repeat: 'fit'}} gap={8} align="center">
+            <VStack gap={4}>
+              <Heading level={2} type="display-2">
+                {ABOUT.heading}
+              </Heading>
+              <Text color="secondary">{ABOUT.story[2]}</Text>
+            </VStack>
+            <VStack gap={2}>
+              <span {...stylex.props(styles.stat)}>2.000+</span>
+              <Text color="secondary">
+                bewoners en ondernemers geplaatst in leegstaande panden
+              </Text>
+            </VStack>
+          </Grid>
+        </div>
       </PageSection>
 
       <PageSection isWashed>
@@ -92,6 +104,7 @@ export function Home() {
               return (
                 <div
                   key={audience.href}
+                  data-reveal=""
                   {...stylex.props(tile.span, styles.cell)}>
                   <ClickableCard
                     label={audience.title}
@@ -100,7 +113,13 @@ export function Home() {
                     xstyle={[tile.tone, styles.card]}>
                     <VStack
                       gap={0}
-                      xstyle={tile.onBand ? bandStyles.onBand : undefined}>
+                      xstyle={
+                        tile.onBand
+                          ? bandStyles.onBand
+                          : tile.tone === styles.tileAccent
+                            ? styles.onAccent
+                            : undefined
+                      }>
                       {tile.withPhoto ? (
                         <Photo
                           label={audience.title}

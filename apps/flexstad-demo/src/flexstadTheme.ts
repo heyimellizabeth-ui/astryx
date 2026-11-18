@@ -35,6 +35,8 @@ export const flexstadTheme = defineTheme({
   },
   radius: {base: 6, multiplier: 1.5},
   tokens: {
+    // One 16px corner for every card, tile, panel and photo frame.
+    '--radius-container': '16px',
     '--color-accent': [ORANGE, 'oklch(0.74 0.17 40)'],
     '--color-on-accent': [AUBERGINE_DEEP, AUBERGINE_DEEP],
     '--color-text-accent': [ORANGE_TEXT, 'oklch(0.78 0.15 45)'],
@@ -47,6 +49,11 @@ export const flexstadTheme = defineTheme({
     '--color-background-card': ['#FFFFFF', 'oklch(0.25 0.04 310)'],
     '--color-text-primary': [AUBERGINE, 'oklch(0.94 0.012 300)'],
     '--color-text-secondary': ['oklch(0.45 0.03 305)', 'oklch(0.78 0.02 300)'],
+    // Field edges need 3:1 against both the page wash and the white surface.
+    '--color-border-emphasized': [
+      'oklch(0.58 0.03 305)',
+      'oklch(0.64 0.03 305)',
+    ],
     '--focus-outline-color': [ORANGE_TEXT, 'oklch(0.78 0.15 45)'],
   },
   components: {

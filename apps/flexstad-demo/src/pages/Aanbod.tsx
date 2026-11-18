@@ -1,10 +1,10 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+import * as stylex from '@stylexjs/stylex';
 import {useState} from 'react';
 import {Button} from '@astryxdesign/core/Button';
 import {CheckboxList, CheckboxListItem} from '@astryxdesign/core/CheckboxList';
 import {Drawer} from '@astryxdesign/core/Drawer';
-import {Grid} from '@astryxdesign/core/Grid';
 import {Heading} from '@astryxdesign/core/Heading';
 import {HStack, VStack} from '@astryxdesign/core/Layout';
 import {Text} from '@astryxdesign/core/Text';
@@ -14,6 +14,24 @@ import {replaceSearch, useSearch} from '../router';
 import {ListingCard} from '../sections/ListingCard';
 import {PageSection} from '../sections/PageSection';
 import {CtaBand, PageHero} from '../sections/ui';
+
+const styles = stylex.create({
+  // The auto-fill columns exist only from 900px, where the content column is
+  // wide enough for two tracks; a two-column span below that would add an
+  // implicit column and overflow phones.
+  catalogue: {
+    display: 'grid',
+    gap: 16,
+    gridTemplateColumns: {
+      default: 'minmax(0, 1fr)',
+      '@media (min-width: 900px)': 'repeat(auto-fill, minmax(260px, 1fr))',
+    },
+  },
+  cell: {display: 'flex'},
+  lead: {
+    gridColumn: {default: 'auto', '@media (min-width: 900px)': 'span 2'},
+  },
+});
 
 function Filters({
   locations,
@@ -107,17 +125,28 @@ export function Aanbod() {
               ) : null}
             </HStack>
             {visible.length > 0 ? (
-              <Grid columns={{minWidth: 260, repeat: 'fill'}} gap={4}>
-                {visible.map(listing => (
-                  <ListingCard key={listing.slug} listing={listing} />
-                ))}
-              </Grid>
+              <div {...stylex.props(styles.catalogue)}>
+                {visible.map((listing, index) => {
+                  const isLead = index === 0 && listing.status === 'available';
+                  return (
+                    <div
+                      key={listing.slug}
+                      data-reveal=""
+                      {...stylex.props(
+                        styles.cell,
+                        isLead ? styles.lead : undefined,
+                      )}>
+                      <ListingCard listing={listing} isFeatured={isLead} />
+                    </div>
+                  );
+                })}
+              </div>
             ) : (
               <VStack gap={3} align="start">
                 <Heading level={3}>Geen aanbod gevonden</Heading>
                 <Text color="secondary">
-                  Pas de filters aan of schrijf je in, dan laten we het weten
-                  als er iets beschikbaar komt.
+                  Er is geen aanbod met deze filters. Wis de filters om al het
+                  aanbod te zien.
                 </Text>
                 {hasFilters ? (
                   <Button
