@@ -9,6 +9,7 @@ import {HStack, VStack} from '@astryxdesign/core/Layout';
 import {Text} from '@astryxdesign/core/Text';
 import {CONTACT, type Cta} from '../content';
 import type {Photo as PhotoData} from '../photos';
+import {bandStyles} from './bandStyles';
 import {PageSection} from './PageSection';
 import {Placeholder} from './Placeholder';
 
@@ -88,6 +89,12 @@ const styles = stylex.create({
     lineHeight: 'var(--text-heading-2-leading)',
   },
   prose2: {maxWidth: '65ch'},
+  // The lead sentence of a page with no photograph: an aubergine plate.
+  plate: {
+    padding: {default: 28, '@media (min-width: 900px)': 56},
+    borderRadius: 'var(--radius-container)',
+    backgroundColor: 'var(--flex-band)',
+  },
   // A banner with something beside its head: the head on the left, the aside
   // on the right, both sitting on one baseline row from 900px.
   heroSplit: {
@@ -99,6 +106,18 @@ const styles = stylex.create({
       default: 'minmax(0, 1fr)',
       '@media (min-width: 900px)': 'minmax(0, 1fr) minmax(0, 380px)',
     },
+  },
+  // The aside is a photograph: five of twelve columns, as tall as the head.
+  heroSplitWide: {
+    gridTemplateColumns: {
+      default: 'minmax(0, 1fr)',
+      '@media (min-width: 900px)': 'minmax(0, 7fr) minmax(0, 5fr)',
+    },
+    alignItems: 'stretch',
+  },
+  heroAside: {
+    position: 'relative',
+    minHeight: {default: 240, '@media (min-width: 900px)': 400},
   },
   photo: {
     borderRadius: 'var(--radius-container)',
@@ -264,6 +283,8 @@ interface PageHeroProps {
   paddingBlock?: 6 | 8 | 10;
   /** Set beside the head from 900px (an index of the page's content). */
   aside?: ReactNode;
+  /** The aside is a photograph: it takes five columns and the head's height. */
+  isAsidePhoto?: boolean;
 }
 
 /**
@@ -278,6 +299,7 @@ export function PageHero({
   ctas,
   paddingBlock = 8,
   aside,
+  isAsidePhoto = false,
 }: PageHeroProps) {
   const head = (
     <VStack gap={5} align="start">
@@ -312,9 +334,17 @@ export function PageHero({
   return (
     <PageSection isWashed paddingBlock={paddingBlock}>
       {aside ? (
-        <div {...stylex.props(styles.heroSplit)}>
+        <div
+          {...stylex.props(
+            styles.heroSplit,
+            isAsidePhoto ? styles.heroSplitWide : undefined,
+          )}>
           {head}
-          {aside}
+          {isAsidePhoto ? (
+            <div {...stylex.props(styles.heroAside)}>{aside}</div>
+          ) : (
+            aside
+          )}
         </div>
       ) : (
         head
@@ -412,9 +442,11 @@ export function TextColumns({items}: {items: ReadonlyArray<string>}) {
   return (
     <div {...stylex.props(styles.columns)}>
       {items.map(text => (
-        <Text key={text} as="p" color="secondary" xstyle={styles.columnItem}>
-          {text}
-        </Text>
+        <div key={text} {...stylex.props(styles.columnItem)}>
+          <Text as="p" color="secondary">
+            {text}
+          </Text>
+        </div>
       ))}
     </div>
   );
@@ -424,16 +456,30 @@ export function TextColumns({items}: {items: ReadonlyArray<string>}) {
  * An intro set as a statement: its first sentence at the section size, the
  * rest of the same text beneath in two columns. No word is added or dropped.
  */
-export function LeadIntro({paragraphs}: {paragraphs: ReadonlyArray<string>}) {
+export function LeadIntro({
+  paragraphs,
+  isPlate = false,
+}: {
+  paragraphs: ReadonlyArray<string>;
+  /** Set the lead sentence on an aubergine plate (pages with no photograph). */
+  isPlate?: boolean;
+}) {
   const [first, ...others] = paragraphs;
   const lead = firstSentence(first);
   const rest = first.slice(lead.length).trim();
   const items = rest ? [rest, ...others] : others;
+  const leadText = (
+    <Text as="p" weight="bold" xstyle={styles.lead}>
+      {lead}
+    </Text>
+  );
   return (
-    <VStack gap={8} align="start">
-      <Text as="p" weight="bold" xstyle={styles.lead}>
-        {lead}
-      </Text>
+    <VStack gap={8} align="stretch">
+      {isPlate ? (
+        <div {...stylex.props(styles.plate, bandStyles.onBand)}>{leadText}</div>
+      ) : (
+        leadText
+      )}
       {items.length > 0 ? <TextColumns items={items} /> : null}
     </VStack>
   );

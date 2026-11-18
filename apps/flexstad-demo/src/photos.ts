@@ -83,7 +83,7 @@ export const PHOTOS: Record<string, Photo> = {
     width: 1920,
     height: 1440,
     alt: 'Kaal interieur van massief houten wanden met raamopeningen waar daglicht door valt',
-    objectPosition: '60% 50%',
+    objectPosition: '78% 62%',
     credit: 'RoterRolf, CC0',
     licence: 'CC0',
     sourceUrl:
@@ -98,6 +98,8 @@ export const USED_PHOTOS: ReadonlyArray<Photo> = [
   PHOTOS.ownersEntrance,
   PHOTOS.makersAtticStudio,
   PHOTOS.aboutWindowsill,
+  PHOTOS.aboutStreet,
+  PHOTOS.developersShell,
 ];
 
 export const PHOTO_CREDITS_LINE: string =

@@ -5,11 +5,13 @@ import {Grid} from '@astryxdesign/core/Grid';
 import {Heading} from '@astryxdesign/core/Heading';
 import {VStack} from '@astryxdesign/core/Layout';
 import {AUDIENCE_PAGES} from '../content';
+import {PHOTOS} from '../photos';
 import {PageSection} from '../sections/PageSection';
 import {
   CtaBand,
   LeadIntro,
   PageHero,
+  PhotoImage,
   Paragraphs,
   RowsSection,
 } from '../sections/ui';
@@ -37,12 +39,27 @@ const styles = stylex.create({
   },
 });
 
+// Mood photographs where one passes the deletion test. Municipalities have no
+// fitting library photograph: that page stays type-led and sets the lead
+// sentence on an aubergine plate instead.
+const PAGE_PHOTOS = {
+  vastgoedeigenaren: PHOTOS.ownersEntrance,
+  ondernemers: PHOTOS.makersAtticStudio,
+  ontwikkelaars: PHOTOS.developersShell,
+} as const;
+
 /** One template for the four audience pages; the copy comes from content.ts. */
 export function Audience({slug}: {slug: string}) {
   const page = AUDIENCE_PAGES[slug];
   if (!page) {
     return <NotFound />;
   }
+  const photo =
+    slug === 'vastgoedeigenaren' ||
+    slug === 'ondernemers' ||
+    slug === 'ontwikkelaars'
+      ? PAGE_PHOTOS[slug]
+      : undefined;
   return (
     <>
       <PageHero
@@ -53,9 +70,11 @@ export function Audience({slug}: {slug: string}) {
           {title: page.navTitle},
         ]}
         ctas={[page.cta]}
+        isAsidePhoto={photo !== undefined}
+        aside={photo ? <PhotoImage photo={photo} isFilled /> : undefined}
       />
       <PageSection>
-        <LeadIntro paragraphs={page.intro} />
+        <LeadIntro paragraphs={page.intro} isPlate={photo === undefined} />
       </PageSection>
       {page.bullets ? (
         <PageSection isWashed>
