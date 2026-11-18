@@ -58,6 +58,8 @@ const styles = stylex.create({
       '@media (min-width: 900px)': 'repeat(3, minmax(0, 1fr))',
     },
     height: {default: 'auto', '@media (min-width: 900px)': 336},
+    // Air before the tinted band that follows.
+    marginBottom: 48,
   },
   lead: {
     gridRow: {default: 'auto', '@media (min-width: 900px)': '1 / span 3'},
@@ -92,6 +94,7 @@ const styles = stylex.create({
       default: 'minmax(0, 1fr)',
       '@media (min-width: 900px)': 'minmax(0, 1fr) 320px',
     },
+    marginBottom: 40,
   },
   text: {maxWidth: '65ch'},
   headline: {maxWidth: '22em'},

@@ -71,12 +71,11 @@ export function placeholderSrc(label: string) {
  */
 export function PendingPhoto({label}: {label: string}) {
   return (
-    <span {...stylex.props(pending.frame)}>
-      <span {...stylex.props(pending.caption)}>
-        <span {...stylex.props(pending.room)}>{label}</span>
-        <span {...stylex.props(pending.note)}>Foto volgt</span>
-      </span>
-    </span>
+    <span
+      data-room={label}
+      data-note="Foto volgt"
+      {...stylex.props(pending.frame)}
+    />
   );
 }
 
@@ -84,7 +83,9 @@ const pending = stylex.create({
   frame: {
     position: 'relative',
     display: 'flex',
-    alignItems: 'flex-end',
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+    gap: 2,
     width: '100%',
     height: '100%',
     boxSizing: 'border-box',
@@ -96,22 +97,21 @@ const pending = stylex.create({
     outlineColor: 'var(--color-border)',
     outlineOffset: -1,
     textAlign: 'start',
-  },
-  caption: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 2,
-    minWidth: 0,
     lineHeight: 1.3,
     whiteSpace: 'nowrap',
-  },
-  room: {
-    color: 'var(--color-text-primary)',
-    fontSize: 15,
-    fontWeight: 500,
-  },
-  note: {
-    color: 'var(--color-text-secondary)',
-    fontSize: 14,
+    // The caption is generated content: the slot is a button that already
+    // has its accessible name ("Open foto N van M"), so the words are not
+    // button text.
+    '::before': {
+      content: 'attr(data-room)',
+      color: 'var(--color-text-primary)',
+      fontSize: 15,
+      fontWeight: 500,
+    },
+    '::after': {
+      content: 'attr(data-note)',
+      color: 'var(--color-text-secondary)',
+      fontSize: 14,
+    },
   },
 });
