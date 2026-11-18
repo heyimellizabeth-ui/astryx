@@ -27,6 +27,9 @@ const styles = stylex.create({
     gap: 24,
     alignItems: 'start',
     minHeight: 240,
+    padding: 48,
+    borderRadius: 'var(--radius-container)',
+    backgroundColor: 'var(--color-background-muted)',
     gridTemplateColumns: {
       default: 'minmax(0, 1fr)',
       '@media (min-width: 900px)': 'minmax(0, 5fr) minmax(0, 7fr)',

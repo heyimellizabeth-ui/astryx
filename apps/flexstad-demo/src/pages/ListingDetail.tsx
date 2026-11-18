@@ -57,8 +57,17 @@ const styles = stylex.create({
       '@media (min-width: 900px)': 'minmax(0, 1fr) 360px',
     },
   },
-  // A listing without a long description: the facts panel stands alone.
-  bodySingle: {maxWidth: 560},
+  // A listing without a long description: the facts panel runs full width.
+  bodySingle: {width: '100%'},
+  detailInner: {display: 'flex', flexDirection: 'column', gap: 20},
+  singleInner: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    gap: 32,
+  },
+  singleFacts: {flexGrow: 1, maxWidth: 560},
   text: {
     gridColumn: {default: 'auto', '@media (min-width: 900px)': '1'},
     gridRow: {default: 'auto', '@media (min-width: 900px)': '1'},
@@ -68,6 +77,8 @@ const styles = stylex.create({
     gridColumn: {default: 'auto', '@media (min-width: 900px)': '2'},
     gridRow: {default: 'auto', '@media (min-width: 900px)': '1'},
     padding: 32,
+    minHeight: 240,
+    boxSizing: 'border-box',
     borderRadius: 'var(--radius-container)',
     backgroundColor: 'var(--color-background-card)',
     borderWidth: 1,
@@ -145,21 +156,26 @@ export function ListingDetail({slug}: {slug: string}) {
       <PageSection isWashed paddingBlock={8}>
         <div {...stylex.props(detail ? styles.body : styles.bodySingle)}>
           <aside {...stylex.props(styles.panel)}>
-            <VStack gap={5}>
-              <MetadataList>
-                {listing.facts.map(fact => (
-                  <MetadataListItem key={fact.label} label={fact.label}>
-                    {fact.value}
-                  </MetadataListItem>
-                ))}
-              </MetadataList>
+            <div
+              {...stylex.props(
+                detail ? styles.detailInner : styles.singleInner,
+              )}>
+              <div {...stylex.props(detail ? undefined : styles.singleFacts)}>
+                <MetadataList>
+                  {listing.facts.map(fact => (
+                    <MetadataListItem key={fact.label} label={fact.label}>
+                      {fact.value}
+                    </MetadataListItem>
+                  ))}
+                </MetadataList>
+              </div>
               <Button
                 label="Ik heb interesse!"
                 href="#reageren"
                 variant="primary"
                 size="lg"
               />
-            </VStack>
+            </div>
           </aside>
           {detail ? (
             <div {...stylex.props(styles.text)}>

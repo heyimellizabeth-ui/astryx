@@ -40,11 +40,11 @@ export function OverOns() {
       />
       <PageSection paddingBlock={8}>
         <VStack gap={10}>
-          <Photo label="Het Flexstad-team" seed={3} ratio="21 / 8" />
           <div {...stylex.props(styles.statement)}>
             <Heading level={2}>{ABOUT.heading}</Heading>
           </div>
           <TextColumns items={ABOUT.story} />
+          <Photo label="Het Flexstad-team" seed={3} ratio="21 / 8" />
         </VStack>
       </PageSection>
       <PageSection isWashed>

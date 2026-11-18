@@ -80,7 +80,9 @@ const styles = stylex.create({
   },
   columnItem: {breakInside: 'avoid', marginBottom: 24},
   lead: {
-    maxWidth: '24em',
+    maxWidth: 'min(100%, 24em)',
+    minWidth: 0,
+    overflowWrap: 'break-word',
     fontSize: 'var(--text-heading-2-size)',
     lineHeight: 'var(--text-heading-2-leading)',
   },

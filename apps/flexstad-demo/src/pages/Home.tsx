@@ -48,6 +48,8 @@ const styles = stylex.create({
       '@media (min-width: 900px)': '"head stat" "story stat"',
     },
   },
+  // A little air under the hero, still inside the first screen.
+  introLift: {marginTop: 32},
   introHead: {gridArea: 'head'},
   introStat: {gridArea: 'stat'},
   introStory: {gridArea: 'story', maxWidth: '65ch'},
@@ -152,7 +154,7 @@ export function Home() {
       </section>
 
       <PageSection id="intro" paddingBlock={8}>
-        <VStack gap={10}>
+        <VStack gap={10} xstyle={styles.introLift}>
           <div {...stylex.props(styles.intro)}>
             <div {...stylex.props(styles.introHead)}>
               <Heading level={2}>{ABOUT.heading}</Heading>
