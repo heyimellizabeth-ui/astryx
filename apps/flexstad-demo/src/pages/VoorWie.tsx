@@ -9,6 +9,10 @@ import {AUDIENCE_PAGES} from '../content';
 import {PageSection} from '../sections/PageSection';
 import {CtaBand, firstSentence, PageHero} from '../sections/ui';
 
+/** The owners line exactly as the live /voor-wie/ page words it. */
+const VOOR_WIE_OWNERS =
+  'Leegstand brengt risico’s met zich mee, zoals kraak, vandalisme, verloedering en oplopende beheerkosten. Flexstad helpt vastgoedeigenaren om leegstaand vastgoed tijdelijk en verantwoord in gebruik te geven.';
+
 const styles = stylex.create({
   // The banner's index: the four audiences as hairline rows, each a link.
   index: {
@@ -137,7 +141,9 @@ export function VoorWie() {
                 </VStack>
                 <VStack gap={6} align="stretch">
                   <Text as="p" xstyle={styles.sentence}>
-                    {firstSentence(page.intro[0])}
+                    {slug === 'vastgoedeigenaren'
+                      ? VOOR_WIE_OWNERS
+                      : firstSentence(page.intro[0])}
                   </Text>
                   {slug === 'vastgoedeigenaren' && page.bullets ? (
                     <ul {...stylex.props(styles.bullets)}>

@@ -155,6 +155,7 @@ export function Aanbod() {
       <PageHero
         paddingBlock={6}
         title="Actueel aanbod"
+        intro="Flexibele werk-, opslag-, atelier- en bedrijfsruimtes in leegstaand vastgoed. Vind een ruimte die past bij jouw onderneming of initiatief."
         trail={[{title: 'Home', href: '/'}, {title: 'Aanbod'}]}
         ctas={[{label: 'Schrijf je nu in!', href: '/inschrijven/'}]}
         aside={<PlaceIndex />}

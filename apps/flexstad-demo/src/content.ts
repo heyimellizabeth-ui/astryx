@@ -544,6 +544,8 @@ export const ROEMER_DETAIL = {
         'Ben je op zoek naar een eigen kantoor of praktijkruimte op een bijzondere locatie in Amsterdam?',
         'Of spreekt ons flexibele concept met de exclusieve tuinruimte je aan?',
         'Neem gerust contact op voor meer informatie of plan een vrijblijvende bezichtiging.',
+        'FlexStad, Ruimte voor nieuwe mogelijkheden.',
+        'Instagram: Flexstadspaces',
       ],
     },
   ],
