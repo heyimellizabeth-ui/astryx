@@ -98,3 +98,15 @@ a:active {
   color: var(--color-text-secondary);
   cursor: not-allowed;
 }
+
+/* The native input fills its 48px field, so the control measures as tall as
+   the field it sits in (the bare input is 24px inside the padding). */
+.astryx-text-input > input {
+  align-self: stretch;
+  height: auto;
+}
+
+/* FAQ triggers stand as tall as the other controls (44px or more). */
+.astryx-collapsible-trigger {
+  min-height: 48px;
+}

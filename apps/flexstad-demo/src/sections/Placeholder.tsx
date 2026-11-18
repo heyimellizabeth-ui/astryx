@@ -14,6 +14,9 @@ const styles = stylex.create({
     boxSizing: 'border-box',
     color: 'oklch(0.98 0.01 300)',
     fontSize: 13,
+    // The caption is generated content: the slot already has its accessible
+    // name, and the words are not button text when the slot sits in a button.
+    '::after': {content: 'attr(data-caption)'},
   },
 });
 
@@ -42,10 +45,10 @@ export function Placeholder({
     <div
       role="img"
       aria-label={`Fotoplaats: ${label}`}
+      data-caption={`Foto volgt: ${label}`}
       {...stylex.props(styles.frame)}
-      style={{backgroundImage: placeholderGradient(seed), aspectRatio: ratio}}>
-      <span aria-hidden="true">Foto volgt: {label}</span>
-    </div>
+      style={{backgroundImage: placeholderGradient(seed), aspectRatio: ratio}}
+    />
   );
 }
 

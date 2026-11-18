@@ -47,6 +47,7 @@ export function VoorWie() {
                   label={page.cta.label}
                   href={page.cta.href}
                   variant="secondary"
+                  size="lg"
                 />
               </VStack>
             </ClickableCard>

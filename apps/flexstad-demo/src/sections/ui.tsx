@@ -259,13 +259,20 @@ export function CtaBand({
               label={CONTACT.phone}
               href={CONTACT.phoneHref}
               variant="ghost"
+              size="lg"
             />
             <Button
               label={CONTACT.email}
               href={`mailto:${CONTACT.email}`}
               variant="ghost"
+              size="lg"
             />
-            <Button label="LinkedIn" href={CONTACT.linkedin} variant="ghost" />
+            <Button
+              label="LinkedIn"
+              href={CONTACT.linkedin}
+              variant="ghost"
+              size="lg"
+            />
           </HStack>
         </div>
       </VStack>

@@ -47,7 +47,12 @@ export function ListingGrid() {
               ))}
             </HStack>
           </VStack>
-          <Button label="Bekijk alles" variant="ghost" href="/aanbod/" />
+          <Button
+            label="Bekijk alles"
+            variant="ghost"
+            href="/aanbod/"
+            size="lg"
+          />
         </HStack>
         <div data-reveal="block">
           <div

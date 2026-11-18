@@ -78,7 +78,7 @@ export function MijnFlexstad() {
             Het inlogscherm van het klantportaal wordt pas gekoppeld zodra
             Flexstad de koppeling heeft goedgekeurd.
           </Banner>
-          <Button label="Inloggen" variant="primary" isDisabled />
+          <Button label="Inloggen" variant="primary" isDisabled size="lg" />
         </VStack>
       </PageSection>
     </>
@@ -124,6 +124,7 @@ export function Vacatures() {
                 label="Neem contact op"
                 href="/contact/"
                 variant="primary"
+                size="lg"
               />
             </div>
           </VStack>
