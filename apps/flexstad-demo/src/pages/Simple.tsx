@@ -1,57 +1,232 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+import * as stylex from '@stylexjs/stylex';
+import type {ReactNode} from 'react';
 import {Banner} from '@astryxdesign/core/Banner';
 import {Button} from '@astryxdesign/core/Button';
-import {Grid} from '@astryxdesign/core/Grid';
 import {Heading} from '@astryxdesign/core/Heading';
+import {HStack, VStack} from '@astryxdesign/core/Layout';
 import {Link} from '@astryxdesign/core/Link';
-import {VStack} from '@astryxdesign/core/Layout';
 import {Text} from '@astryxdesign/core/Text';
-import {CONTACT, SERVICES, VACANCY} from '../content';
-import {ContactForm, SignupForm, SubscribeForm} from '../sections/Forms';
+import {CONTACT, FAQ, SERVICES, VACANCY} from '../content';
+import {bandStyles} from '../sections/bandStyles';
+import {Faq} from '../sections/Faq';
+import {
+  ContactForm,
+  FormPanel,
+  SignupForm,
+  SubscribeForm,
+} from '../sections/Forms';
 import {PageSection} from '../sections/PageSection';
-import {BulletList, CtaBand, PageHero, Paragraphs} from '../sections/ui';
+import {CtaBand, PageHero, Paragraphs, RowsSection} from '../sections/ui';
 import {NotFound} from './NotFound';
 
 const HOME = {title: 'Home', href: '/'};
+
+const styles = stylex.create({
+  // A short column of facts on the left, the form on the right.
+  split: {
+    display: 'grid',
+    columnGap: 64,
+    rowGap: 32,
+    alignItems: 'start',
+    gridTemplateColumns: {
+      default: 'minmax(0, 1fr)',
+      '@media (min-width: 900px)': 'minmax(0, 5fr) minmax(0, 7fr)',
+    },
+  },
+  sticky: {
+    position: {default: 'static', '@media (min-width: 900px)': 'sticky'},
+    top: 96,
+  },
+  rows: {
+    margin: 0,
+    padding: 0,
+    borderTopWidth: 1,
+    borderTopStyle: 'solid',
+    borderTopColor: 'var(--color-border-emphasized)',
+  },
+  detail: {
+    display: 'grid',
+    gap: 4,
+    paddingBlock: 16,
+    margin: 0,
+    borderBottomWidth: 1,
+    borderBottomStyle: 'solid',
+    borderBottomColor: 'var(--color-border-emphasized)',
+  },
+  detailValue: {margin: 0},
+  plate: {
+    padding: {default: 28, '@media (min-width: 900px)': 40},
+    borderRadius: 'var(--radius-container)',
+    backgroundColor: 'var(--flex-band)',
+  },
+  more: {paddingTop: 32},
+  panel: {
+    padding: {default: 24, '@media (min-width: 900px)': 56},
+    borderRadius: 'var(--radius-container)',
+    backgroundColor: 'var(--color-background-muted)',
+  },
+  panelText: {maxWidth: '60ch'},
+  narrow: {maxWidth: 720},
+  card: {
+    maxWidth: 640,
+    padding: {default: 24, '@media (min-width: 900px)': 40},
+    borderRadius: 'var(--radius-container)',
+    backgroundColor: 'var(--color-background-surface)',
+  },
+  // The vacancy: facts and the apply action stay beside the text.
+  vacancy: {
+    display: 'grid',
+    columnGap: 64,
+    rowGap: 32,
+    alignItems: 'start',
+    gridTemplateColumns: {
+      default: 'minmax(0, 1fr)',
+      '@media (min-width: 900px)': 'minmax(0, 4fr) minmax(0, 8fr)',
+    },
+  },
+  vacancyText: {maxWidth: '65ch', minWidth: 0},
+  // The vacancy title is long: a step below the section head so it fits the narrow column.
+  vacancyTitle: {
+    overflowWrap: 'break-word',
+    fontSize: 'clamp(24px, 14px + 1.1vw, 30px)',
+    lineHeight: 1.2,
+  },
+  block: {
+    paddingTop: 16,
+    borderTopWidth: 2,
+    borderTopStyle: 'solid',
+    borderTopColor: 'var(--color-text-primary)',
+  },
+  items: {
+    margin: 0,
+    padding: 0,
+    listStyleType: 'none',
+    borderTopWidth: 1,
+    borderTopStyle: 'solid',
+    borderTopColor: 'var(--color-border-emphasized)',
+  },
+  item: {
+    paddingBlock: 10,
+    borderBottomWidth: 1,
+    borderBottomStyle: 'solid',
+    borderBottomColor: 'var(--color-border-emphasized)',
+  },
+  closingPlate: {
+    padding: {default: 28, '@media (min-width: 900px)': 56},
+    borderRadius: 'var(--radius-container)',
+    backgroundColor: 'var(--flex-band)',
+  },
+  closingText: {
+    maxWidth: 'min(100%, 24em)',
+    margin: 0,
+    fontSize: 'var(--text-heading-2-size)',
+    lineHeight: 'var(--text-heading-2-leading)',
+  },
+});
+
+function Detail({label, children}: {label: string; children: ReactNode}) {
+  return (
+    <div {...stylex.props(styles.detail)}>
+      <dt {...stylex.props(styles.detailValue)}>
+        <Text type="supporting" color="secondary">
+          {label}
+        </Text>
+      </dt>
+      <dd {...stylex.props(styles.detailValue)}>
+        <Text type="large">{children}</Text>
+      </dd>
+    </div>
+  );
+}
+
+/** The office and the ways to reach it, as hairline rows. */
+function ContactDetails() {
+  const [street, city] = CONTACT.address.split(', ');
+  return (
+    <dl {...stylex.props(styles.rows)}>
+      <Detail label="Kantoor">
+        {street}
+        <br />
+        {city}
+        <br />
+        Nederland
+      </Detail>
+      <Detail label="Email">
+        <Link href={`mailto:${CONTACT.email}`}>{CONTACT.email}</Link>
+      </Detail>
+      <Detail label="Telefoon">
+        <Link href={CONTACT.phoneHref}>{CONTACT.phone}</Link>
+      </Detail>
+      <Detail label="LinkedIn">
+        <Link href={CONTACT.linkedin} isExternalLink>
+          LinkedIn
+        </Link>
+      </Detail>
+    </dl>
+  );
+}
 
 export function Contact() {
   return (
     <>
       <PageHero title="Contact" trail={[HOME, {title: 'Contact'}]} />
       <PageSection>
-        <Grid columns={{minWidth: 300, repeat: 'fit'}} gap={8} align="start">
-          <VStack gap={3}>
-            <Text type="large">
-              <Link href={`mailto:${CONTACT.email}`}>{CONTACT.email}</Link>
-            </Text>
-            <Text type="large">
-              <Link href={CONTACT.phoneHref}>{CONTACT.phone}</Link>
-            </Text>
-            <Text type="large">
-              <Link href={CONTACT.linkedin} isExternalLink>
-                LinkedIn
-              </Link>
-            </Text>
-          </VStack>
-          <ContactForm />
-        </Grid>
+        <div {...stylex.props(styles.split)}>
+          <ContactDetails />
+          <FormPanel>
+            <ContactForm />
+          </FormPanel>
+        </div>
       </PageSection>
     </>
   );
 }
 
 export function Inschrijven() {
+  const answer = FAQ[0].items[0].answer;
+  const more = [FAQ[0].items[2], FAQ[0].items[4]];
   return (
     <>
       <PageHero title="Inschrijven" trail={[HOME, {title: 'Inschrijven'}]} />
       <PageSection>
-        <Grid columns={{minWidth: 300, repeat: 'fit'}} gap={8} align="start">
-          <Heading level={2}>Jouw gegevens</Heading>
-          <SignupForm />
-        </Grid>
+        <div {...stylex.props(styles.split)}>
+          <div {...stylex.props(styles.sticky)}>
+            <div {...stylex.props(styles.plate, bandStyles.onBand)}>
+              <VStack gap={5} align="start">
+                <Heading level={2}>Jouw gegevens</Heading>
+                <Text color="secondary">{answer}</Text>
+                <HStack gap={2} wrap="wrap">
+                  <Button
+                    label={CONTACT.phone}
+                    href={CONTACT.phoneHref}
+                    variant="ghost"
+                    size="lg"
+                  />
+                  <Button
+                    label={CONTACT.email}
+                    href={`mailto:${CONTACT.email}`}
+                    variant="ghost"
+                    size="lg"
+                  />
+                </HStack>
+              </VStack>
+            </div>
+            <VStack gap={5} xstyle={styles.more}>
+              {more.map(item => (
+                <VStack key={item.question} gap={2} align="start">
+                  <Heading level={3}>{item.question}</Heading>
+                  <Text color="secondary">{item.answer}</Text>
+                </VStack>
+              ))}
+            </VStack>
+          </div>
+          <FormPanel>
+            <SignupForm />
+          </FormPanel>
+        </div>
       </PageSection>
-      <CtaBand />
     </>
   );
 }
@@ -59,9 +234,17 @@ export function Inschrijven() {
 export function Abonneren() {
   return (
     <>
-      <PageHero title="Aanmelden" trail={[HOME, {title: 'Aanmelden'}]} />
-      <PageSection measure={720}>
-        <SubscribeForm />
+      <PageHero
+        title="Aanmelden"
+        intro="Kies een inschrijving die bij jou past."
+        trail={[HOME, {title: 'Aanmelden'}]}
+      />
+      <PageSection>
+        <div {...stylex.props(styles.narrow)}>
+          <FormPanel>
+            <SubscribeForm />
+          </FormPanel>
+        </div>
       </PageSection>
     </>
   );
@@ -72,16 +255,30 @@ export function MijnFlexstad() {
   return (
     <>
       <PageHero title="MijnFlexstad" trail={[HOME, {title: 'MijnFlexstad'}]} />
-      <PageSection measure={720}>
-        <VStack gap={4} align="start">
-          <Banner status="info" title="Inloggen volgt" collapsible={false}>
-            Het inlogscherm van het klantportaal wordt pas gekoppeld zodra
-            Flexstad de koppeling heeft goedgekeurd.
-          </Banner>
-          <Button label="Inloggen" variant="primary" isDisabled size="lg" />
-        </VStack>
+      <PageSection>
+        <div {...stylex.props(styles.card)}>
+          <VStack gap={5} align="start">
+            <Banner status="info" title="Inloggen volgt" collapsible={false}>
+              Het inlogscherm van het klantportaal wordt pas gekoppeld zodra
+              Flexstad de koppeling heeft goedgekeurd.
+            </Banner>
+            <Button label="Inloggen" variant="primary" isDisabled size="lg" />
+          </VStack>
+        </div>
       </PageSection>
     </>
+  );
+}
+
+function VacancyList({items}: {items: ReadonlyArray<string>}) {
+  return (
+    <ul {...stylex.props(styles.items)}>
+      {items.map(item => (
+        <li key={item} {...stylex.props(styles.item)}>
+          <Text weight="normal">{item}</Text>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -90,51 +287,62 @@ export function Vacatures() {
     <>
       <PageHero title="Vacatures" trail={[HOME, {title: 'Vacatures'}]} />
       <PageSection>
-        <VStack gap={8}>
-          <VStack gap={3}>
-            <Heading level={2}>{VACANCY.title}</Heading>
-            <Text weight="medium" color="secondary">
-              {VACANCY.meta}
-            </Text>
-            <Paragraphs items={VACANCY.intro} />
-          </VStack>
-          <Grid columns={{minWidth: 300, repeat: 'fit'}} gap={8} align="start">
-            {VACANCY.blocks.map(block => (
-              <VStack key={block.title} gap={3}>
-                <Heading level={3}>{block.title}</Heading>
-                {block.lead ? (
-                  <Text color="secondary">{block.lead}</Text>
-                ) : null}
-                <BulletList items={block.items} />
-                {block.after ? (
-                  <Text color="secondary">{block.after}</Text>
-                ) : null}
-              </VStack>
-            ))}
-          </Grid>
-          <VStack gap={3}>
-            <Heading level={3}>{VACANCY.about.title}</Heading>
-            <Paragraphs items={VACANCY.about.body} />
-          </VStack>
-          <VStack gap={3}>
-            <Heading level={3}>{VACANCY.apply.title}</Heading>
-            <Paragraphs items={VACANCY.apply.body} />
-            <div>
+        <div {...stylex.props(styles.vacancy)}>
+          <div {...stylex.props(styles.sticky)}>
+            <VStack gap={4} align="start">
+              <Heading level={2} xstyle={styles.vacancyTitle}>
+                {VACANCY.title}
+              </Heading>
+              <Text weight="medium" color="secondary">
+                {VACANCY.meta}
+              </Text>
               <Button
                 label="Neem contact op"
                 href="/contact/"
                 variant="primary"
                 size="lg"
               />
-            </div>
+            </VStack>
+          </div>
+          <VStack gap={8} xstyle={styles.vacancyText}>
+            <Paragraphs items={VACANCY.intro} />
+            {VACANCY.blocks.map(block => (
+              <VStack key={block.title} gap={3} xstyle={styles.block}>
+                <Heading level={3}>{block.title}</Heading>
+                {block.lead ? (
+                  <Text color="secondary">{block.lead}</Text>
+                ) : null}
+                <VacancyList items={block.items} />
+                {block.after ? (
+                  <Text color="secondary">{block.after}</Text>
+                ) : null}
+              </VStack>
+            ))}
+            <VStack gap={3} xstyle={styles.block}>
+              <Heading level={3}>{VACANCY.about.title}</Heading>
+              <Paragraphs items={VACANCY.about.body} />
+            </VStack>
+            <VStack gap={3} xstyle={styles.block}>
+              <Heading level={3}>{VACANCY.apply.title}</Heading>
+              <Paragraphs items={VACANCY.apply.body} />
+              <div>
+                <Button
+                  label="Neem contact op"
+                  href="/contact/"
+                  variant="primary"
+                  size="lg"
+                />
+              </div>
+            </VStack>
           </VStack>
-        </VStack>
+        </div>
       </PageSection>
       <CtaBand />
     </>
   );
 }
 
+/** Both services share one live text: a head, the list, the closing line. */
 export function Dienst({slug}: {slug: string}) {
   const service = SERVICES[slug];
   if (!service) {
@@ -144,19 +352,28 @@ export function Dienst({slug}: {slug: string}) {
     <>
       <PageHero title={service.title} trail={[HOME, {title: service.title}]} />
       <PageSection>
-        <Grid columns={{minWidth: 280, repeat: 'fit'}} gap={8} align="start">
-          <VStack gap={3}>
-            <Heading level={2}>{service.heading}</Heading>
-            <Paragraphs items={[service.body]} />
-          </VStack>
-          <VStack gap={3}>
-            <Heading level={2}>{service.bulletsTitle}</Heading>
-            <Paragraphs items={[service.bulletsIntro]} />
-            <BulletList items={service.bullets} />
-            <Paragraphs items={[service.closing]} />
-          </VStack>
-        </Grid>
+        <div {...stylex.props(styles.split, styles.panel)}>
+          <Heading level={2}>{service.heading}</Heading>
+          <Text type="large" color="secondary" xstyle={styles.panelText}>
+            {service.body}
+          </Text>
+        </div>
       </PageSection>
+      <PageSection isWashed>
+        <RowsSection
+          title={service.bulletsTitle}
+          items={service.bullets}
+          aside={<Paragraphs items={[service.bulletsIntro]} />}
+        />
+      </PageSection>
+      <PageSection>
+        <div {...stylex.props(styles.closingPlate, bandStyles.onBand)}>
+          <Text as="p" weight="bold" xstyle={styles.closingText}>
+            {service.closing}
+          </Text>
+        </div>
+      </PageSection>
+      <Faq />
       <CtaBand />
     </>
   );

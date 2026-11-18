@@ -1,5 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+import * as stylex from '@stylexjs/stylex';
 import {useState, type FormEvent, type ReactNode} from 'react';
 import {Banner} from '@astryxdesign/core/Banner';
 import {Button} from '@astryxdesign/core/Button';
@@ -9,6 +10,19 @@ import {Selector} from '@astryxdesign/core/Selector';
 import {TextArea} from '@astryxdesign/core/TextArea';
 import {TextInput} from '@astryxdesign/core/TextInput';
 import {CONTACT, SIGNUP} from '../content';
+
+const styles = stylex.create({
+  panel: {
+    padding: {default: 20, '@media (min-width: 900px)': 40},
+    borderRadius: 'var(--radius-container)',
+    backgroundColor: 'var(--color-background-surface)',
+  },
+});
+
+/** A raised sheet that holds a form, one step above the paper. */
+export function FormPanel({children}: {children: ReactNode}) {
+  return <div {...stylex.props(styles.panel)}>{children}</div>;
+}
 
 const toOptions = (values: ReadonlyArray<string>) =>
   values.map(value => ({value, label: value}));
