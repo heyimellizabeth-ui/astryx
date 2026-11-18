@@ -89,7 +89,7 @@ export function Vacatures() {
   return (
     <>
       <PageHero title="Vacatures" trail={[HOME, {title: 'Vacatures'}]} />
-      <PageSection measure={960}>
+      <PageSection>
         <VStack gap={8}>
           <VStack gap={3}>
             <Heading level={2}>{VACANCY.title}</Heading>

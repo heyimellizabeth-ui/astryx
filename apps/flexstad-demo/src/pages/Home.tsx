@@ -151,7 +151,7 @@ export function Home() {
         </div>
       </section>
 
-      <PageSection id="intro" paddingBlock={6}>
+      <PageSection id="intro" paddingBlock={8}>
         <VStack gap={10}>
           <div {...stylex.props(styles.intro)}>
             <div {...stylex.props(styles.introHead)}>

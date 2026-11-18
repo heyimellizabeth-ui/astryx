@@ -57,19 +57,17 @@ const styles = stylex.create({
       '@media (min-width: 900px)': 'minmax(0, 1fr) 360px',
     },
   },
-  head: {
-    gridColumn: {default: 'auto', '@media (min-width: 900px)': '1'},
-    gridRow: {default: 'auto', '@media (min-width: 900px)': '1'},
-  },
+  // A listing without a long description: the facts panel stands alone.
+  bodySingle: {maxWidth: 560},
   text: {
     gridColumn: {default: 'auto', '@media (min-width: 900px)': '1'},
-    gridRow: {default: 'auto', '@media (min-width: 900px)': '2'},
+    gridRow: {default: 'auto', '@media (min-width: 900px)': '1'},
     maxWidth: '65ch',
   },
   panel: {
     gridColumn: {default: 'auto', '@media (min-width: 900px)': '2'},
-    gridRow: {default: 'auto', '@media (min-width: 900px)': '1 / span 2'},
-    padding: 24,
+    gridRow: {default: 'auto', '@media (min-width: 900px)': '1'},
+    padding: 32,
     borderRadius: 'var(--radius-container)',
     backgroundColor: 'var(--color-background-card)',
     borderWidth: 1,
@@ -127,6 +125,16 @@ export function ListingDetail({slug}: {slug: string}) {
               {title: listing.name},
             ]}
           />
+          <VStack gap={3} align="start">
+            <Badge
+              variant={listing.status === 'available' ? 'success' : 'neutral'}
+              label={statusLabel(listing.status)}
+            />
+            <Heading level={1} type="display-2">
+              {listing.name}
+            </Heading>
+            <Text color="secondary">{LISTING_ADDRESS[listing.slug]}</Text>
+          </VStack>
           <div {...stylex.props(styles.gallery)}>
             {shot(0)}
             {rest.map((_, index) => shot(index + 1))}
@@ -135,19 +143,7 @@ export function ListingDetail({slug}: {slug: string}) {
       </PageSection>
 
       <PageSection isWashed paddingBlock={8}>
-        <div {...stylex.props(styles.body)}>
-          <div {...stylex.props(styles.head)}>
-            <VStack gap={3} align="start">
-              <Badge
-                variant={listing.status === 'available' ? 'success' : 'neutral'}
-                label={statusLabel(listing.status)}
-              />
-              <Heading level={1} type="display-2">
-                {listing.name}
-              </Heading>
-              <Text color="secondary">{LISTING_ADDRESS[listing.slug]}</Text>
-            </VStack>
-          </div>
+        <div {...stylex.props(detail ? styles.body : styles.bodySingle)}>
           <aside {...stylex.props(styles.panel)}>
             <VStack gap={5}>
               <MetadataList>

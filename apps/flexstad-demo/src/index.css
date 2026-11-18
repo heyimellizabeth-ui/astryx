@@ -104,6 +104,7 @@ a:active {
 .astryx-text-input > input {
   align-self: stretch;
   height: auto;
+  margin-block: -5px;
 }
 
 /* FAQ triggers stand as tall as the other controls (44px or more). */

@@ -4,6 +4,7 @@ import {useState, type ComponentProps, type FormEvent} from 'react';
 import {Button} from '@astryxdesign/core/Button';
 import {DateInput} from '@astryxdesign/core/DateInput';
 import {FormLayout} from '@astryxdesign/core/FormLayout';
+import {Grid} from '@astryxdesign/core/Grid';
 import {Heading} from '@astryxdesign/core/Heading';
 import {VStack} from '@astryxdesign/core/Layout';
 import {RadioList, RadioListItem} from '@astryxdesign/core/RadioList';
@@ -43,99 +44,101 @@ export function EnquiryForm({listingName}: {listingName?: string}) {
   }
 
   return (
-    <PageSection id="reageren" measure={720}>
+    <PageSection id="reageren">
       <form onSubmit={handleSubmit} noValidate>
-        <VStack gap={6}>
+        <Grid columns={{minWidth: 300, repeat: 'fit'}} gap={8} align="start">
           <Heading level={2}>Reageren</Heading>
-          {isSent ? <NotConnectedNotice /> : null}
-          <FormLayout>
-            <TextInput
-              size="lg"
-              label="Volledige naam"
-              value={name}
-              onChange={setName}
-              isOptional
-              htmlName="name"
-            />
-            <TextInput
-              size="lg"
-              label="E-mailadres"
-              type="email"
-              value={email}
-              onChange={setEmail}
-              isOptional
-              htmlName="email"
-            />
-            <TextInput
-              size="lg"
-              label="Telefoonnummer"
-              type="tel"
-              value={phone}
-              onChange={setPhone}
-              isOptional
-              htmlName="phone"
-            />
-            <RadioList
-              label="Type gebruik"
-              value={use}
-              onChange={value => setUse(value as Use)}
-              orientation="horizontal"
-              isRequired
-              htmlName="use">
-              <RadioListItem value="wonen" label="Wonen" />
-              <RadioListItem value="werken" label="Werken" />
-            </RadioList>
-            {listingName ? (
+          <VStack gap={6}>
+            {isSent ? <NotConnectedNotice /> : null}
+            <FormLayout>
               <TextInput
                 size="lg"
-                label="Ik reageer op"
-                value={listingName}
-                isReadOnly
-                htmlName="listing"
+                label="Volledige naam"
+                value={name}
+                onChange={setName}
+                isOptional
+                htmlName="name"
               />
-            ) : null}
-            <Selector
-              size="lg"
-              label="Mijn budget"
-              options={BUDGETS}
-              value={budget}
-              onChange={setBudget}
-              isOptional
-              htmlName="budget"
-            />
-            <DateInput
-              size="lg"
-              label="Startdatum"
-              value={start}
-              onChange={setStart}
-              isRequired
-            />
-            <DateInput
-              size="lg"
-              label="Eventuele einddatum"
-              value={end}
-              onChange={setEnd}
-              isOptional
-              hasClear
-            />
-            <TextArea
-              label="Eventuele opmerkingen"
-              value={notes}
-              onChange={setNotes}
-              rows={4}
-              isOptional
-            />
-          </FormLayout>
-          <div>
-            <Button
-              label="Versturen"
-              type="submit"
-              variant="primary"
-              size="lg"
-              isDisabled={isInvalid}
-            />
-          </div>
-        </VStack>
+              <TextInput
+                size="lg"
+                label="E-mailadres"
+                type="email"
+                value={email}
+                onChange={setEmail}
+                isOptional
+                htmlName="email"
+              />
+              <TextInput
+                size="lg"
+                label="Telefoonnummer"
+                type="tel"
+                value={phone}
+                onChange={setPhone}
+                isOptional
+                htmlName="phone"
+              />
+              <RadioList
+                label="Type gebruik"
+                value={use}
+                onChange={value => setUse(value as Use)}
+                orientation="horizontal"
+                isRequired
+                htmlName="use">
+                <RadioListItem value="wonen" label="Wonen" />
+                <RadioListItem value="werken" label="Werken" />
+              </RadioList>
+              {listingName ? (
+                <TextInput
+                  size="lg"
+                  label="Ik reageer op"
+                  value={listingName}
+                  isReadOnly
+                  htmlName="listing"
+                />
+              ) : null}
+              <Selector
+                size="lg"
+                label="Mijn budget"
+                options={BUDGETS}
+                value={budget}
+                onChange={setBudget}
+                isOptional
+                htmlName="budget"
+              />
+              <DateInput
+                size="lg"
+                label="Startdatum"
+                value={start}
+                onChange={setStart}
+                isRequired
+              />
+              <DateInput
+                size="lg"
+                label="Eventuele einddatum"
+                value={end}
+                onChange={setEnd}
+                isOptional
+                hasClear
+              />
+              <TextArea
+                label="Eventuele opmerkingen"
+                value={notes}
+                onChange={setNotes}
+                rows={4}
+                isOptional
+              />
+            </FormLayout>
+            <div>
+              <Button
+                label="Versturen"
+                type="submit"
+                variant="primary"
+                size="lg"
+                isDisabled={isInvalid}
+              />
+            </div>
+          </VStack>
+        </Grid>
       </form>
     </PageSection>
   );

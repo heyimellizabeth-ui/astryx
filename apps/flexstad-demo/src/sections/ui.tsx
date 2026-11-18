@@ -74,6 +74,16 @@ const styles = stylex.create({
     borderTopColor: 'color-mix(in oklch, var(--flex-on-band) 28%, transparent)',
   },
   measure: {maxWidth: '55ch'},
+  columns: {
+    columnGap: 64,
+    columnCount: {default: 1, '@media (min-width: 900px)': 2},
+  },
+  columnItem: {breakInside: 'avoid', marginBottom: 24},
+  lead: {
+    maxWidth: '24em',
+    fontSize: 'var(--text-heading-2-size)',
+    lineHeight: 'var(--text-heading-2-leading)',
+  },
   prose2: {maxWidth: '65ch'},
   photo: {
     borderRadius: 'var(--radius-container)',
@@ -277,5 +287,37 @@ export function CtaBand({
         </div>
       </VStack>
     </PageSection>
+  );
+}
+
+/** Paragraphs in two balanced columns from 900px, one on phones. */
+export function TextColumns({items}: {items: ReadonlyArray<string>}) {
+  return (
+    <div {...stylex.props(styles.columns)}>
+      {items.map(text => (
+        <Text key={text} as="p" color="secondary" xstyle={styles.columnItem}>
+          {text}
+        </Text>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * An intro set as a statement: its first sentence at the section size, the
+ * rest of the same text beneath in two columns. No word is added or dropped.
+ */
+export function LeadIntro({paragraphs}: {paragraphs: ReadonlyArray<string>}) {
+  const [first, ...others] = paragraphs;
+  const lead = firstSentence(first);
+  const rest = first.slice(lead.length).trim();
+  const items = rest ? [rest, ...others] : others;
+  return (
+    <VStack gap={8} align="start">
+      <Text as="p" weight="bold" xstyle={styles.lead}>
+        {lead}
+      </Text>
+      {items.length > 0 ? <TextColumns items={items} /> : null}
+    </VStack>
   );
 }

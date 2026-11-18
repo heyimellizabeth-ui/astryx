@@ -2,7 +2,6 @@
 
 import * as stylex from '@stylexjs/stylex';
 import {Collapsible, CollapsibleGroup} from '@astryxdesign/core/Collapsible';
-import {Grid} from '@astryxdesign/core/Grid';
 import {Heading} from '@astryxdesign/core/Heading';
 import {Text} from '@astryxdesign/core/Text';
 import {VStack} from '@astryxdesign/core/Layout';
@@ -10,6 +9,15 @@ import {FAQ} from '../content';
 import {PageSection} from './PageSection';
 
 const styles = stylex.create({
+  layout: {
+    display: 'grid',
+    gap: 32,
+    alignItems: 'start',
+    gridTemplateColumns: {
+      default: 'minmax(0, 1fr)',
+      '@media (min-width: 900px)': 'minmax(0, 5fr) minmax(0, 7fr)',
+    },
+  },
   // Each group opens with a firm rule, so the three read as three lists.
   group: {
     paddingTop: 16,
@@ -23,9 +31,9 @@ const styles = stylex.create({
 export function Faq() {
   return (
     <PageSection isWashed>
-      <VStack gap={8}>
+      <div {...stylex.props(styles.layout)}>
         <Heading level={2}>Veelgestelde vragen</Heading>
-        <Grid columns={{minWidth: 300, repeat: 'fit'}} gap={8} align="start">
+        <VStack gap={8}>
           {FAQ.map(group => (
             <VStack key={group.id} gap={3} xstyle={styles.group}>
               <Heading level={3}>{group.title}</Heading>
@@ -42,8 +50,8 @@ export function Faq() {
               </CollapsibleGroup>
             </VStack>
           ))}
-        </Grid>
-      </VStack>
+        </VStack>
+      </div>
     </PageSection>
   );
 }

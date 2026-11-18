@@ -8,11 +8,17 @@ import {Text} from '@astryxdesign/core/Text';
 import {ABOUT} from '../content';
 import {bandStyles} from '../sections/bandStyles';
 import {PageSection} from '../sections/PageSection';
-import {CtaBand, PageHero, Photo, RowsSection} from '../sections/ui';
+import {
+  CtaBand,
+  PageHero,
+  Photo,
+  RowsSection,
+  TextColumns,
+} from '../sections/ui';
 
 const styles = stylex.create({
   // The statement is a text object at the section token, ten columns wide.
-  statement: {maxWidth: '22em'},
+  statement: {maxWidth: '24em'},
   panel: {
     padding: 32,
     borderRadius: 'var(--radius-container)',
@@ -32,21 +38,13 @@ export function OverOns() {
         title="Over Flexstad"
         trail={[{title: 'Home', href: '/'}, {title: 'Over ons'}]}
       />
-      <PageSection isWashed paddingBlock={6}>
-        <Photo label="Het Flexstad-team" seed={3} ratio="21 / 8" />
-      </PageSection>
-      <PageSection paddingBlock={10}>
-        <VStack gap={8}>
+      <PageSection paddingBlock={8}>
+        <VStack gap={10}>
+          <Photo label="Het Flexstad-team" seed={3} ratio="21 / 8" />
           <div {...stylex.props(styles.statement)}>
             <Heading level={2}>{ABOUT.heading}</Heading>
           </div>
-          <Grid columns={{minWidth: 280, repeat: 'fit'}} gap={8} align="start">
-            {ABOUT.story.map(text => (
-              <Text key={text} color="secondary">
-                {text}
-              </Text>
-            ))}
-          </Grid>
+          <TextColumns items={ABOUT.story} />
         </VStack>
       </PageSection>
       <PageSection isWashed>
