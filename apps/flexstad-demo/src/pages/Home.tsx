@@ -8,7 +8,6 @@ import {HStack, VStack} from '@astryxdesign/core/Layout';
 import {Text} from '@astryxdesign/core/Text';
 import {ABOUT, AUDIENCES, AUDIENCE_PAGES, HOME_COPY} from '../content';
 import {PHOTOS} from '../photos';
-import {bandStyles} from '../sections/bandStyles';
 import {Faq} from '../sections/Faq';
 import {ListingGrid} from '../sections/ListingGrid';
 import {PageSection} from '../sections/PageSection';
@@ -152,7 +151,6 @@ const styles = stylex.create({
   },
   cell: {display: 'flex'},
   card: {flexGrow: 1},
-  tileBand: {backgroundColor: 'var(--flex-band)'},
   tileMuted: {backgroundColor: 'var(--color-background-muted)'},
   // A wide tile: the photograph beside the words on desktop, above them on
   // phones. The photograph fills its half edge to edge.
@@ -213,7 +211,7 @@ const styles = stylex.create({
 // timber shell is too weak a mood to earn a place, so both are type-led.
 const TILES = [
   {index: 0, span: styles.wide, photo: PHOTOS.ownersEntrance, tone: undefined},
-  {index: 2, span: styles.narrow, photo: undefined, tone: styles.tileBand},
+  {index: 2, span: styles.narrow, photo: undefined, tone: styles.tileMuted},
   {index: 3, span: styles.narrow, photo: undefined, tone: styles.tileMuted},
   {
     index: 1,
@@ -325,7 +323,6 @@ export function Home() {
               const sentence = firstSentence(
                 AUDIENCE_PAGES[AUDIENCE_SLUGS[tile.index]].intro[0],
               );
-              const isBand = tile.tone === styles.tileBand;
               const words = (
                 <VStack
                   gap={3}
@@ -350,7 +347,6 @@ export function Home() {
                     xstyle={[tile.tone, styles.card]}>
                     <div
                       {...stylex.props(
-                        isBand ? bandStyles.onBand : undefined,
                         tile.photo ? styles.tileSplit : undefined,
                       )}>
                       {tile.photo ? (

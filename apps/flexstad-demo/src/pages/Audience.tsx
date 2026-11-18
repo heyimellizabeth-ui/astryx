@@ -6,6 +6,7 @@ import {Heading} from '@astryxdesign/core/Heading';
 import {VStack} from '@astryxdesign/core/Layout';
 import {AUDIENCE_PAGES} from '../content';
 import {PHOTOS} from '../photos';
+import {ListingGrid} from '../sections/ListingGrid';
 import {PageSection} from '../sections/PageSection';
 import {
   CtaBand,
@@ -40,8 +41,8 @@ const styles = stylex.create({
 });
 
 // Mood photographs where one passes the deletion test. Municipalities have no
-// fitting library photograph: that page stays type-led and sets the lead
-// sentence on an aubergine plate instead.
+// fitting library photograph: that page stays type-led, with the lead sentence
+// set as type on paper.
 const PAGE_PHOTOS = {
   vastgoedeigenaren: PHOTOS.ownersEntrance,
   ondernemers: PHOTOS.makersAtticStudio,
@@ -76,8 +77,9 @@ export function Audience({slug}: {slug: string}) {
         }
       />
       <PageSection>
-        <LeadIntro paragraphs={page.intro} isPlate={photo === undefined} />
+        <LeadIntro paragraphs={page.intro} />
       </PageSection>
+      {slug === 'ondernemers' ? <ListingGrid /> : null}
       {page.sections ? (
         <PageSection>
           <Grid

@@ -15,6 +15,7 @@ const styles = stylex.create({
   rhythm: {paddingBlock: 'clamp(16px, 3vw, 32px)'},
   wash: {backgroundColor: 'var(--color-background-body)'},
   band: {backgroundColor: 'var(--flex-band)'},
+  muted: {backgroundColor: 'var(--color-background-muted)'},
 });
 
 interface PageSectionProps {
@@ -53,7 +54,9 @@ export function PageSection({
           ? [styles.band, bandStyles.onBand]
           : isWashed
             ? styles.wash
-            : undefined
+            : variant === 'muted'
+              ? styles.muted
+              : undefined
       }>
       <div
         id={id}

@@ -9,7 +9,6 @@ import {HStack, VStack} from '@astryxdesign/core/Layout';
 import {Text} from '@astryxdesign/core/Text';
 import {CONTACT, type Cta} from '../content';
 import type {Photo as PhotoData} from '../photos';
-import {bandStyles} from './bandStyles';
 import {PageSection} from './PageSection';
 import {Placeholder} from './Placeholder';
 
@@ -89,12 +88,9 @@ const styles = stylex.create({
     lineHeight: 'var(--text-heading-2-leading)',
   },
   prose2: {maxWidth: '65ch'},
-  // The lead sentence of a page with no photograph: an aubergine plate.
-  plate: {
-    padding: {default: 28, '@media (min-width: 900px)': 56},
-    borderRadius: 'var(--radius-container)',
-    backgroundColor: 'var(--flex-band)',
-  },
+  // Ghost buttons carry the Button's inline padding inside their hit area; the
+  // row is pulled back by the same token so the text sits on the column edge.
+  ghostRow: {marginInlineStart: 'calc(-1 * var(--spacing-3))'},
   // A banner with something beside its head: the head on the left, the aside
   // on the right, both sitting on one baseline row from 900px.
   heroSplit: {
@@ -107,6 +103,7 @@ const styles = stylex.create({
       '@media (min-width: 900px)': 'minmax(0, 1fr) minmax(0, 380px)',
     },
   },
+  heroSplitStart: {alignItems: 'start'},
   // The aside is a photograph: five of twelve columns, as tall as the head.
   heroSplitWide: {
     gridTemplateColumns: {
@@ -301,9 +298,14 @@ export function PageHero({
   aside,
   isAsidePhoto = false,
 }: PageHeroProps) {
+  // Beside a photograph the trail stays inside the head, so the picture runs
+  // the head's full height. Beside an index the trail sits above both, so the
+  // head and the index start on one line.
+  const isSplitIndex = aside !== undefined && !isAsidePhoto;
+  const crumbs = trail ? <Crumbs trail={trail} /> : null;
   const head = (
     <VStack gap={5} align="start">
-      {trail ? <Crumbs trail={trail} /> : null}
+      {isSplitIndex ? null : crumbs}
       <Reveal>
         <VStack gap={5} align="start">
           <Heading level={1} type="display-2">
@@ -334,18 +336,21 @@ export function PageHero({
   return (
     <PageSection isWashed paddingBlock={paddingBlock}>
       {aside ? (
-        <div
-          {...stylex.props(
-            styles.heroSplit,
-            isAsidePhoto ? styles.heroSplitWide : undefined,
-          )}>
-          {head}
-          {isAsidePhoto ? (
-            <div {...stylex.props(styles.heroAside)}>{aside}</div>
-          ) : (
-            aside
-          )}
-        </div>
+        <VStack gap={5} align="stretch">
+          {isSplitIndex ? crumbs : null}
+          <div
+            {...stylex.props(
+              styles.heroSplit,
+              isAsidePhoto ? styles.heroSplitWide : styles.heroSplitStart,
+            )}>
+            {head}
+            {isAsidePhoto ? (
+              <div {...stylex.props(styles.heroAside)}>{aside}</div>
+            ) : (
+              aside
+            )}
+          </div>
+        </VStack>
       ) : (
         head
       )}
@@ -411,7 +416,7 @@ export function CtaBand({
           />
         </div>
         <div {...stylex.props(styles.bandLinks)}>
-          <HStack gap={2} wrap="wrap">
+          <HStack gap={2} wrap="wrap" xstyle={styles.ghostRow}>
             <Button
               label={CONTACT.phone}
               href={CONTACT.phoneHref}
@@ -456,30 +461,16 @@ export function TextColumns({items}: {items: ReadonlyArray<string>}) {
  * An intro set as a statement: its first sentence at the section size, the
  * rest of the same text beneath in two columns. No word is added or dropped.
  */
-export function LeadIntro({
-  paragraphs,
-  isPlate = false,
-}: {
-  paragraphs: ReadonlyArray<string>;
-  /** Set the lead sentence on an aubergine plate (pages with no photograph). */
-  isPlate?: boolean;
-}) {
+export function LeadIntro({paragraphs}: {paragraphs: ReadonlyArray<string>}) {
   const [first, ...others] = paragraphs;
   const lead = firstSentence(first);
   const rest = first.slice(lead.length).trim();
   const items = rest ? [rest, ...others] : others;
-  const leadText = (
-    <Text as="p" weight="bold" xstyle={styles.lead}>
-      {lead}
-    </Text>
-  );
   return (
     <VStack gap={8} align="stretch">
-      {isPlate ? (
-        <div {...stylex.props(styles.plate, bandStyles.onBand)}>{leadText}</div>
-      ) : (
-        leadText
-      )}
+      <Text as="p" weight="bold" xstyle={styles.lead}>
+        {lead}
+      </Text>
       {items.length > 0 ? <TextColumns items={items} /> : null}
     </VStack>
   );

@@ -81,8 +81,10 @@ export function useFormSubmit(hasErrors: boolean): {
     if (tries === 0) {
       return;
     }
+    // The first failing control: a radio group carries aria-invalid on its
+    // wrapper, which cannot take focus, so only real controls are matched.
     const first = formRef.current?.querySelector<HTMLElement>(
-      '[aria-invalid="true"]',
+      ':is(input, textarea, select, button, [tabindex])[aria-invalid="true"]',
     );
     if (first) {
       first.focus();

@@ -7,7 +7,6 @@ import {VStack} from '@astryxdesign/core/Layout';
 import {Text} from '@astryxdesign/core/Text';
 import {ABOUT} from '../content';
 import {PHOTOS} from '../photos';
-import {bandStyles} from '../sections/bandStyles';
 import {PageSection} from '../sections/PageSection';
 import {CtaBand, PageHero, PhotoImage, Paragraphs} from '../sections/ui';
 
@@ -27,11 +26,6 @@ const styles = stylex.create({
     padding: 40,
     borderRadius: 'var(--radius-container)',
     backgroundColor: 'var(--color-background-muted)',
-  },
-  band: {
-    padding: 40,
-    borderRadius: 'var(--radius-container)',
-    backgroundColor: 'var(--flex-band)',
   },
   // The six reasons: ruled, three across over three across.
   reasons: {
@@ -80,7 +74,7 @@ export function OverOns() {
               <Text color="secondary">{ABOUT.mission.body}</Text>
             </VStack>
           </div>
-          <div {...stylex.props(styles.band, bandStyles.onBand)}>
+          <div {...stylex.props(styles.panel)}>
             <VStack gap={3}>
               <Heading level={3}>{ABOUT.vision.title}</Heading>
               <Text color="secondary">{ABOUT.vision.body}</Text>

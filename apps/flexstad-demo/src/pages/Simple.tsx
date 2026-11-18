@@ -9,7 +9,6 @@ import {HStack, VStack} from '@astryxdesign/core/Layout';
 import {Link} from '@astryxdesign/core/Link';
 import {Text} from '@astryxdesign/core/Text';
 import {CONTACT, FAQ, SERVICES, VACANCY} from '../content';
-import {bandStyles} from '../sections/bandStyles';
 import {Faq} from '../sections/Faq';
 import {
   ContactForm,
@@ -56,11 +55,9 @@ const styles = stylex.create({
     borderBottomColor: 'var(--color-border-emphasized)',
   },
   detailValue: {margin: 0},
-  plate: {
-    padding: {default: 28, '@media (min-width: 900px)': 40},
-    borderRadius: 'var(--radius-container)',
-    backgroundColor: 'var(--flex-band)',
-  },
+  // Ghost buttons carry the Button's inline padding inside their hit area; the
+  // row is pulled back by the same token so the text sits on the column edge.
+  ghostRow: {marginInlineStart: 'calc(-1 * var(--spacing-3))'},
   more: {paddingTop: 32},
   desktopOnly: {
     display: {default: 'none', '@media (min-width: 900px)': 'block'},
@@ -116,11 +113,6 @@ const styles = stylex.create({
     borderBottomWidth: 1,
     borderBottomStyle: 'solid',
     borderBottomColor: 'var(--color-border-emphasized)',
-  },
-  closingPlate: {
-    padding: {default: 28, '@media (min-width: 900px)': 56},
-    borderRadius: 'var(--radius-container)',
-    backgroundColor: 'var(--flex-band)',
   },
   closingText: {
     maxWidth: 'min(100%, 24em)',
@@ -196,11 +188,11 @@ export function Inschrijven() {
   // beside the form from 900px, after the form on phones.
   const aside = (
     <>
-      <div {...stylex.props(styles.plate, bandStyles.onBand)}>
+      <div>
         <VStack gap={5} align="start">
           <Heading level={2}>Jouw gegevens</Heading>
           <Text color="secondary">{answer}</Text>
-          <HStack gap={2} wrap="wrap">
+          <HStack gap={2} wrap="wrap" xstyle={styles.ghostRow}>
             <Button
               label={CONTACT.phone}
               href={CONTACT.phoneHref}
@@ -381,12 +373,10 @@ export function Dienst({slug}: {slug: string}) {
           aside={<Paragraphs items={[service.bulletsIntro]} />}
         />
       </PageSection>
-      <PageSection>
-        <div {...stylex.props(styles.closingPlate, bandStyles.onBand)}>
-          <Text as="p" weight="bold" xstyle={styles.closingText}>
-            {service.closing}
-          </Text>
-        </div>
+      <PageSection paddingBlock={8}>
+        <Text as="p" weight="bold" xstyle={styles.closingText}>
+          {service.closing}
+        </Text>
       </PageSection>
       <Faq />
       <CtaBand />

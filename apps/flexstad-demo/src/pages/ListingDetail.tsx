@@ -43,26 +43,17 @@ const styles = stylex.create({
     fontWeight: 700,
     whiteSpace: 'nowrap',
   },
-  // "Photos follow": one quiet treatment for the four slots. A lead frame
-  // and three beside it from 900px, kept low so the empty frames never
-  // outweigh the facts; a two-by-two grid of the same frames on phones.
+  // "Photos follow": one quiet strip of the four slots below the facts, kept
+  // small so the empty frames never outweigh the street, the facts and the
+  // action. One row of four from 900px, two by two on phones.
   gallery: {
     display: 'grid',
     gap: 12,
     gridTemplateColumns: {
       default: 'repeat(2, minmax(0, 1fr))',
-      '@media (min-width: 900px)': 'minmax(0, 2fr) minmax(0, 1fr)',
+      '@media (min-width: 900px)': 'repeat(4, minmax(0, 1fr))',
     },
-    gridTemplateRows: {
-      default: 'repeat(2, 120px)',
-      '@media (min-width: 900px)': 'repeat(3, minmax(0, 1fr))',
-    },
-    height: {default: 'auto', '@media (min-width: 900px)': 336},
-    // Air before the tinted band that follows.
-    marginBottom: 48,
-  },
-  lead: {
-    gridRow: {default: 'auto', '@media (min-width: 900px)': '1 / span 3'},
+    gridAutoRows: {default: 104, '@media (min-width: 900px)': 136},
   },
   shot: {
     display: 'block',
@@ -196,6 +187,26 @@ export function ListingDetail({slug}: {slug: string}) {
   }));
   const detail = slug === 'roemer-visscherstraat' ? ROEMER_DETAIL : null;
 
+  const gallery = (
+    <PageSection paddingBlock={8}>
+      <VStack gap={4}>
+        <Text color="secondary">Foto&apos;s volgen</Text>
+        <div {...stylex.props(styles.gallery)}>
+          {GALLERY_LABELS.map((label, index) => (
+            <button
+              key={label}
+              type="button"
+              aria-label={`Open foto ${index + 1} van ${media.length}`}
+              onClick={() => setLightbox(index)}
+              {...stylex.props(styles.shot)}>
+              <PendingPhoto label={label} />
+            </button>
+          ))}
+        </div>
+      </VStack>
+    </PageSection>
+  );
+
   return (
     <>
       <PageSection isWashed paddingBlock={8}>
@@ -230,23 +241,10 @@ export function ListingDetail({slug}: {slug: string}) {
               size="lg"
             />
           </div>
-          <div {...stylex.props(styles.gallery)}>
-            {GALLERY_LABELS.map((label, index) => (
-              <button
-                key={label}
-                type="button"
-                aria-label={`Open foto ${index + 1} van ${media.length}`}
-                onClick={() => setLightbox(index)}
-                {...stylex.props(
-                  styles.shot,
-                  index === 0 ? styles.lead : undefined,
-                )}>
-                <PendingPhoto label={label} />
-              </button>
-            ))}
-          </div>
         </VStack>
       </PageSection>
+
+      {detail ? null : gallery}
 
       {detail ? (
         <PageSection paddingBlock={10}>
@@ -297,6 +295,8 @@ export function ListingDetail({slug}: {slug: string}) {
           </div>
         </PageSection>
       ) : null}
+
+      {detail ? gallery : null}
 
       <EnquiryForm
         listingName={listing.name}
