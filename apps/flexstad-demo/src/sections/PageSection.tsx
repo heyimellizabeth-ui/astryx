@@ -11,6 +11,8 @@ const styles = stylex.create({
     marginInlineEnd: 'auto',
     width: '100%',
   },
+  // One vertical rhythm for every seam: about 112px at desktop, 80px on phones.
+  rhythm: {paddingBlock: 'clamp(16px, 3vw, 32px)'},
   wash: {backgroundColor: 'var(--color-background-body)'},
   band: {backgroundColor: 'var(--flex-band)'},
 });
@@ -33,7 +35,7 @@ export function PageSection({
   variant = 'transparent',
   isWashed = false,
   isBand = false,
-  paddingBlock = 10,
+  paddingBlock = 6,
   maxWidth = 1200,
   children,
 }: PageSectionProps) {
@@ -50,7 +52,10 @@ export function PageSection({
             ? styles.wash
             : undefined
       }>
-      <div id={id} {...stylex.props(styles.centered)} style={{maxWidth}}>
+      <div
+        id={id}
+        {...stylex.props(styles.centered, styles.rhythm)}
+        style={{maxWidth}}>
         {children}
       </div>
     </Section>
