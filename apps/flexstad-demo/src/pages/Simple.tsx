@@ -1,9 +1,9 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 import * as stylex from '@stylexjs/stylex';
-import type {ReactNode} from 'react';
-import {Banner} from '@astryxdesign/core/Banner';
+import {useEffect, type ReactNode} from 'react';
 import {Button} from '@astryxdesign/core/Button';
+import {Card} from '@astryxdesign/core/Card';
 import {Heading} from '@astryxdesign/core/Heading';
 import {HStack, VStack} from '@astryxdesign/core/Layout';
 import {Link} from '@astryxdesign/core/Link';
@@ -18,6 +18,9 @@ import {
 } from '../sections/Forms';
 import {PageSection} from '../sections/PageSection';
 import {CtaBand, PageHero, Paragraphs, RowsSection} from '../sections/ui';
+import {LoginPanel} from '../portal/LoginPanel';
+import {OVERVIEW_PATH, useDemoSession} from '../portal/demoAuth';
+import {navigate} from '../router';
 import {NotFound} from './NotFound';
 
 const HOME = {title: 'Home', href: '/'};
@@ -70,12 +73,6 @@ const styles = stylex.create({
   },
   panelText: {maxWidth: '60ch'},
   narrow: {maxWidth: 720},
-  card: {
-    maxWidth: 640,
-    padding: {default: 24, '@media (min-width: 900px)': 40},
-    borderRadius: 'var(--radius-container)',
-    backgroundColor: 'var(--color-background-surface)',
-  },
   // The vacancy: facts and the apply action stay beside the text.
   vacancy: {
     display: 'grid',
@@ -257,21 +254,28 @@ export function Abonneren() {
   );
 }
 
-/** The portal login is not rebuilt: credentials are never collected here. */
+/**
+ * The demo login: a working form against one published test account, with
+ * nothing collected (see `portal/demoAuth.ts`). A visitor who is already
+ * logged in goes on to the overview without seeing the form.
+ */
 export function MijnFlexstad() {
+  const hasSession = useDemoSession();
+  useEffect(() => {
+    if (hasSession) {
+      navigate(OVERVIEW_PATH, {replace: true});
+    }
+  }, [hasSession]);
+  if (hasSession) {
+    return null;
+  }
   return (
     <>
       <PageHero title="MijnFlexstad" trail={[HOME, {title: 'MijnFlexstad'}]} />
       <PageSection>
-        <div {...stylex.props(styles.card)}>
-          <VStack gap={5} align="start">
-            <Banner status="info" title="Inloggen volgt" collapsible={false}>
-              Het inlogscherm van het klantportaal wordt pas gekoppeld zodra
-              Flexstad de koppeling heeft goedgekeurd.
-            </Banner>
-            <Button label="Inloggen" variant="primary" isDisabled size="lg" />
-          </VStack>
-        </div>
+        <Card maxWidth={640} padding={8}>
+          <LoginPanel />
+        </Card>
       </PageSection>
     </>
   );

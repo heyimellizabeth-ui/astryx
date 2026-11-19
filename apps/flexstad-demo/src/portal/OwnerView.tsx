@@ -3,20 +3,14 @@
 import * as stylex from '@stylexjs/stylex';
 import {useState} from 'react';
 import {Badge} from '@astryxdesign/core/Badge';
+import {Card} from '@astryxdesign/core/Card';
+import {Grid} from '@astryxdesign/core/Grid';
 import {VStack} from '@astryxdesign/core/Layout';
+import {List, ListItem} from '@astryxdesign/core/List';
 import {Table, proportional} from '@astryxdesign/core/Table';
 import {Tab, TabList} from '@astryxdesign/core/TabList';
 import {Text} from '@astryxdesign/core/Text';
-import {
-  BlockTitle,
-  Card,
-  ContactCard,
-  DemoDownload,
-  RowText,
-  RuledList,
-  RuledRow,
-  ScrollBox,
-} from './Parts';
+import {BlockTitle, ContactCard, DemoDownload, PortalCard} from './Parts';
 import {
   OWNER_DOCUMENTS,
   OWNER_INSPECTIONS,
@@ -30,21 +24,6 @@ const PANEL_ID = 'eigenaar-paneel';
 type Section = 'objecten' | 'inspecties' | 'documenten';
 
 const styles = stylex.create({
-  figures: {
-    display: 'grid',
-    gap: 16,
-    margin: 0,
-    padding: 0,
-    gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-  },
-  figure: {
-    display: 'grid',
-    gap: 4,
-    margin: 0,
-    padding: {default: 16, '@media (min-width: 700px)': 24},
-    borderRadius: 'var(--radius-container)',
-    backgroundColor: 'var(--color-background-muted)',
-  },
   figureValue: {
     margin: 0,
     fontSize: 'clamp(32px, 20px + 2.4vw, 56px)',
@@ -52,7 +31,6 @@ const styles = stylex.create({
     fontWeight: 700,
     color: 'var(--color-text-primary)',
   },
-  figureLabel: {margin: 0},
 });
 
 const STATUS_VARIANT: Record<ObjectStatus, 'success' | 'neutral' | 'info'> = {
@@ -78,27 +56,26 @@ function Summary() {
     {label: 'Leeg', value: empty},
   ];
   return (
-    <dl {...stylex.props(styles.figures)}>
+    <Grid columns={3} gap={4}>
       {figures.map(item => (
-        <div key={item.label} {...stylex.props(styles.figure)}>
-          <dd {...stylex.props(styles.figureValue)}>{item.value}</dd>
-          <dt {...stylex.props(styles.figureLabel)}>
+        <Card key={item.label} variant="muted" padding={4}>
+          <VStack gap={1} align="start">
+            <Text xstyle={styles.figureValue}>{item.value}</Text>
             <Text color="secondary">{item.label}</Text>
-          </dt>
-        </div>
+          </VStack>
+        </Card>
       ))}
-    </dl>
+    </Grid>
   );
 }
 
 function ObjectsCard() {
   return (
-    <Card>
+    <PortalCard>
       <VStack gap={4} align="stretch">
         <BlockTitle>Mijn objecten</BlockTitle>
-        <ScrollBox>
           <Table<OwnerObject & Record<string, unknown>>
-            label="Objecten (voorbeelddata)"
+            aria-label="Objecten (voorbeelddata)"
             data={
               OWNER_OBJECTS as unknown as Array<
                 OwnerObject & Record<string, unknown>
@@ -139,66 +116,53 @@ function ObjectsCard() {
               },
             ]}
           />
-        </ScrollBox>
       </VStack>
-    </Card>
+    </PortalCard>
   );
 }
 
 function InspectionsCard() {
   return (
-    <Card>
+    <PortalCard>
       <VStack gap={4} align="stretch">
         <BlockTitle>Inspecties</BlockTitle>
-        <RuledList>
+        <List hasDividers edge="flush">
           {OWNER_INSPECTIONS.map(item => (
-            <RuledRow key={item.id}>
-              <RowText>
-                <VStack gap={1} align="start">
-                  <Text weight="medium">
-                    {item.date}, {item.address}
-                  </Text>
-                  <Text color="secondary">{item.note}</Text>
-                </VStack>
-              </RowText>
-              <Badge
-                variant={item.result === 'goedgekeurd' ? 'success' : 'warning'}
-                label={
-                  item.result === 'goedgekeurd'
-                    ? 'Goedgekeurd'
-                    : 'Aandachtspunt'
-                }
-              />
-            </RuledRow>
+            <ListItem
+              key={item.id}
+              label={`${item.date}, ${item.address}`}
+              description={<Text color="secondary">{item.note}</Text>}
+              endContent={
+                <Badge
+                  variant={item.result === 'goedgekeurd' ? 'success' : 'warning'}
+                  label={item.result === 'goedgekeurd' ? 'Goedgekeurd' : 'Aandachtspunt'}
+                />
+              }
+            />
           ))}
-        </RuledList>
+        </List>
       </VStack>
-    </Card>
+    </PortalCard>
   );
 }
 
 function DocumentsCard() {
   return (
-    <Card>
+    <PortalCard>
       <VStack gap={4} align="stretch">
         <BlockTitle>Documenten</BlockTitle>
-        <RuledList>
+        <List hasDividers edge="flush">
           {OWNER_DOCUMENTS.map(item => (
-            <RuledRow key={item.id}>
-              <RowText>
-                <VStack gap={1} align="start">
-                  <Text weight="medium">{item.title}</Text>
-                  <Text type="supporting" color="secondary">
-                    {item.detail}
-                  </Text>
-                </VStack>
-              </RowText>
-              <DemoDownload name={item.title} />
-            </RuledRow>
+            <ListItem
+              key={item.id}
+              label={item.title}
+              description={item.detail}
+              endContent={<DemoDownload name={item.title} />}
+            />
           ))}
-        </RuledList>
+        </List>
       </VStack>
-    </Card>
+    </PortalCard>
   );
 }
 

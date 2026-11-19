@@ -77,9 +77,11 @@ export function LoginPanel() {
       <form ref={formRef} onSubmit={handleSubmit} noValidate autoComplete="off">
         <VStack gap={6} align="stretch">
           {isRejected ? (
-            <Banner status="error" collapsible={false}>
-              Dit is een demo. Alleen het testaccount werkt.
-            </Banner>
+            <Banner
+              status="error"
+              title="Dit is een demo. Alleen het testaccount werkt."
+              collapsible={false}
+            />
           ) : null}
           <FormLayout>
             <TextInput

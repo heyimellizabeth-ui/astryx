@@ -62,6 +62,15 @@ Geologica, base 17px, ratio 1.25, headings bold, one colour.
 - Listing cards are type-led: no picture, no gradient; the street name is the largest thing on the card (24 to 30px), then the city, status, facts and feature lines. Four across from 1100px, a snap rail below.
 - Remaining stand-ins (the team slot on `/over-ons/` is gone: there is no team photograph and none is invented): the four gallery slots on each listing detail stay labelled "Foto volgt" until the client supplies photographs.
 
+## Demo portal
+
+`/mijnflexstad/` is a demo login and `/mijnflexstad/overzicht/` the space behind it (Huurder and Eigenaar views, built from Astryx Card, Table, TabList, SegmentedControl, MetadataList, List, Badge, StatusDot, Banner, Selector, TextArea, FormLayout). The site is not hosted on Flexstad's domain, so these safeguards hold and none may be weakened:
+
+- The check runs in the browser against one published test account (KEESFLEX, compared without case, and 12345678). No `fetch`, XHR or beacon, no form `action`, no `name` on inputs, `autoComplete="off"`; typed values live in React state only and never reach storage, the address, the console or the network.
+- The login panel prints the account in a Demo banner and says never to type real details; any other input gets "Dit is een demo. Alleen het testaccount werkt."
+- Storage: `sessionStorage['flexstad-demo-session']` and `['flexstad-demo-view']` only; Uitloggen clears both. Logged out, the overview redirects to the login with no portal content rendered; logged in, the login redirects to the overview.
+- Every portal screen carries a Demo badge and "Alle gegevens op deze pagina zijn voorbeelddata."; the sample data (`src/portal/sampleData.ts`) is fictional (Kees, Voorbeeldstraat 12) and never uses real listing addresses, people or prices. Only the contact card shows real Flexstad details.
+
 ## Motion
 
 - Still: one reveal on the hero at load, scroll reveal on tiles; everything static under reduced motion.

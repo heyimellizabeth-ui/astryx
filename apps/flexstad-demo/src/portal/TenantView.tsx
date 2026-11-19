@@ -6,6 +6,7 @@ import {Banner} from '@astryxdesign/core/Banner';
 import {Button} from '@astryxdesign/core/Button';
 import {FormLayout} from '@astryxdesign/core/FormLayout';
 import {HStack, VStack} from '@astryxdesign/core/Layout';
+import {List, ListItem} from '@astryxdesign/core/List';
 import {Selector} from '@astryxdesign/core/Selector';
 import {StatusDot} from '@astryxdesign/core/StatusDot';
 import {Table, proportional} from '@astryxdesign/core/Table';
@@ -15,14 +16,10 @@ import {TextArea} from '@astryxdesign/core/TextArea';
 import {useFormSubmit} from '../sections/Forms';
 import {
   BlockTitle,
-  Card,
   ContactCard,
   DemoDownload,
   Facts,
-  RowText,
-  RuledList,
-  RuledRow,
-  ScrollBox,
+  PortalCard,
 } from './Parts';
 import {
   REPORT_CATEGORIES,
@@ -39,7 +36,7 @@ type Section = 'ruimte' | 'kosten' | 'melding' | 'berichten';
 function SpaceCard() {
   const space = TENANT_SPACE;
   return (
-    <Card>
+    <PortalCard>
       <VStack gap={4} align="stretch">
         <HStack gap={3} align="center" wrap="wrap">
           <BlockTitle>Mijn ruimte</BlockTitle>
@@ -58,15 +55,14 @@ function SpaceCard() {
           ]}
         />
       </VStack>
-    </Card>
+    </PortalCard>
   );
 }
 
 function InvoiceTable() {
   return (
-    <ScrollBox>
       <Table<Invoice & Record<string, unknown>>
-        label="Facturen (voorbeelddata)"
+        aria-label="Facturen (voorbeelddata)"
         data={
           TENANT_INVOICES as unknown as Array<Invoice & Record<string, unknown>>
         }
@@ -106,13 +102,12 @@ function InvoiceTable() {
           },
         ]}
       />
-    </ScrollBox>
   );
 }
 
 function CostsCard() {
   return (
-    <Card>
+    <PortalCard>
       <VStack gap={5} align="stretch">
         <BlockTitle>Kosten</BlockTitle>
         <Facts
@@ -123,7 +118,7 @@ function CostsCard() {
         />
         <InvoiceTable />
       </VStack>
-    </Card>
+    </PortalCard>
   );
 }
 
@@ -138,7 +133,7 @@ function ReportCard() {
   };
   const form = useFormSubmit(Object.values(errors).some(Boolean));
   return (
-    <Card>
+    <PortalCard>
       <form
         ref={form.formRef}
         onSubmit={form.handleSubmit}
@@ -183,32 +178,31 @@ function ReportCard() {
           </div>
         </VStack>
       </form>
-    </Card>
+    </PortalCard>
   );
 }
 
 function MessagesCard() {
   return (
-    <Card>
+    <PortalCard>
       <VStack gap={4} align="stretch">
         <BlockTitle>Berichten</BlockTitle>
-        <RuledList>
+        <List hasDividers edge="flush">
           {TENANT_MESSAGES.map(message => (
-            <RuledRow key={message.id}>
-              <RowText>
-                <VStack gap={1} align="start">
-                  <Text weight="medium">{message.title}</Text>
-                  <Text color="secondary">{message.body}</Text>
-                </VStack>
-              </RowText>
-              <Text type="supporting" color="secondary">
-                {message.date}
-              </Text>
-            </RuledRow>
+            <ListItem
+              key={message.id}
+              label={message.title}
+              description={<Text color="secondary">{message.body}</Text>}
+              endContent={
+                <Text type="supporting" color="secondary">
+                  {message.date}
+                </Text>
+              }
+            />
           ))}
-        </RuledList>
+        </List>
       </VStack>
-    </Card>
+    </PortalCard>
   );
 }
 

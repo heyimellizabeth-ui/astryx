@@ -20,6 +20,7 @@ import {
   Vacatures,
 } from './pages/Simple';
 import {VoorWie} from './pages/VoorWie';
+import {PortalShell} from './portal/PortalShell';
 import {RouterProvider, usePath} from './router';
 import {SiteFooter} from './sections/SiteFooter';
 import {SiteHeader} from './sections/SiteHeader';
@@ -67,6 +68,8 @@ function Routes() {
       return <Abonneren />;
     case '/mijnflexstad/':
       return <MijnFlexstad />;
+    case '/mijnflexstad/overzicht/':
+      return <PortalShell />;
     case '/vacatures/':
       return <Vacatures />;
     default:
