@@ -46,8 +46,12 @@ export function useSearch(): URLSearchParams {
   return new URLSearchParams(search);
 }
 
-export function navigate(href: string) {
-  window.history.pushState(null, '', href);
+export function navigate(href: string, options?: {replace?: boolean}) {
+  if (options?.replace) {
+    window.history.replaceState(null, '', href);
+  } else {
+    window.history.pushState(null, '', href);
+  }
   window.scrollTo(0, 0);
   emit();
 }
