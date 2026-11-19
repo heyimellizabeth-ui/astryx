@@ -65,6 +65,7 @@ export function DemoDownload({name}: {name: string}) {
         <Button
           label="Download (demo)"
           variant="ghost"
+          size="lg"
           aria-label={`Download (demo), ${name}`}
           onClick={() => setIsShown(true)}
         />

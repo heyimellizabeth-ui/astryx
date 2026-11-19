@@ -116,6 +116,7 @@ export function LoginPanel() {
                 <Button
                   label={isShown ? 'Verberg wachtwoord' : 'Toon wachtwoord'}
                   variant="ghost"
+                  size="lg"
                   icon={<Icon icon="eyeSlash" />}
                   onClick={() => setIsShown(value => !value)}
                 />
