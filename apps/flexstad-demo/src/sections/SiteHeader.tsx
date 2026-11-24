@@ -137,11 +137,17 @@ function PhoneHeader() {
           <BrandMark width={112} />
         </Link>
         <HStack gap={2} align="center">
-          <Button label="Inschrijven" variant="primary" href="/inschrijven/" />
+          <Button
+            label="Inschrijven"
+            variant="primary"
+            href="/inschrijven/"
+            size="lg"
+          />
           <IconButton
             label="Menu"
             icon={<Icon icon="menu" />}
             variant="ghost"
+            size="lg"
             onClick={() => setIsOpen(true)}
           />
         </HStack>

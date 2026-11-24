@@ -70,6 +70,12 @@ Geologica, base 17px, ratio 1.25, one colour per head. Display heads are set tig
 - Secondary and ghost: Astryx, same pill and height. Fields: `size="lg"`, 48px.
 - Listing cards: flat on the well, a hairline frame that turns ink on hover, no shadow; the street name is the largest thing on the card.
 
+## Composition of `/` and the listing pages
+
+- `/`: Rise hero (`sections/RiseHero.tsx`), then **Actueel aanbod as a bento on the aubergine band** (`sections/ListingBento.tsx`: the available listings, the first tall on seven columns, each an Astryx `ClickableCard` filled by its building's photograph with name, city, price and total on a solid plate), then 2.000+ on paper (ink, the plus in orange), Voor wie, Van leegstand naar meerwaarde (Linnaeusstraat, linked), FAQ, Interesse?, footer.
+- `/aanbod/<slug>/`: the same Rise hero with the building's cover photograph, the head, address, facts and Ik heb interesse! on the block; the rest of its photographs as a mosaic on the aubergine band beneath (the Lightbox holds them all, the cover first).
+- Every photograph ships with 640 and 1024px cuts (`srcSetFor` in `photos.ts`) and a `sizes` for its slot. Routes other than `/` load on demand (`React.lazy` in `App.tsx`); `/` preloads its hero photograph from `index.html`; Geologica loads from `index.html` with preconnects. A skip link ("Naar de inhoud") leads to `<main id="inhoud">`, and every route sets its own document title.
+
 ## Pictures
 
 - **Every photograph is Flexstad's own**, taken from the public flexstad.com pages and served as WebP from `public/photos/flexstad/` (`src/photos.ts`). The footer credits them as "Foto's: Flexstad." No library stand-in remains.

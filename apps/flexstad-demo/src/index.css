@@ -1,5 +1,5 @@
-/* Hallmark · shape: Manifesto · job: join (Aanmelden subscribes; Inschrijven and Contact sign up after viewing the listings) · genre: editorial (inferred) · theme: brand, rebuilt on the logo (#421F54 aubergine, #F6522A orange, the slanted bars) · redesign: full · paper: oklch(0.975 0.006 25) · accent: oklch(0.66 0.21 34.6) · display: Geologica · body: Geologica · hero: Rise (/), aubergine Banner with an arched photograph beside the head (/vastgoedeigenaren/, /ondernemers/, /ontwikkelaars/), aubergine Banner (every other inner route, /contact/, /inschrijven/, /abonneren/ and /mijnflexstad/ over their form columns), a quiet head with the Demo badge over cards (/mijnflexstad/overzicht/), aubergine Banner holding the street, address, facts and Ik heb interesse! (/aanbod/<slug>/) · nav: three-part, sticky on translucent paper, the real wordmark at the content edge · footer: aubergine ground, the logo's stripe across its top, hairline rows of links, the wordmark set the width of the column · signature: an aubergine block rising out of the band into Flexstad's own photograph of a maker at work, carrying the client's headline; the band runs on underneath with 2.000+ set as the largest thing on the page
- * sections: Rise hero · aubergine band (2.000+ in the logo orange, the statement, the reasons each marked with one bar of the logo) · Voor wie as an index of four full-width rows with arched windows · Actueel aanbod on the well, each card led by the building's own photograph · Van leegstand naar meerwaarde beside the Linnaeusstraat shop before and after, wiped with the Astryx Slider · FAQ as three ruled lists · Interesse? on the logo orange, set huge · footer
+/* Hallmark · shape: Manifesto · job: join (Aanmelden subscribes; Inschrijven and Contact sign up after viewing the listings) · genre: editorial (inferred) · theme: brand, rebuilt on the logo (#421F54 aubergine, #F6522A orange, the slanted bars) · redesign: full · paper: oklch(0.975 0.006 25) · accent: oklch(0.66 0.21 34.6) · display: Geologica · body: Geologica · hero: Rise (/ and /aanbod/<slug>/, the building's own photograph under an aubergine block with its name, facts and Ik heb interesse!), aubergine Banner with an arched photograph beside the head (/vastgoedeigenaren/, /ondernemers/, /ontwikkelaars/), aubergine Banner (every other inner route, /contact/, /inschrijven/, /abonneren/ and /mijnflexstad/ over their form columns), a quiet head with the Demo badge over cards (/mijnflexstad/overzicht/), aubergine Banner holding the street, address, facts and Ik heb interesse! (/aanbod/<slug>/) · nav: three-part, sticky on translucent paper, the real wordmark at the content edge · footer: aubergine ground, the logo's stripe across its top, hairline rows of links, the wordmark set the width of the column · signature: an aubergine block rising out of the band into Flexstad's own photograph of a maker at work, carrying the client's headline; the band runs on underneath with 2.000+ set as the largest thing on the page
+ * sections: Rise hero · Actueel aanbod as a bento on the aubergine band (the lead listing tall on seven columns, two beside it, names and facts on solid plates) · 2.000+ on paper in ink with an orange plus, the statement, the reasons each marked with one bar of the logo · Voor wie as an index of four full-width rows with arched windows · Van leegstand naar meerwaarde beside the Linnaeusstraat shop before and after, wiped with the Astryx Slider · FAQ as three ruled lists · Interesse? on the logo orange, set huge · footer
  * axes: light/geometric-sans/warm · posture: Rise · contrast: pass · fold: pass · v2.0.0 */
 /* Hallmark · pre-emit critique: P pass · H pass · E pass · S pass · R pass · V pass · weakest: some listing photographs are furnished impressions (the live site's own "sfeerimpressie"), named as such in their alt text; the client should confirm which rooms are delivered empty */
 /* Hallmark · dropped hero-amsterdam-canal-dusk.jpg, owners-brick-entrance-blue-doors.jpg, makers-attic-studio-arched-window.jpg, about-brick-windowsill-daylight.jpg, street-quiet-street-blue-hour.jpg, developers-timber-shell-interior.jpg · the owner asked for Flexstad's own photographs from flexstad.com in place of the library stand-ins */
@@ -12,7 +12,7 @@
 /* Hallmark · waive 44c · inner pages open with a Banner hero (trail, head and one action across the content column, about 300 to 460px tall; on the owners, entrepreneurs and developers pages a photograph stands beside the head, about 600px tall, with the head and its action inside the first screen); on the aanbod detail pages the head holds the street, address, facts and Ik heb interesse!, about 520 to 580px tall, and the small Foto's volgen strip sits below the facts · the stamp's hero field names the posture per route and the built stylesheet strips the stamp, so a URL run cannot read it and reports the posture as unset */
 /* Copyright (c) Meta Platforms, Inc. and affiliates. */
 
-@import url('https://fonts.googleapis.com/css2?family=Geologica:wght@400;500;600;700&display=swap');
+/* Geologica loads from index.html (preconnect and stylesheet link). */
 
 /* Placeholder to ensure Vite emits a CSS asset for StyleX aggregation. */
 :root {
@@ -201,4 +201,23 @@ a:active {
   .astryx-clickable-card:hover .flex-cover {
     transform: scale(1.04);
   }
+}
+
+/* Skip link: hidden until focused, then it sits at the top left on the
+   paper, above the sticky bar. */
+.flex-skip {
+  position: absolute;
+  left: 16px;
+  top: 8px;
+  z-index: 30;
+  padding: 12px 16px;
+  border-radius: var(--radius-inner);
+  background-color: var(--color-background-surface);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+  transform: translateY(-200%);
+}
+
+.flex-skip:focus-visible {
+  transform: none;
 }

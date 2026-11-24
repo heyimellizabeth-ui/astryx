@@ -8,83 +8,16 @@ import {HStack, VStack} from '@astryxdesign/core/Layout';
 import {Text} from '@astryxdesign/core/Text';
 import {ABOUT, AUDIENCES, AUDIENCE_PAGES, HOME_COPY} from '../content';
 import {PHOTOS, type Photo} from '../photos';
-import {bandStyles} from '../sections/bandStyles';
 import {BeforeAfter} from '../sections/BeforeAfter';
 import {Faq} from '../sections/Faq';
-import {ListingGrid} from '../sections/ListingGrid';
+import {ListingBento} from '../sections/ListingBento';
 import {PageSection} from '../sections/PageSection';
+import {RiseHero} from '../sections/RiseHero';
 import {CtaBand, firstSentence, PhotoImage} from '../sections/ui';
 
-const rise = stylex.keyframes({
-  from: {opacity: 0, transform: 'translateY(56px)'},
-  to: {opacity: 1, transform: 'translateY(0)'},
-});
-
-const settle = stylex.keyframes({
-  from: {transform: 'scale(1.08)'},
-  to: {transform: 'scale(1)'},
-});
-
-const MOTION = '@media (prefers-reduced-motion: no-preference)';
 const WIDE = '@media (min-width: 900px)';
 
 const styles = stylex.create({
-  // The signature: the canal photograph fills the first screen and an
-  // aubergine block rises out of the band below into it, carrying the
-  // client's headline. The block and the band are one colour, so the page
-  // reads as one building rising into the street.
-  hero: {
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'flex-end',
-    overflow: 'hidden',
-    height: {default: 'auto', [WIDE]: 'calc(100dvh - 73px)'},
-    minHeight: {default: 0, [WIDE]: 620},
-    maxHeight: {default: 'none', [WIDE]: 940},
-  },
-  photo: {
-    position: {default: 'relative', [WIDE]: 'absolute'},
-    inset: 0,
-    height: {default: 'clamp(260px, 66vw, 460px)', [WIDE]: 'auto'},
-    overflow: 'hidden',
-    animationName: {default: 'none', [MOTION]: settle},
-    animationDuration: '1.8s',
-    animationTimingFunction: 'var(--flex-ease)',
-    animationFillMode: 'both',
-    // A light aubergine tint cools the lit canal toward the brand; the words
-    // never sit on the photograph itself, only on the block.
-    '::after': {
-      content: '""',
-      position: 'absolute',
-      inset: 0,
-      backgroundColor: 'var(--flex-band)',
-      opacity: 0.18,
-      mixBlendMode: 'multiply',
-      pointerEvents: 'none',
-    },
-  },
-  column: {
-    position: 'relative',
-    boxSizing: 'border-box',
-    width: {default: '100%', [WIDE]: 'min(100% - 32px, 1200px)'},
-    marginInline: 'auto',
-  },
-  block: {
-    boxSizing: 'border-box',
-    width: {default: '100%', [WIDE]: 'min(100%, 900px)'},
-    backgroundColor: 'var(--flex-band)',
-    borderStartStartRadius: {default: 0, [WIDE]: 'var(--radius-container)'},
-    borderStartEndRadius: {default: 0, [WIDE]: 'var(--radius-container)'},
-    paddingInline: 'clamp(16px, 4vw, 56px)',
-    paddingTop: 'clamp(32px, 4.4vw, 60px)',
-    paddingBottom: 'clamp(32px, 3.4vw, 48px)',
-    animationName: {default: 'none', [MOTION]: rise},
-    animationDuration: '1.1s',
-    animationDelay: '0.15s',
-    animationTimingFunction: 'var(--flex-ease)',
-    animationFillMode: 'both',
-  },
   head: {
     fontSize: 'clamp(40px, 12px + 4vw, 76px)',
     lineHeight: 1,
@@ -95,7 +28,7 @@ const styles = stylex.create({
 
   // The band continues under the block: the figure, the statement, the reasons.
   band: {
-    backgroundColor: 'var(--flex-band)',
+    backgroundColor: 'var(--color-background-body)',
     paddingBlock: 'clamp(56px, 8vw, 128px)',
     paddingInline: 16,
   },
@@ -120,9 +53,12 @@ const styles = stylex.create({
     lineHeight: 0.82,
     letterSpacing: '-0.06em',
     whiteSpace: 'nowrap',
-    color: 'var(--flex-orange)',
+    color: 'var(--color-text-primary)',
     marginInlineStart: '-0.04em',
   },
+  // Only the plus takes the logo orange: the figure is ink, the growth is
+  // the brand's.
+  plus: {color: 'var(--flex-orange)'},
   statLine: {
     maxWidth: '18ch',
     fontSize: 'clamp(22px, 0.9vw + 16px, 30px)',
@@ -324,51 +260,37 @@ const ROWS: ReadonlyArray<{slug: string; index: number; photo: Photo}> = [
 
 function Hero() {
   return (
-    <section aria-label="Introductie" {...stylex.props(styles.hero)}>
-      <div {...stylex.props(styles.photo)}>
-        <PhotoImage
-          photo={PHOTOS.homeMakerAtelier}
-          isPriority
-          isBleed
-          isFilled
-        />
-      </div>
-      <div {...stylex.props(styles.column)}>
-        <div {...stylex.props(styles.block, bandStyles.onBand)}>
-          <VStack gap={5} align="start">
-            <Heading level={1} type="display-1" xstyle={styles.head}>
-              <span {...stylex.props(styles.headLine)}>
-                Leegstaand vastgoed?
-              </span>{' '}
-              <span {...stylex.props(styles.headLine)}>
-                Wij activeren, beheren en exploiteren
-              </span>
-            </Heading>
-            <Text
-              type="large"
-              weight="normal"
-              color="secondary"
-              xstyle={styles.heroLine}>
-              {HOME_COPY.hero}
-            </Text>
-            <HStack gap={3} wrap="wrap">
-              <Button
-                label="Bekijk ons aanbod"
-                href="/aanbod/"
-                size="lg"
-                variant="primary"
-              />
-              <Button
-                label="Ontdek onze mogelijkheden"
-                href="#intro"
-                size="lg"
-                variant="ghost"
-              />
-            </HStack>
-          </VStack>
-        </div>
-      </div>
-    </section>
+    <RiseHero photo={PHOTOS.homeMakerAtelier} label="Introductie">
+      <VStack gap={5} align="start">
+        <Heading level={1} type="display-1" xstyle={styles.head}>
+          <span {...stylex.props(styles.headLine)}>Leegstaand vastgoed?</span>{' '}
+          <span {...stylex.props(styles.headLine)}>
+            Wij activeren, beheren en exploiteren
+          </span>
+        </Heading>
+        <Text
+          type="large"
+          weight="normal"
+          color="secondary"
+          xstyle={styles.heroLine}>
+          {HOME_COPY.hero}
+        </Text>
+        <HStack gap={3} wrap="wrap">
+          <Button
+            label="Bekijk ons aanbod"
+            href="/aanbod/"
+            size="lg"
+            variant="primary"
+          />
+          <Button
+            label="Ontdek onze mogelijkheden"
+            href="#intro"
+            size="lg"
+            variant="ghost"
+          />
+        </HStack>
+      </VStack>
+    </RiseHero>
   );
 }
 
@@ -377,10 +299,12 @@ function Proof() {
     <section
       id="intro"
       aria-label="Over Flexstad"
-      {...stylex.props(styles.band, bandStyles.onBand)}>
+      {...stylex.props(styles.band)}>
       <div {...stylex.props(styles.bandInner)}>
         <div {...stylex.props(styles.intro)}>
-          <span {...stylex.props(styles.stat, styles.statRow)}>2.000+</span>
+          <span {...stylex.props(styles.stat, styles.statRow)}>
+            2.000<span {...stylex.props(styles.plus)}>+</span>
+          </span>
           <Text type="large" xstyle={styles.statLine}>
             bewoners en ondernemers geplaatst in leegstaande panden
           </Text>
@@ -477,7 +401,12 @@ function AudienceRow({
           {sentence}
         </Text>
         <span {...withClass('flex-index-pic', styles.rowPic)}>
-          <PhotoImage photo={photo} isFilled isArch />
+          <PhotoImage
+            photo={photo}
+            isFilled
+            isArch
+            sizes="(min-width: 900px) 192px, 96px"
+          />
         </span>
       </div>
     </ClickableCard>
@@ -512,10 +441,19 @@ function Value() {
             after={PHOTOS.linnaeusAfter}
             label="Schuif tussen voor en na"
           />
+          <Heading level={3}>Linnaeusstraat</Heading>
           <Text type="supporting" color="secondary">
             Van leegstaande winkelruimte naar African fashion store:
             winkelruimte van circa 100 m² aan de Linnaeusstraat in Amsterdam.
           </Text>
+          <div>
+            <Button
+              label="Bekijk de Linnaeusstraat"
+              href="/aanbod/linnaeusstraat/"
+              variant="secondary"
+              size="lg"
+            />
+          </div>
         </VStack>
       </div>
     </PageSection>
@@ -526,11 +464,9 @@ export function Home() {
   return (
     <>
       <Hero />
+      <ListingBento />
       <Proof />
       <AudienceIndex />
-      <PageSection variant="muted" paddingBlock={8}>
-        <ListingGrid isBare />
-      </PageSection>
       <Value />
       <Faq />
       <CtaBand body={HOME_COPY.interest} />

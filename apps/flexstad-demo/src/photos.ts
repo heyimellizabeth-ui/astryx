@@ -18,8 +18,8 @@ export interface Photo {
 export const PHOTOS = {
   homeMakerAtelier: {
     src: '/photos/flexstad/home-maker-atelier.webp',
-    width: 2200,
-    height: 1467,
+    width: 2560,
+    height: 1707,
     alt: 'Een maakster aan het werk in haar atelier, tussen verf, kwasten en kleurstalen bij het raam',
     objectPosition: '70% 40%',
   },
@@ -466,3 +466,19 @@ export const LISTING_PHOTOS: Record<
 
 /** Credit for the footer: every photograph is Flexstad's own. */
 export const PHOTO_CREDITS_LINE = "Foto's: Flexstad.";
+
+/** The narrower WebP files cut for each photograph (only where it is wider). */
+const VARIANT_WIDTHS = [640, 1024] as const;
+
+/**
+ * A `srcSet` for a photograph: its 640 and 1024px cuts (made only when the
+ * original is at least 15% wider) and the original, so a phone or a small
+ * tile never downloads the full file. Pair it with a `sizes` for the layout.
+ */
+export function srcSetFor(photo: Photo): string {
+  const base = photo.src.replace(/\.webp$/, '');
+  const cuts = VARIANT_WIDTHS.filter(width => photo.width > width * 1.15).map(
+    width => `${base}-${width}.webp ${width}w`,
+  );
+  return [...cuts, `${photo.src} ${photo.width}w`].join(', ');
+}

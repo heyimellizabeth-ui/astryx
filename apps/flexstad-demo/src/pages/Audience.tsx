@@ -71,7 +71,13 @@ export function Audience({slug}: {slug: string}) {
         isAsidePhoto={photo !== undefined}
         aside={
           photo ? (
-            <PhotoImage photo={photo} isFilled isPriority isArch />
+            <PhotoImage
+              photo={photo}
+              isFilled
+              isPriority
+              isArch
+              sizes="(min-width: 900px) 440px, 340px"
+            />
           ) : undefined
         }
       />

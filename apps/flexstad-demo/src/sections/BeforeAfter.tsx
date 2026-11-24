@@ -6,7 +6,7 @@ import {AspectRatio} from '@astryxdesign/core/AspectRatio';
 import {Badge} from '@astryxdesign/core/Badge';
 import {VStack} from '@astryxdesign/core/Layout';
 import {Slider} from '@astryxdesign/core/Slider';
-import type {Photo} from '../photos';
+import {srcSetFor, type Photo} from '../photos';
 
 const styles = stylex.create({
   frame: {
@@ -74,6 +74,8 @@ export function BeforeAfter({
         <div {...stylex.props(styles.fill)}>
           <img
             src={after.src}
+            srcSet={srcSetFor(after)}
+            sizes="(min-width: 900px) 560px, 100vw"
             width={after.width}
             height={after.height}
             alt={after.alt}
@@ -84,6 +86,8 @@ export function BeforeAfter({
           />
           <img
             src={before.src}
+            srcSet={srcSetFor(before)}
+            sizes="(min-width: 900px) 560px, 100vw"
             width={before.width}
             height={before.height}
             alt={before.alt}

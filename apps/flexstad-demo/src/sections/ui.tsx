@@ -8,7 +8,7 @@ import {Heading} from '@astryxdesign/core/Heading';
 import {HStack, VStack} from '@astryxdesign/core/Layout';
 import {Text} from '@astryxdesign/core/Text';
 import {CONTACT, type Cta} from '../content';
-import type {Photo as PhotoData} from '../photos';
+import {srcSetFor, type Photo as PhotoData} from '../photos';
 import {PageSection} from './PageSection';
 import {Placeholder} from './Placeholder';
 
@@ -235,8 +235,11 @@ export function PhotoImage({
   isBleed = false,
   isFilled = false,
   isArch = false,
+  sizes = '100vw',
 }: {
   photo: PhotoData;
+  /** The `sizes` for the photograph's slot; the srcSet holds three cuts. */
+  sizes?: string;
   ratio?: keyof typeof PHOTO_RATIOS;
   isPriority?: boolean;
   /** Full-bleed across the page: no corner radius. */
@@ -257,6 +260,8 @@ export function PhotoImage({
       style={ratio ? {aspectRatio: PHOTO_RATIOS[ratio]} : undefined}>
       <img
         src={photo.src}
+        srcSet={srcSetFor(photo)}
+        sizes={sizes}
         width={photo.width}
         height={photo.height}
         alt={photo.alt}

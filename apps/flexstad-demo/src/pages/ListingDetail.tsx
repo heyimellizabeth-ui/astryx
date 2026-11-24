@@ -20,7 +20,8 @@ import {
 import {EnquiryForm} from '../sections/EnquiryForm';
 import {statusLabel} from '../sections/ListingCard';
 import {PageSection} from '../sections/PageSection';
-import {LISTING_PHOTOS} from '../photos';
+import {RiseHero} from '../sections/RiseHero';
+import {LISTING_PHOTOS, srcSetFor} from '../photos';
 import {BulletList, Crumbs, CtaBand, Paragraphs} from '../sections/ui';
 import {NotFound} from './NotFound';
 
@@ -210,16 +211,21 @@ export function ListingDetail({slug}: {slug: string}) {
   }
   const address = LISTING_ADDRESS[listing.slug];
   const photos = LISTING_PHOTOS[listing.slug]?.gallery ?? [];
+  const cover = LISTING_PHOTOS[listing.slug]?.cover;
   const media = photos.map(photo => ({src: photo.src, alt: photo.alt}));
-  const shown = photos.slice(0, MOSAIC_COUNT);
-  const extra = photos.length - shown.length;
+  // The cover carries the hero; the mosaic starts at the next photograph and
+  // the Lightbox still holds them all, the cover first.
+  const shown = photos
+    .slice(1, MOSAIC_COUNT + 1)
+    .map((photo, offset) => ({photo, index: offset + 1}));
+  const extra = photos.length - 1 - shown.length;
   const detail = slug === 'roemer-visscherstraat' ? ROEMER_DETAIL : null;
 
   const gallery =
     shown.length > 0 ? (
-      <PageSection paddingBlock={8}>
+      <PageSection isBand paddingBlock={8}>
         <div {...stylex.props(styles.gallery)}>
-          {shown.map((photo, index) => (
+          {shown.map(({photo, index}) => (
             <button
               key={photo.src}
               type="button"
@@ -228,20 +234,25 @@ export function ListingDetail({slug}: {slug: string}) {
               {...stylex.props(
                 styles.shot,
                 styles.tile,
-                index === 0 ? styles.lead : undefined,
+                index === 1 ? styles.lead : undefined,
               )}>
               <img
                 src={photo.src}
+                srcSet={srcSetFor(photo)}
+                sizes={
+                  index === 1
+                    ? '(min-width: 900px) 600px, 100vw'
+                    : '(min-width: 900px) 300px, 50vw'
+                }
                 width={photo.width}
                 height={photo.height}
                 alt=""
-                loading={index === 0 ? undefined : 'lazy'}
-                fetchPriority={index === 0 ? 'high' : undefined}
+                loading="lazy"
                 decoding="async"
                 {...stylex.props(styles.tileImage)}
                 style={{objectPosition: photo.objectPosition}}
               />
-              {index === shown.length - 1 && extra > 0 ? (
+              {index === shown.length && extra > 0 ? (
                 <span {...stylex.props(styles.more)}>+{extra} foto&apos;s</span>
               ) : null}
             </button>
@@ -252,9 +263,9 @@ export function ListingDetail({slug}: {slug: string}) {
 
   return (
     <>
-      <PageSection isWashed paddingBlock={8}>
-        <VStack gap={8}>
-          <VStack gap={6}>
+      <RiseHero photo={cover ?? photos[0]} label={listing.name}>
+        <VStack gap={6}>
+          <VStack gap={5}>
             <Crumbs
               trail={[
                 {title: 'Home', href: '/'},
@@ -285,7 +296,7 @@ export function ListingDetail({slug}: {slug: string}) {
             />
           </div>
         </VStack>
-      </PageSection>
+      </RiseHero>
 
       {gallery}
 

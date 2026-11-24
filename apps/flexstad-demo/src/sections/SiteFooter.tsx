@@ -42,8 +42,14 @@ const styles = stylex.create({
       '@media (min-width: 900px)': 'minmax(0, 3fr) minmax(0, 9fr)',
     },
   },
-  links: {display: 'flex', flexWrap: 'wrap', columnGap: 24, rowGap: 8},
-  nowrap: {whiteSpace: 'nowrap'},
+  links: {display: 'flex', flexWrap: 'wrap', columnGap: 24, rowGap: 0},
+  // Each link stands in a 44px row, so a thumb can hit it on a phone.
+  nowrap: {
+    whiteSpace: 'nowrap',
+    display: 'inline-flex',
+    alignItems: 'center',
+    minHeight: 44,
+  },
   lead: {
     maxWidth: '22ch',
     fontSize: 'clamp(24px, 1.4vw + 16px, 36px)',
@@ -97,14 +103,19 @@ export function SiteFooter() {
             </div>
             <div {...stylex.props(styles.row)}>
               <Heading level={3}>Contact</Heading>
-              <Text color="secondary">
-                <Link href={CONTACT.phoneHref}>{CONTACT.phone}</Link>,{' '}
-                <Link href={`mailto:${CONTACT.email}`}>{CONTACT.email}</Link>,{' '}
-                <Link href={CONTACT.linkedin} isExternalLink>
-                  LinkedIn
-                </Link>
-                .
-              </Text>
+              <div {...stylex.props(styles.links)}>
+                <span {...stylex.props(styles.nowrap)}>
+                  <Link href={CONTACT.phoneHref}>{CONTACT.phone}</Link>
+                </span>
+                <span {...stylex.props(styles.nowrap)}>
+                  <Link href={`mailto:${CONTACT.email}`}>{CONTACT.email}</Link>
+                </span>
+                <span {...stylex.props(styles.nowrap)}>
+                  <Link href={CONTACT.linkedin} isExternalLink>
+                    LinkedIn
+                  </Link>
+                </span>
+              </div>
             </div>
           </div>
           <Divider />

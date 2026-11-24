@@ -9,7 +9,7 @@ import {VStack} from '@astryxdesign/core/Layout';
 import {MetadataList, MetadataListItem} from '@astryxdesign/core/MetadataList';
 import {Text} from '@astryxdesign/core/Text';
 import {listingFeatures, STATUSES, type Listing} from '../content';
-import {LISTING_PHOTOS} from '../photos';
+import {LISTING_PHOTOS, srcSetFor} from '../photos';
 
 const styles = stylex.create({
   fill: {flexGrow: 1},
@@ -87,6 +87,8 @@ export function ListingCard({
       <AspectRatio ratio={4 / 3} xstyle={styles.coverWrap}>
         <img
           src={photo.src}
+          srcSet={srcSetFor(photo)}
+          sizes="(min-width: 1100px) 300px, (min-width: 640px) 42vw, 78vw"
           width={photo.width}
           height={photo.height}
           alt={photo.alt}
