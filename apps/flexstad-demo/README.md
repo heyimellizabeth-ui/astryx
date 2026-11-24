@@ -75,3 +75,21 @@ Veiligheid: het token staat alleen op de server, nooit in de browser of in git
 trek het dan in en maak een nieuw. Het endpoint accepteert alleen POST vanaf de eigen
 site, beperkt de grootte en het aantal verzoeken per IP, en een verborgen veld plus een
 minimale invultijd houden bots tegen.
+
+## Contactformulier: "Je vraagt naar" en Formspree
+
+Een link naar de contactpagina kan zeggen waar de vraag over gaat:
+`/contact/?about=de-molen`. De contactpagina toont dan "Je vraagt naar: De Molen,
+Houten (vanaf €250 p/m)", vult het onderwerp en de eerste zin van het bericht in, en
+stuurt de sleutel mee naar Asana en Formspree. Een onbekende sleutel, of geen
+sleutel, verandert niets.
+
+- Alles staat in één bestand: `src/enquiryConfig.ts`. De panden komen automatisch
+  uit `content.ts` (de sleutel is het laatste stuk van het pandadres, de prijs is
+  altijd gelijk aan de prijs op de site). Doelgroepen voeg je daar zelf toe.
+- De knoppen "Neem contact op" op de pandpagina's en de doelgroeppagina's sturen de
+  sleutel al mee.
+- **Formspree** (een e-mailkopie van het contactformulier): zet het adres van je
+  formulier in `FORMSPREE_ENDPOINT`, bijvoorbeeld `https://formspree.io/f/abcdwxyz`
+  (formspree.io, je formulier, Integration), bouw opnieuw en upload. Formspree
+  gebruikt het onderwerp als onderwerp van de e-mail. Leeg laten = alleen Asana.

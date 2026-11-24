@@ -36,3 +36,24 @@ export async function sendToAsana(
     return 'error';
   }
 }
+
+/**
+ * Posts a form to Formspree (the e-mail copy). Formspree reads `_subject` as
+ * the e-mail subject and `_gotcha` as its own spam honeypot.
+ */
+export async function sendToFormspree(
+  endpoint: string,
+  fields: Record<string, string>,
+  website: string,
+): Promise<SendResult> {
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', Accept: 'application/json'},
+      body: JSON.stringify({...fields, _gotcha: website}),
+    });
+    return response.ok ? 'sent' : 'error';
+  } catch {
+    return 'error';
+  }
+}

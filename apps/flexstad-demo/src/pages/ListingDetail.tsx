@@ -375,7 +375,12 @@ export function ListingDetail({slug}: {slug: string}) {
           </div>
         }
       />
-      <CtaBand />
+      <CtaBand
+        cta={{
+          label: 'Neem contact op',
+          href: `/contact/?about=${listing.slug}`,
+        }}
+      />
       <Lightbox
         isOpen={lightbox !== null}
         onOpenChange={open => setLightbox(open ? (lightbox ?? 0) : null)}

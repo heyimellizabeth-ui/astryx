@@ -27,6 +27,7 @@ const KINDS = [
         [
             'name' => ['Naam', 'name'], 'email' => ['E-mailadres', 'email'],
             'subject' => ['Onderwerp', 'name'], 'message' => ['Bericht', 'text'],
+            'about' => ['Gaat over (?about=)', 'name'],
         ],
     ],
     'inschrijving' => [

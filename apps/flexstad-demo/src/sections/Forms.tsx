@@ -12,12 +12,20 @@ import {
 import {Banner} from '@astryxdesign/core/Banner';
 import {Button} from '@astryxdesign/core/Button';
 import {FormLayout} from '@astryxdesign/core/FormLayout';
+import {Link} from '@astryxdesign/core/Link';
 import {VStack} from '@astryxdesign/core/Layout';
 import {Selector} from '@astryxdesign/core/Selector';
 import {TextArea} from '@astryxdesign/core/TextArea';
 import {TextInput} from '@astryxdesign/core/TextInput';
 import {CONTACT, SIGNUP} from '../content';
-import {sendToAsana, type FormKind, type SendResult} from './sendToAsana';
+import {FORMSPREE_ENDPOINT} from '../enquiryConfig';
+import {useEnquiryContext} from './enquiryContext';
+import {
+  sendToAsana,
+  sendToFormspree,
+  type FormKind,
+  type SendResult,
+} from './sendToAsana';
 
 const styles = stylex.create({
   panel: {
@@ -154,10 +162,20 @@ export function useFormSubmit(
       return;
     }
     setState('sending');
-    void sendToAsana(kind, getFields(), {
+    const fields = getFields();
+    const toAsana = sendToAsana(kind, fields, {
       startedAt: startedAt.current,
       website,
-    }).then(setState);
+    });
+    // The contact form also goes to Formspree (the e-mail copy) when its
+    // address is set in enquiryConfig.ts. Sent when either one took it.
+    const toFormspree =
+      kind === 'contact' && FORMSPREE_ENDPOINT !== ''
+        ? sendToFormspree(FORMSPREE_ENDPOINT, fields, website)
+        : null;
+    void Promise.all([toAsana, toFormspree]).then(([asana, formspree]) =>
+      setState(formspree === 'sent' ? 'sent' : asana),
+    );
   }
 
   // The messages land on the render after the press, so focus moves here.
@@ -432,10 +450,13 @@ export function SignupForm() {
 
 /** "Contact": Naam, Emailadres, Onderwerp, Bericht. */
 export function ContactForm() {
+  // ?about=<key> (the enquiry-context plugin): the subject and the first
+  // sentence start filled in; nothing the visitor types is overwritten.
+  const about = useEnquiryContext();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [subject, setSubject] = useState('');
-  const [message, setMessage] = useState('');
+  const [subject, setSubject] = useState(about?.subject ?? '');
+  const [message, setMessage] = useState(about?.message ?? '');
   const errors = {
     name: name.trim() === '' ? 'Vul je naam in.' : undefined,
     email: emailError(email),
@@ -444,10 +465,31 @@ export function ContactForm() {
   const form = useFormSubmit(
     Object.values(errors).some(Boolean),
     'contact',
-    () => ({name, email, subject, message}),
+    () => ({
+      name,
+      email,
+      subject,
+      message,
+      ...(about ? {about: about.key, _subject: about.subject} : {}),
+    }),
   );
+  // As the plugin does: with a known key, the visitor lands in the first
+  // field still empty (the name), the banner and the pre-filled text in view.
+  const aboutKey = about?.key;
+  useEffect(() => {
+    if (!aboutKey) {
+      return;
+    }
+    const first = form.formRef.current?.querySelector<HTMLElement>(
+      'input:not([type="hidden"]):not([tabindex="-1"])',
+    );
+    first?.focus();
+  }, [aboutKey, form.formRef]);
   return (
     <FormShell form={form} submitLabel="Verstuur bericht">
+      {about ? (
+        <EnquiryBanner text={about.text} href={about.changeHref} />
+      ) : null}
       <TextInput
         size="lg"
         label="Naam"
@@ -484,6 +526,30 @@ export function ContactForm() {
         status={form.status(errors.message)}
       />
     </FormShell>
+  );
+}
+
+/**
+ * "Je vraagt naar: …" above the contact form, with a link back to where the
+ * visitor chose. The item goes in as text, never as markup.
+ */
+const enquiryStyles = stylex.create({
+  // The ink on the info banner's tint clears 4.5:1; the accent text did not.
+  change: {color: 'var(--color-text-primary)'},
+});
+
+function EnquiryBanner({text, href}: {text: string; href: string}) {
+  return (
+    <Banner
+      status="info"
+      title="Je vraagt naar"
+      description={text}
+      endContent={
+        <Link href={href} xstyle={enquiryStyles.change}>
+          Wijzig
+        </Link>
+      }
+    />
   );
 }
 
