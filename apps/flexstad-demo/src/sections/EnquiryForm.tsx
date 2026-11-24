@@ -12,7 +12,7 @@ import {Selector} from '@astryxdesign/core/Selector';
 import {TextArea} from '@astryxdesign/core/TextArea';
 import {TextInput} from '@astryxdesign/core/TextInput';
 import {BUDGETS, type ListingUse} from '../content';
-import {NotConnectedNotice, useFormSubmit} from './Forms';
+import {Honeypot, SendNotice, useFormSubmit} from './Forms';
 import {PageSection} from './PageSection';
 
 const styles = stylex.create({
@@ -43,8 +43,7 @@ type IsoDate = ComponentProps<typeof DateInput>['value'];
 
 /**
  * "Reageren" form on a listing page. Field labels and order match the live
- * form. Nothing is sent: submitting only shows a notice that the form is
- * not connected.
+ * form. A valid submit becomes a task in Asana through the site's endpoint.
  */
 export function EnquiryForm({
   listingName,
@@ -70,7 +69,22 @@ export function EnquiryForm({
     use: use === '' ? 'Kies een optie bij Type gebruik.' : undefined,
     start: start ? undefined : 'Vul een startdatum in.',
   };
-  const form = useFormSubmit(Object.values(errors).some(Boolean));
+  const form = useFormSubmit(
+    Object.values(errors).some(Boolean),
+    'interesse',
+    () => ({
+      name,
+      email,
+      phone,
+      use,
+      listing: listingName ?? '',
+      gebruik: uses.map(item => USE_LABELS[item]).join(', '),
+      budget: budget ?? '',
+      start: start ?? '',
+      end: end ?? '',
+      notes,
+    }),
+  );
 
   return (
     <PageSection id="reageren" variant="muted">
@@ -81,7 +95,7 @@ export function EnquiryForm({
             {aside}
           </VStack>
           <VStack gap={6}>
-            {form.isSent ? <NotConnectedNotice /> : null}
+            <SendNotice state={form.state} />
             <FormLayout>
               <TextInput
                 size="lg"
@@ -188,10 +202,12 @@ export function EnquiryForm({
                 type="submit"
                 variant="primary"
                 size="lg"
+                isLoading={form.state === 'sending'}
               />
             </div>
           </VStack>
         </div>
+        <Honeypot value={form.website} onChange={form.setWebsite} />
       </form>
     </PageSection>
   );

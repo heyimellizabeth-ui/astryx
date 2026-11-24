@@ -17,6 +17,7 @@ import {Selector} from '@astryxdesign/core/Selector';
 import {TextArea} from '@astryxdesign/core/TextArea';
 import {TextInput} from '@astryxdesign/core/TextInput';
 import {CONTACT, SIGNUP} from '../content';
+import {sendToAsana, type FormKind, type SendResult} from './sendToAsana';
 
 const styles = stylex.create({
   panel: {
@@ -44,36 +45,119 @@ export function NotConnectedNotice() {
   );
 }
 
+/** Shown after a successful send. */
+export function SentNotice() {
+  return (
+    <Banner status="success" title="Bedankt!" collapsible={false}>
+      Bedankt! We hebben je aanvraag ontvangen.
+    </Banner>
+  );
+}
+
+/** Shown when the request failed. */
+export function SendErrorNotice() {
+  return (
+    <Banner status="error" title="Versturen lukte niet" collapsible={false}>
+      Versturen lukte niet. Probeer het later opnieuw of bel {CONTACT.phone}.
+    </Banner>
+  );
+}
+
+/** The notice for whatever the last send came back with. */
+export function SendNotice({state}: {state: SendState}) {
+  if (state === 'sent') {
+    return <SentNotice />;
+  }
+  if (state === 'error') {
+    return <SendErrorNotice />;
+  }
+  return state === 'not-connected' ? <NotConnectedNotice /> : null;
+}
+
+/** Visually hidden trap for bots; people never see or reach it. */
+export function Honeypot({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        position: 'absolute',
+        left: -10000,
+        width: 1,
+        height: 1,
+        overflow: 'hidden',
+      }}>
+      <input
+        type="text"
+        name="website"
+        tabIndex={-1}
+        autoComplete="off"
+        value={value}
+        onChange={event => onChange(event.target.value)}
+      />
+    </div>
+  );
+}
+
 /** What a field shows when it is the one that failed. */
 export type FieldError = string | undefined;
+
+export type SendState = 'idle' | 'sending' | SendResult;
 
 /**
  * Submit handling shared by every form. The submit button is never disabled:
  * pressing it validates, every failing field shows its message, and focus
- * moves to the first one. Nothing is sent anywhere yet: a valid submit only
- * shows a notice that the form is not connected.
+ * moves to the first one. A valid submit is sent to Asana through the site's
+ * endpoint; `state` says how that went.
  */
-export function useFormSubmit(hasErrors: boolean): {
+export function useFormSubmit(
+  hasErrors: boolean,
+  kind?: FormKind,
+  getFields?: () => Record<string, string>,
+): {
   formRef: RefObject<HTMLFormElement | null>;
+  state: SendState;
+  /** True once the form is done: sent, or (demo forms) accepted locally. */
   isSent: boolean;
+  website: string;
+  setWebsite: (value: string) => void;
   handleSubmit: (event: FormEvent) => void;
   /** The status prop for a field: its message once a submit was tried. */
   status: (message: FieldError) => {type: 'error'; message: string} | undefined;
 } {
   const formRef = useRef<HTMLFormElement>(null);
+  const startedAt = useRef(Date.now());
   const [hasTried, setHasTried] = useState(false);
   const [tries, setTries] = useState(0);
-  const [isSent, setIsSent] = useState(false);
+  const [state, setState] = useState<SendState>('idle');
+  const [website, setWebsite] = useState('');
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
+    if (state === 'sending') {
+      return;
+    }
     setHasTried(true);
     if (hasErrors) {
-      setIsSent(false);
+      setState('idle');
       setTries(count => count + 1);
-    } else {
-      setIsSent(true);
+      return;
     }
+    if (!kind || !getFields) {
+      // Demo forms (the portal) never make a request.
+      setState('sent');
+      return;
+    }
+    setState('sending');
+    void sendToAsana(kind, getFields(), {
+      startedAt: startedAt.current,
+      website,
+    }).then(setState);
   }
 
   // The messages land on the render after the press, so focus moves here.
@@ -93,7 +177,10 @@ export function useFormSubmit(hasErrors: boolean): {
 
   return {
     formRef,
-    isSent,
+    state,
+    isSent: state === 'sent',
+    website,
+    setWebsite,
     handleSubmit,
     status: message =>
       hasTried && message ? {type: 'error', message} : undefined,
@@ -113,7 +200,7 @@ function FormShell({
   return (
     <form ref={form.formRef} onSubmit={form.handleSubmit} noValidate>
       <VStack gap={6}>
-        {form.isSent ? <NotConnectedNotice /> : null}
+        <SendNotice state={form.state} />
         <FormLayout>{children}</FormLayout>
         <div>
           <Button
@@ -121,8 +208,10 @@ function FormShell({
             type="submit"
             variant="primary"
             size="lg"
+            isLoading={form.state === 'sending'}
           />
         </div>
+        <Honeypot value={form.website} onChange={form.setWebsite} />
       </VStack>
     </form>
   );
@@ -177,7 +266,26 @@ export function SignupForm() {
       ? empty(staff, 'Vul het aantal medewerkers in.')
       : undefined,
   };
-  const form = useFormSubmit(Object.values(errors).some(Boolean));
+  const form = useFormSubmit(
+    Object.values(errors).some(Boolean),
+    'inschrijving',
+    () => ({
+      first,
+      last,
+      email,
+      phone,
+      start: start ?? '',
+      region,
+      seeks: seeks ?? '',
+      budget: budget ?? '',
+      who: who ?? '',
+      persons: isParticulier ? (persons ?? '') : '',
+      company: isBusiness ? company : '',
+      sector: isBusiness ? sector : '',
+      staff: isBusiness ? staff : '',
+      notes,
+    }),
+  );
 
   return (
     <FormShell form={form} submitLabel="Inschrijven">
@@ -333,7 +441,11 @@ export function ContactForm() {
     email: emailError(email),
     message: message.trim() === '' ? 'Vul je bericht in.' : undefined,
   };
-  const form = useFormSubmit(Object.values(errors).some(Boolean));
+  const form = useFormSubmit(
+    Object.values(errors).some(Boolean),
+    'contact',
+    () => ({name, email, subject, message}),
+  );
   return (
     <FormShell form={form} submitLabel="Verstuur bericht">
       <TextInput
@@ -379,7 +491,9 @@ export function ContactForm() {
 export function SubscribeForm() {
   const [email, setEmail] = useState('');
   const error = emailError(email);
-  const form = useFormSubmit(error !== undefined);
+  const form = useFormSubmit(error !== undefined, 'aanmelding', () => ({
+    email,
+  }));
   return (
     <FormShell form={form} submitLabel="Aanmelden">
       <TextInput

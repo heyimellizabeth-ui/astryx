@@ -52,3 +52,26 @@ Elk pand in `src/content.ts` (de lijst `LISTINGS`) heeft één instelling,
 
 Daarna opnieuw bouwen (`pnpm -F @astryxdesign/flexstad-demo build`) en de
 map `dist` uploaden.
+
+## Formulieren koppelen aan Asana
+
+Elk formulier op de site (Interesse per pand, Contact, Inschrijven, Aanmelden) wordt
+een taak in Asana. De site zelf is statisch; een klein PHP-bestand op dezelfde
+Hostinger-hosting (`public/api/aanvraag.php`, na de build `dist/api/`) stuurt de taak
+door. De demo-omgeving (`/mijnflexstad/`) is bewust niet gekoppeld en doet geen verzoeken.
+
+1. Maak een persoonlijk toegangstoken: Asana, Mijn instellingen, Apps, Developer console.
+2. Kopieer `asana-config.example.php` naar `flexstad-asana-config.php` en vul het token,
+   de GID's (project, secties, workspace) en `allowed_origins` (het echte domein) in.
+3. Upload dat bestand één niveau BOVEN `public_html` (dus niet in `public_html`).
+4. Zet `dry_run` op `false`. Met `true` wordt de taak alleen opgebouwd en teruggegeven, niet aangemaakt.
+5. Upload de inhoud van `dist/` naar `public_html` en test met één formulier.
+
+Overstappen naar de Asana van de werkgever: nieuw token en nieuwe GID's in het
+configuratiebestand op de server. Geen codewijziging en geen nieuwe build.
+
+Veiligheid: het token staat alleen op de server, nooit in de browser of in git
+(`flexstad-asana-config.php` staat in `.gitignore`). Is het token ooit zichtbaar geweest,
+trek het dan in en maak een nieuw. Het endpoint accepteert alleen POST vanaf de eigen
+site, beperkt de grootte en het aantal verzoeken per IP, en een verborgen veld plus een
+minimale invultijd houden bots tegen.
