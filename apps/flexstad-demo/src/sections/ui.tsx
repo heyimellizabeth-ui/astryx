@@ -77,7 +77,8 @@ const styles = stylex.create({
   measure: {maxWidth: '40ch'},
   // "Interesse?" is the page's last word: set at the home head's size.
   ctaHead: {
-    fontSize: 'clamp(52px, 16px + 7.5vw, 140px)',
+    // Phones: 40px, so the longest closing word (Kennismaken?) fits 320px.
+    fontSize: 'clamp(40px, 10px + 8vw, 140px)',
     lineHeight: 0.95,
     letterSpacing: '-0.045em',
   },

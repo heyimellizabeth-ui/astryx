@@ -124,7 +124,7 @@ const styles = stylex.create({
   statLine: {
     maxWidth: '18ch',
     fontSize: 'clamp(22px, 0.9vw + 16px, 30px)',
-    lineHeight: 1.2,
+    lineHeight: 1.3,
     fontWeight: 600,
     letterSpacing: '-0.015em',
   },
@@ -169,7 +169,7 @@ const styles = stylex.create({
   },
   reasonText: {
     fontSize: 'clamp(20px, 0.8vw + 14px, 26px)',
-    lineHeight: 1.2,
+    lineHeight: 1.3,
     fontWeight: 600,
     letterSpacing: '-0.01em',
   },
@@ -232,6 +232,7 @@ const styles = stylex.create({
   },
   rowTitle: {
     gridArea: 'title',
+    margin: 0,
     display: 'flex',
     alignItems: 'center',
     gap: 16,
@@ -453,7 +454,7 @@ function AudienceRow({
 }) {
   return (
     <a href={href} {...withClass('flex-index-row', styles.row)}>
-      <span {...stylex.props(styles.rowTitle)}>
+      <h3 {...stylex.props(styles.rowTitle)}>
         <span
           aria-hidden="true"
           {...withClass('flex-index-bar', styles.rowBar)}
@@ -461,7 +462,7 @@ function AudienceRow({
         <span {...withClass('flex-index-title', styles.rowTitleText)}>
           {title}
         </span>
-      </span>
+      </h3>
       <Text color="secondary" xstyle={styles.rowLine}>
         {sentence}
       </Text>

@@ -11,8 +11,9 @@ const styles = stylex.create({
     marginInlineEnd: 'auto',
     width: '100%',
   },
-  // One vertical rhythm for every seam: about 112px at desktop, 80px on phones.
-  rhythm: {paddingBlock: 'clamp(16px, 3vw, 32px)'},
+  // One vertical rhythm for every seam. The aubergine and orange bands make
+  // every seam visible, so each side carries at least 72px at desktop.
+  rhythm: {paddingBlock: 'clamp(24px, 3.4vw, 48px)'},
   wash: {backgroundColor: 'var(--color-background-body)'},
   band: {backgroundColor: 'var(--flex-band)'},
   muted: {backgroundColor: 'var(--color-background-muted)'},
