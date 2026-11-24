@@ -13,12 +13,15 @@ import {
   LISTINGS,
   LISTING_ADDRESS,
   ROEMER_DETAIL,
+  listingFeatures,
+  listingUses,
   type Listing,
 } from '../content';
 import {EnquiryForm} from '../sections/EnquiryForm';
 import {statusLabel} from '../sections/ListingCard';
 import {PageSection} from '../sections/PageSection';
-import {PendingPhoto, placeholderSrc} from '../sections/Placeholder';
+import {RiseHero} from '../sections/RiseHero';
+import {LISTING_PHOTOS, srcSetFor} from '../photos';
 import {BulletList, Crumbs, CtaBand, Paragraphs} from '../sections/ui';
 import {NotFound} from './NotFound';
 
@@ -43,9 +46,9 @@ const styles = stylex.create({
     fontWeight: 700,
     whiteSpace: 'nowrap',
   },
-  // "Photos follow": one quiet strip of the four slots below the facts, kept
-  // small so the empty frames never outweigh the street, the facts and the
-  // action. One row of four from 900px, two by two on phones.
+  // The building's own photographs: the cover large on the left, four
+  // smaller tiles beside it, the last one counting the photographs the
+  // Lightbox holds beyond them. Two across on phones.
   gallery: {
     display: 'grid',
     gap: 12,
@@ -53,7 +56,31 @@ const styles = stylex.create({
       default: 'repeat(2, minmax(0, 1fr))',
       '@media (min-width: 900px)': 'repeat(4, minmax(0, 1fr))',
     },
-    gridAutoRows: {default: 104, '@media (min-width: 900px)': 136},
+    gridAutoRows: {default: 150, '@media (min-width: 900px)': 220},
+  },
+  lead: {
+    gridColumn: 'span 2',
+    gridRow: {default: 'span 1', '@media (min-width: 900px)': 'span 2'},
+  },
+  tile: {position: 'relative', overflow: 'hidden', minWidth: 0},
+  tileImage: {
+    display: 'block',
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    borderRadius: 'var(--radius-container)',
+  },
+  // "+8 foto's" sits on a solid aubergine plate (the overlay rule).
+  more: {
+    position: 'absolute',
+    insetInlineEnd: 12,
+    bottom: 12,
+    paddingBlock: 8,
+    paddingInline: 14,
+    borderRadius: 'var(--radius-full)',
+    backgroundColor: 'var(--flex-band)',
+    color: 'var(--flex-on-band)',
+    fontWeight: 600,
   },
   shot: {
     display: 'block',
@@ -124,7 +151,8 @@ const styles = stylex.create({
   },
 });
 
-const GALLERY_LABELS = ['Voorgevel', 'Ontvangstruimte', 'Werkruimte', 'Tuin'];
+/** Tiles the mosaic shows; the rest open from the last tile in the Lightbox. */
+const MOSAIC_COUNT = 5;
 
 function Facts({
   listing,
@@ -151,12 +179,13 @@ function Facts({
 }
 
 function Features({listing}: {listing: Listing}) {
-  if (!listing.features || listing.features.length === 0) {
+  const features = listingFeatures(listing);
+  if (features.length === 0) {
     return null;
   }
   return (
     <VStack gap={1}>
-      {listing.features.map(line => (
+      {features.map(line => (
         <Text key={line} as="p" color="secondary">
           {line}
         </Text>
@@ -181,37 +210,62 @@ export function ListingDetail({slug}: {slug: string}) {
     return <NotFound />;
   }
   const address = LISTING_ADDRESS[listing.slug];
-  const media = GALLERY_LABELS.map(label => ({
-    src: placeholderSrc(label),
-    alt: `Fotoplaats: ${listing.name}, ${label}`,
-  }));
+  const photos = LISTING_PHOTOS[listing.slug]?.gallery ?? [];
+  const cover = LISTING_PHOTOS[listing.slug]?.cover;
+  const media = photos.map(photo => ({src: photo.src, alt: photo.alt}));
+  // The cover carries the hero; the mosaic starts at the next photograph and
+  // the Lightbox still holds them all, the cover first.
+  const shown = photos
+    .slice(1, MOSAIC_COUNT + 1)
+    .map((photo, offset) => ({photo, index: offset + 1}));
+  const extra = photos.length - 1 - shown.length;
   const detail = slug === 'roemer-visscherstraat' ? ROEMER_DETAIL : null;
 
-  const gallery = (
-    <PageSection paddingBlock={8}>
-      <VStack gap={4}>
-        <Text color="secondary">Foto&apos;s volgen</Text>
+  const gallery =
+    shown.length > 0 ? (
+      <PageSection isBand paddingBlock={8}>
         <div {...stylex.props(styles.gallery)}>
-          {GALLERY_LABELS.map((label, index) => (
+          {shown.map(({photo, index}) => (
             <button
-              key={label}
+              key={photo.src}
               type="button"
-              aria-label={`Open foto ${index + 1} van ${media.length}`}
+              aria-label={`Open foto ${index + 1} van ${media.length}: ${photo.alt}`}
               onClick={() => setLightbox(index)}
-              {...stylex.props(styles.shot)}>
-              <PendingPhoto label={label} />
+              {...stylex.props(
+                styles.shot,
+                styles.tile,
+                index === 1 ? styles.lead : undefined,
+              )}>
+              <img
+                src={photo.src}
+                srcSet={srcSetFor(photo)}
+                sizes={
+                  index === 1
+                    ? '(min-width: 900px) 600px, 100vw'
+                    : '(min-width: 900px) 300px, 50vw'
+                }
+                width={photo.width}
+                height={photo.height}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                {...stylex.props(styles.tileImage)}
+                style={{objectPosition: photo.objectPosition}}
+              />
+              {index === shown.length && extra > 0 ? (
+                <span {...stylex.props(styles.more)}>+{extra} foto&apos;s</span>
+              ) : null}
             </button>
           ))}
         </div>
-      </VStack>
-    </PageSection>
-  );
+      </PageSection>
+    ) : null;
 
   return (
     <>
-      <PageSection isWashed paddingBlock={8}>
-        <VStack gap={8}>
-          <VStack gap={6}>
+      <RiseHero photo={cover ?? photos[0]} label={listing.name}>
+        <VStack gap={6}>
+          <VStack gap={5}>
             <Crumbs
               trail={[
                 {title: 'Home', href: '/'},
@@ -242,9 +296,9 @@ export function ListingDetail({slug}: {slug: string}) {
             />
           </div>
         </VStack>
-      </PageSection>
+      </RiseHero>
 
-      {detail ? null : gallery}
+      {gallery}
 
       {detail ? (
         <PageSection paddingBlock={10}>
@@ -296,10 +350,9 @@ export function ListingDetail({slug}: {slug: string}) {
         </PageSection>
       ) : null}
 
-      {detail ? gallery : null}
-
       <EnquiryForm
         listingName={listing.name}
+        uses={listingUses(listing)}
         aside={
           <div {...stylex.props(styles.recap)}>
             <VStack gap={4} align="start">

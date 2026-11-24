@@ -58,7 +58,7 @@ export function OverOns() {
         paddingBlock={6}
       />
       <PageSection paddingBlock={6}>
-        <PhotoImage photo={PHOTOS.aboutStreet} ratio="wide" isPriority />
+        <PhotoImage photo={PHOTOS.aboutOfficeFloor} ratio="wide" isPriority />
       </PageSection>
       <PageSection paddingBlock={8}>
         <div {...stylex.props(styles.story)}>

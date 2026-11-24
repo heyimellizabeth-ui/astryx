@@ -4,63 +4,85 @@ The locked system. Every Hallmark run reads this first and pages share it. Chang
 
 ## System
 
-- Genre: modern-minimal (inferred)
-- Shape of the first page: Manifesto, Ledge posture on `/`: a library photograph is the tall field across the screen and the client's headline rests under it; inner pages stay Banner
-- Theme: brand, read from `src/flexstadTheme.ts`; no Hallmark theme dealt
-- Axes: light/geometric-sans/warm · posture: Ledge on `/`, Banner inside · nav: three-part bar on the content column, on paper above the photograph
-- Source of truth: `src/flexstadTheme.ts` (tokens, scale), `src/index.css` (stamp, band tokens). There is no `tokens.css`: the Astryx theme is the token file.
+- Genre: editorial (inferred). The brand is the logo itself, read from flexstad.com: aubergine `#421F54`, orange `#F6522A`, and the mark's four slanted bars.
+- Shape of the first page: Manifesto, **Rise** posture on `/`: Flexstad's own photograph of a maker at work fills the first screen and an aubergine block rises out of the band below into it, carrying the client's headline. Block and band are one colour. Inner pages open on an aubergine Banner.
+- Theme: brand, from `src/flexstadTheme.ts`; no Hallmark theme dealt.
+- Axes: light/geometric-sans/warm · posture: Rise on `/`, aubergine Banner inside · nav: three-part, sticky on translucent paper, the real wordmark at the content edge.
+- Source of truth: `src/flexstadTheme.ts` (tokens, scale), `src/index.css` (stamp, brand tokens), `src/sections/BrandMark.tsx` (the wordmark and the stripe).
+
+## Brand devices
+
+- **Wordmark:** `BrandMark`, the live site's own SVG. Letters take `currentColor` (light on aubergine and in dark mode); the bars are always `--flex-orange`. In the header at 136px, phones at 112px, and in the footer at the full column width.
+- **Bar:** one bar of the mark, cut on its slant (half its height across), marks each reason on `/` and slides in beside an audience row on hover. Never a bullet anywhere else.
+- **Stripe:** `BrandStripes`, three orange rows of 12px ending at staggered lengths, each end cut on the mark's slant. Only across the top of the footer, as on the live site.
+- **Arched window:** `--flex-arch` (a half-circle over a 16px base). Every photograph beside text is framed as one: the audience heroes, the four index rows. Full-bleed photographs (the hero) keep no radius.
 
 ## Tokens
 
 ```css
 :root {
-  --color-background-body: oklch(0.975 0.006 25);   /* warm paper, a faint rose toward the aubergine */
-  --color-background-surface: oklch(0.992 0.003 25); /* one step above paper, never pure white */
-  --color-background-muted: oklch(0.94 0.008 20);   /* tinted well */
-  --color-text-primary: oklch(0.314 0.097 312.6);   /* aubergine ink */
+  --color-background-body: oklch(0.975 0.006 25); /* warm paper */
+  --color-background-surface: oklch(0.992 0.003 25);
+  --color-background-muted: oklch(
+    0.94 0.008 20
+  ); /* the well under the listings */
+  --color-text-primary: oklch(0.314 0.097 312.6); /* aubergine ink, #421F54 */
   --color-text-secondary: oklch(0.42 0.025 310);
-  --color-accent: oklch(0.7 0.19 38);               /* orange: actions and the focus ring only */
-  --color-text-accent: oklch(0.5 0.17 34);          /* orange as text on links */
+  --color-accent: oklch(
+    0.66 0.21 34.6
+  ); /* the logo orange #F6522A: actions, focus */
+  --color-text-accent: oklch(0.5 0.17 34); /* orange as text on paper */
   --color-on-accent: oklch(0.2 0.07 312);
-  --color-border-emphasized: oklch(0.56 0.025 310); /* field edge, 4.3:1 on paper */
-  --flex-band: oklch(0.314 0.097 312.6);            /* aubergine band and photo plate */
-  --font-family-heading, --font-family-body: Geologica, system sans fallbacks;
-  --radius-container: 16px;  --radius-inner: 8px;  --radius-full: pills for buttons, badges, tokens;
+  --flex-band: oklch(
+    0.314 0.097 312.6
+  ); /* the hero block, the band, inner heroes */
+  --flex-band-deep: oklch(0.24 0.08 312); /* the footer */
+  --flex-orange: oklch(
+    0.66 0.21 34.6
+  ); /* the figure, bars, stripe, closing band */
+  --flex-on-orange: oklch(0.2 0.07 312); /* ink on the orange band, 4.6:1 */
+  --flex-arch: 999px 999px 16px 16px;
+  --flex-ease: cubic-bezier(0.16, 1, 0.3, 1);
 }
 ```
 
-Dark mode values sit beside each colour in `flexstadTheme.ts` (paper L 0.17, surface 0.21, muted 0.25, all chroma 0.012 to 0.016 at hue 310). The paper moved from a blue lavender (L 0.953, hue 280) to a lighter, warmer one; neutrals are one family tinted toward it. Orange is no longer used for the `2.000+` figure (it is ink); the audience tiles on `/` are aubergine, muted or surface, never orange.
+Surfaces, in order down `/`: photograph, aubergine (block and band), paper (Voor wie), well (listings), paper (value, FAQ), orange (Interesse?), deep aubergine (footer). Never two orange or two aubergine sections apart from the block and its band. `bandStyles.onBand` flips text, accent-text, border and focus tokens to light on aubergine; `orangeStyles.onOrange` sets deep aubergine ink and turns the primary button aubergine with light text on the orange band.
 
 ## Type scale
 
-Geologica, base 17px, ratio 1.25, headings bold, one colour.
+Geologica, base 17px, ratio 1.25, one colour per head. Display heads are set tight (`letter-spacing: -0.028em` for h1 and h2, tighter on the largest sizes), the way the wordmark is set.
 
-- Home head, `display-1`: clamp(38px, 11px + 3.95vw, 72px), 68px at 1440, leading 1.08 (two lines at 1200px; the photograph carries the screen)
-- Inner page head, `display-2`: clamp(28px, 14px + 3.5vw, 68px), 64px at 1440, leading 1.1
-- **Section head, `h2` (`--text-heading-2-size`): clamp(30px, 16px + 1.95vw, 48px), 44px at 1440, leading 1.15**
+- Home head: clamp(40px, 12px + 4vw, 76px), leading 1, three lines at 1440 on a 900px block
+- Inner page head, `display-2`: clamp(36px, 12px + 4.6vw, 84px), leading 1.02
+- Section head, `h2`: clamp(32px, 14px + 2.6vw, 56px), leading 1.06
+- Set pieces: `2.000+` at clamp(5.5rem, 2rem + 16.5vw, 19.5rem) in the logo orange; the Voor wie head at up to 120px; audience row titles at up to 68px; `Interesse?` at up to 140px
 - Item title `h3`, body 17px, labels one step down, sentence case, untracked
 
 ## Layout
 
-- One container: 1200px content, 16px gutters on small screens, centred; gutters grow at 1920, grids do not.
-- Nav and page content share the same left and right edge (wordmark at the content edge).
-- Sections part by the `PageSection` rhythm. One radius per nesting level: 0 for a full-bleed photograph, 16px (`--radius-container`) for every card, tile and framed photo, 8px (`--radius-inner`) for a plate or picture inside a padded container, pills for controls.
+- One container: 1200px content, 16px gutters on phones, centred; gutters grow at 1920, grids do not.
+- Nav, hero block and page content share the same left edge.
+- One radius per nesting level: 0 for a full-bleed photograph, 16px for cards, panels and the top corners of the hero block, the arch for framed photographs, pills for controls.
 
 ## Controls
 
-- Primary: orange fill, aubergine label, pill, `size="lg"` = 48px (`--size-element-lg`)
-- Secondary: Astryx secondary, same pill and height
-- Fields: `size="lg"`, 48px
+- Primary: orange fill, deep aubergine label, pill, `size="lg"` = 48px. On the orange band it turns aubergine with a light label.
+- Secondary and ghost: Astryx, same pill and height. Fields: `size="lg"`, 48px.
+- Listing cards: flat on the well, a hairline frame that turns ink on hover, no shadow; the street name is the largest thing on the card.
+
+## Composition of `/` and the listing pages
+
+- `/`: Rise hero (`sections/RiseHero.tsx`), then **Actueel aanbod as a bento on the aubergine band** (`sections/ListingBento.tsx`: the available listings, the first tall on seven columns, each an Astryx `ClickableCard` filled by its building's photograph with name, city, price and total on a solid plate), then 2.000+ on paper (ink, the plus in orange), Voor wie, Van leegstand naar meerwaarde (Linnaeusstraat, linked), FAQ, Interesse?, footer.
+- `/aanbod/<slug>/`: the same Rise hero with the building's cover photograph, the head, address, facts and Ik heb interesse! on the block; the rest of its photographs as a mosaic on the aubergine band beneath (the Lightbox holds them all, the cover first).
+- Every photograph ships with 640 and 1024px cuts (`srcSetFor` in `photos.ts`) and a `sizes` for its slot. Routes other than `/` load on demand (`React.lazy` in `App.tsx`); `/` preloads its hero photograph from `index.html`; Geologica loads from `index.html` with preconnects. A skip link ("Naar de inhoud") leads to `<main id="inhoud">`, and every route sets its own document title.
 
 ## Pictures
 
-- Library photographs (`src/photos.ts`, `PHOTOS`, credited in the footer via `PHOTO_CREDITS_LINE`) are mood images only: never on a listing, never standing in for a customer or teammate. Rendered by `PhotoImage` in `src/sections/ui.tsx`: real `<img>` with `width`/`height`, Dutch `alt`, `object-fit: cover`, the stored `object-position`. The photograph on the first screen of a route (the home hero, the audience hero photograph, the `/over-ons/` frame) is `fetchPriority="high"` with no `loading`; every other one is `loading="lazy"`.
-- Ratios: `wide` 21/9 across, `landscape` 3/2, `portrait` 4/5 beside text, `square` 1/1 in pairs (`PHOTO_RATIOS`). The hero fills a box sized by flex, so layout never waits for the image (CLS 0).
-- Treatment on every photograph: `saturate(0.94)`, and `brightness(0.9)` in dark mode. Photographs take at most a third of the page below the hero and never lead two sections in a row.
-- **Overlay rule: text on a photograph sits on a solid plate of `--flex-band` with `bandStyles.onBand` (aubergine, light text), 8px radius inside a 16px frame, never on a scrim or the bare image.** Contrast is then a colour pair: 12.4:1 (muted line 8.5:1) in light, 17.7:1 (12.1:1) in dark, the same over every pixel. The hero carries no text on its photograph.
-- Photographs in use: `heroCanal` (hero), `ownersEntrance` and `makersAtticStudio` (the two wide audience tiles on `/`). Municipalities have no photograph and `developersShell` is too weak a mood for a tile, so those two audience tiles are type-led. On the audience pages the photograph stands beside the head (`PageHero` with `isAsidePhoto`, five of twelve columns): `ownersEntrance` on `/vastgoedeigenaren/`, `makersAtticStudio` on `/ondernemers/`, `developersShell` on `/ontwikkelaars/` (a timber shell before it is finished, which is that page's subject); `/gemeenten/` has none and sets its lead sentence on an aubergine plate (`LeadIntro isPlate`). `/over-ons/` shows `aboutStreet` once, 21/9 across. The footer credits exactly the photographs in use (`USED_PHOTOS`, `PHOTO_CREDITS_LINE`, `data-credits`).
-- Listing cards are type-led: no picture, no gradient; the street name is the largest thing on the card (24 to 30px), then the city, status, facts and feature lines. Four across from 1100px, a snap rail below.
-- Remaining stand-ins (the team slot on `/over-ons/` is gone: there is no team photograph and none is invented): the four gallery slots on each listing detail stay labelled "Foto volgt" until the client supplies photographs.
+- **Every photograph is Flexstad's own**, taken from the public flexstad.com pages and served as WebP from `public/photos/flexstad/` (`src/photos.ts`). The footer credits them as "Foto's: Flexstad." No library stand-in remains.
+- Listings show their own building: each card leads with its cover (`LISTING_PHOTOS[slug].cover`, 4/3, a small zoom on hover), and each detail page opens with a mosaic of its photographs (the cover large, four tiles, the last counting the rest) that opens the Astryx `Lightbox`. Furnished impressions keep the live site's word "Sfeerimpressie" in their alt text.
+- `/`: the hero is the maker at work in her atelier (the live site's own hero photograph); the Voor wie rows and the four audience heroes take the photographs flexstad.com gives each audience page; Van leegstand naar meerwaarde shows the Linnaeusstraat shop empty and as the African fashion store it became, wiped with the Astryx `Slider` (keyboard steps included), captioned with the live site's own line.
+- Rendered by `PhotoImage` (`isArch` for the arched frame) or, inside components, a plain `<img>` with `width`/`height`, Dutch `alt` and `object-fit: cover`. The first photograph on a route is `fetchPriority="high"`; every other one is lazy.
+- **Overlay rule:** text on a photograph sits on a solid plate (the aubergine hero block, a Badge, the "+N foto's" pill), never on a scrim or the bare image.
 
 ## Demo portal
 
@@ -73,7 +95,10 @@ Geologica, base 17px, ratio 1.25, headings bold, one colour.
 
 ## Motion
 
-- Still: one reveal on the hero at load, scroll reveal on tiles; everything static under reduced motion.
+- On load: the hero photograph settles from 1.08 to 1 and the block rises 56px into place (1.1s, `--flex-ease`).
+- On scroll: reasons and listing cards reveal through a view timeline.
+- On hover or focus of an audience row: the bar slides in, the title moves along by its length, the arched window lifts and tilts 2deg.
+- Under `prefers-reduced-motion: reduce` nothing moves: content is at full opacity, and only the bar's opacity changes on hover.
 
 ## Exports
 

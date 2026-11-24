@@ -16,7 +16,8 @@ import {neutralTheme} from '@astryxdesign/theme-neutral';
 
 const AUBERGINE = 'oklch(0.314 0.097 312.6)';
 const AUBERGINE_DEEP = 'oklch(0.2 0.07 312)';
-const ORANGE = 'oklch(0.7 0.19 38)';
+// The logo's own orange, #F6522A.
+const ORANGE = 'oklch(0.66 0.21 34.6)';
 const ORANGE_TEXT = 'oklch(0.5 0.17 34)';
 
 export const flexstadTheme = defineTheme({
@@ -42,20 +43,19 @@ export const flexstadTheme = defineTheme({
     // The level inside a padded container (a picture in a card, a plate on a
     // picture): the container radius less its padding, never the same value.
     '--radius-inner': '8px',
-    // Heading scale, one rung per role (hallmark gate 78: section heads at
-    // 40px or more at 1440). Each clamp lands on the rung's 1440px size and
-    // shrinks on phones so Dutch compounds stay on the line.
-    //   h2 (section head)            44px at 1440, 48px cap
-    //   display-2 (inner page head)  64px at 1440, 68px cap
-    //   display-1 (homepage head)    68px at 1440, 72px cap: the photograph
-    //                                carries the first screen, so the head is
-    //                                set one notch above the inner pages
-    '--text-heading-2-size': 'clamp(30px, 16px + 1.95vw, 48px)',
-    '--text-heading-2-leading': '1.15',
-    '--text-display-2-size': 'clamp(28px, 14px + 3.5vw, 68px)',
-    '--text-display-2-leading': '1.1',
-    '--text-display-1-size': 'clamp(38px, 11px + 3.95vw, 72px)',
-    '--text-display-1-leading': '1.08',
+    // Heading scale, one rung per role, set larger and tighter than the
+    // neutral theme (see design.md, Type scale). Each clamp shrinks on
+    // phones so Dutch compounds stay on the line.
+    //   h2 (section head)            up to 56px
+    //   display-2 (inner page head)  up to 84px
+    //   display-1 (homepage head)    up to 84px; Home.tsx sets its own
+    //                                76px cap so the head fits the block
+    '--text-heading-2-size': 'clamp(32px, 14px + 2.6vw, 56px)',
+    '--text-heading-2-leading': '1.06',
+    '--text-display-2-size': 'clamp(36px, 12px + 4.6vw, 84px)',
+    '--text-display-2-leading': '1.02',
+    '--text-display-1-size': 'clamp(40px, 8px + 4.7vw, 84px)',
+    '--text-display-1-leading': '1',
     // Large controls (hero and closing actions, form fields) stand 48px tall:
     // hallmark's marketing range is 44 to 52px (gate 39b).
     '--size-element-lg': '48px',

@@ -5,7 +5,7 @@ import {Grid} from '@astryxdesign/core/Grid';
 import {Heading} from '@astryxdesign/core/Heading';
 import {VStack} from '@astryxdesign/core/Layout';
 import {AUDIENCE_PAGES} from '../content';
-import {PHOTOS} from '../photos';
+import {PHOTOS, type Photo} from '../photos';
 import {ListingGrid} from '../sections/ListingGrid';
 import {PageSection} from '../sections/PageSection';
 import {
@@ -43,11 +43,13 @@ const styles = stylex.create({
 // Mood photographs where one passes the deletion test. Municipalities have no
 // fitting library photograph: that page stays type-led, with the lead sentence
 // set as type on paper.
-const PAGE_PHOTOS = {
-  vastgoedeigenaren: PHOTOS.ownersEntrance,
-  ondernemers: PHOTOS.makersAtticStudio,
-  ontwikkelaars: PHOTOS.developersShell,
-} as const;
+// Each audience page keeps the photograph flexstad.com gives it.
+const PAGE_PHOTOS: Record<string, Photo> = {
+  vastgoedeigenaren: PHOTOS.ownersApartmentFacade,
+  ondernemers: PHOTOS.makersClothingRail,
+  gemeenten: PHOTOS.municipalitiesOfficeFloor,
+  ontwikkelaars: PHOTOS.developersDesk,
+};
 
 /** One template for the four audience pages; the copy comes from content.ts. */
 export function Audience({slug}: {slug: string}) {
@@ -55,12 +57,7 @@ export function Audience({slug}: {slug: string}) {
   if (!page) {
     return <NotFound />;
   }
-  const photo =
-    slug === 'vastgoedeigenaren' ||
-    slug === 'ondernemers' ||
-    slug === 'ontwikkelaars'
-      ? PAGE_PHOTOS[slug]
-      : undefined;
+  const photo: Photo | undefined = PAGE_PHOTOS[slug];
   return (
     <>
       <PageHero
@@ -73,7 +70,15 @@ export function Audience({slug}: {slug: string}) {
         ctas={[page.cta]}
         isAsidePhoto={photo !== undefined}
         aside={
-          photo ? <PhotoImage photo={photo} isFilled isPriority /> : undefined
+          photo ? (
+            <PhotoImage
+              photo={photo}
+              isFilled
+              isPriority
+              isArch
+              sizes="(min-width: 900px) 440px, 340px"
+            />
+          ) : undefined
         }
       />
       <PageSection>
