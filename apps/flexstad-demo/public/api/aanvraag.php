@@ -204,39 +204,57 @@ if ($page !== '') {
 }
 $html .= '<li><strong>Tijd:</strong> ' . $esc($time) . ' (Europe/Amsterdam)</li></ul></body>';
 
+$sectionGid = (string) (($config['sections'] ?? [])[$kind] ?? '');
+// Two documented Asana calls: create the task in the project, then move it
+// into its form's section. If the move fails the task still exists in the
+// project, so no submission is lost.
 $task = [
     'name' => $name,
     'html_notes' => $html,
     'projects' => [(string) ($config['project_gid'] ?? '')],
-    'memberships' => [[
-        'project' => (string) ($config['project_gid'] ?? ''),
-        'section' => (string) (($config['sections'] ?? [])[$kind] ?? ''),
-    ]],
 ];
 if (!empty($config['dry_run'])) {
-    reply(200, ['ok' => true, 'dryRun' => true, 'task' => $task]);
+    reply(200, ['ok' => true, 'dryRun' => true, 'task' => $task, 'section' => $sectionGid]);
 }
 
 $generic = 'Versturen lukte niet. Probeer het later opnieuw.';
-$ch = curl_init('https://app.asana.com/api/1.0/tasks');
-curl_setopt_array($ch, [
-    CURLOPT_POST => true,
-    CURLOPT_POSTFIELDS => json_encode(['data' => $task], JSON_UNESCAPED_UNICODE),
-    CURLOPT_HTTPHEADER => [
-        'Authorization: Bearer ' . (string) ($config['token'] ?? ''),
-        'Content-Type: application/json',
-        'Accept: application/json',
-    ],
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_TIMEOUT => 10,
-    CURLOPT_CONNECTTIMEOUT => 5,
-]);
-curl_exec($ch);
-$status = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-curl_close($ch);
+$token = (string) ($config['token'] ?? '');
 
+/** POSTs JSON to the Asana API; returns [status, decoded body or null]. */
+function asanaPost(string $path, array $data, string $token): array
+{
+    $ch = curl_init('https://app.asana.com/api/1.0' . $path);
+    curl_setopt_array($ch, [
+        CURLOPT_POST => true,
+        CURLOPT_POSTFIELDS => json_encode(['data' => $data], JSON_UNESCAPED_UNICODE),
+        CURLOPT_HTTPHEADER => [
+            'Authorization: Bearer ' . $token,
+            'Content-Type: application/json',
+            'Accept: application/json',
+        ],
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT => 10,
+        CURLOPT_CONNECTTIMEOUT => 5,
+    ]);
+    $raw = curl_exec($ch);
+    $status = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+    curl_close($ch);
+    $body = is_string($raw) ? json_decode($raw, true) : null;
+    return [$status, is_array($body) ? $body : null];
+}
+
+[$status, $created] = asanaPost('/tasks', $task, $token);
 if ($status < 200 || $status >= 300) {
     error_log('flexstad aanvraag: asana status ' . $status . ' kind ' . $kind);
     fail(502, $generic);
+}
+
+$taskGid = (string) ($created['data']['gid'] ?? '');
+if ($taskGid !== '' && $sectionGid !== '') {
+    [$moved] = asanaPost('/sections/' . rawurlencode($sectionGid) . '/addTask', ['task' => $taskGid], $token);
+    if ($moved < 200 || $moved >= 300) {
+        // The task is saved in the project; only its section is missing.
+        error_log('flexstad aanvraag: section move status ' . $moved . ' kind ' . $kind);
+    }
 }
 reply(200, ['ok' => true]);
