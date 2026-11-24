@@ -5,7 +5,7 @@ The locked system. Every Hallmark run reads this first and pages share it. Chang
 ## System
 
 - Genre: editorial (inferred). The brand is the logo itself, read from flexstad.com: aubergine `#421F54`, orange `#F6522A`, and the mark's four slanted bars.
-- Shape of the first page: Manifesto, **Rise** posture on `/`: the canal photograph fills the first screen and an aubergine block rises out of the band below into it, carrying the client's headline. Block and band are one colour, so the page reads as one building rising into the street. Inner pages open on an aubergine Banner.
+- Shape of the first page: Manifesto, **Rise** posture on `/`: Flexstad's own photograph of a maker at work fills the first screen and an aubergine block rises out of the band below into it, carrying the client's headline. Block and band are one colour. Inner pages open on an aubergine Banner.
 - Theme: brand, from `src/flexstadTheme.ts`; no Hallmark theme dealt.
 - Axes: light/geometric-sans/warm · posture: Rise on `/`, aubergine Banner inside · nav: three-part, sticky on translucent paper, the real wordmark at the content edge.
 - Source of truth: `src/flexstadTheme.ts` (tokens, scale), `src/index.css` (stamp, brand tokens), `src/sections/BrandMark.tsx` (the wordmark and the stripe).
@@ -15,7 +15,7 @@ The locked system. Every Hallmark run reads this first and pages share it. Chang
 - **Wordmark:** `BrandMark`, the live site's own SVG. Letters take `currentColor` (light on aubergine and in dark mode); the bars are always `--flex-orange`. In the header at 136px, phones at 112px, and in the footer at the full column width.
 - **Bar:** one bar of the mark, cut on its slant (half its height across), marks each reason on `/` and slides in beside an audience row on hover. Never a bullet anywhere else.
 - **Stripe:** `BrandStripes`, three orange rows of 12px ending at staggered lengths, each end cut on the mark's slant. Only across the top of the footer, as on the live site.
-- **Arched window:** `--flex-arch` (a half-circle over a 16px base). Every photograph beside text is framed as one: the audience heroes, the four index rows, the value section (where an orange arch sits behind it, offset 24px). Full-bleed photographs (the hero) keep no radius.
+- **Arched window:** `--flex-arch` (a half-circle over a 16px base). Every photograph beside text is framed as one: the audience heroes, the four index rows. Full-bleed photographs (the hero) keep no radius.
 
 ## Tokens
 
@@ -72,10 +72,11 @@ Geologica, base 17px, ratio 1.25, one colour per head. Display heads are set tig
 
 ## Pictures
 
-- Library photographs (`src/photos.ts`, credited in the footer via `PHOTO_CREDITS_LINE`) are mood images only: never on a listing, never standing in for a customer or teammate. Rendered by `PhotoImage` (`isArch` for the arched frame): a real `<img>` with `width`/`height`, Dutch `alt`, `object-fit: cover`. The first photograph on a route is `fetchPriority="high"`; every other one is lazy.
-- **Overlay rule:** text on a photograph sits on a solid aubergine block (`--flex-band` with `bandStyles.onBand`), never on a scrim or the bare image. The hero headline sits on the block, 12.4:1.
-- In use: `heroCanal` (hero), and in the Voor wie index `ownersEntrance`, `makersAtticStudio`, `aboutStreet` (gemeenten) and `developersShell`; `aboutWindowsill` beside Van leegstand naar meerwaarde; the audience heroes keep theirs; `/over-ons/` shows `aboutStreet` 21/9 across.
-- Listing cards and the four gallery slots on each listing detail carry no photograph until the client supplies them.
+- **Every photograph is Flexstad's own**, taken from the public flexstad.com pages and served as WebP from `public/photos/flexstad/` (`src/photos.ts`). The footer credits them as "Foto's: Flexstad." No library stand-in remains.
+- Listings show their own building: each card leads with its cover (`LISTING_PHOTOS[slug].cover`, 4/3, a small zoom on hover), and each detail page opens with a mosaic of its photographs (the cover large, four tiles, the last counting the rest) that opens the Astryx `Lightbox`. Furnished impressions keep the live site's word "Sfeerimpressie" in their alt text.
+- `/`: the hero is the maker at work in her atelier (the live site's own hero photograph); the Voor wie rows and the four audience heroes take the photographs flexstad.com gives each audience page; Van leegstand naar meerwaarde shows the Linnaeusstraat shop empty and as the African fashion store it became, wiped with the Astryx `Slider` (keyboard steps included), captioned with the live site's own line.
+- Rendered by `PhotoImage` (`isArch` for the arched frame) or, inside components, a plain `<img>` with `width`/`height`, Dutch `alt` and `object-fit: cover`. The first photograph on a route is `fetchPriority="high"`; every other one is lazy.
+- **Overlay rule:** text on a photograph sits on a solid plate (the aubergine hero block, a Badge, the "+N foto's" pill), never on a scrim or the bare image.
 
 ## Demo portal
 

@@ -1,7 +1,10 @@
-/* Hallmark · shape: Manifesto · job: join (Aanmelden subscribes; Inschrijven and Contact sign up after viewing the listings) · genre: editorial (inferred) · theme: brand, rebuilt on the logo (#421F54 aubergine, #F6522A orange, the slanted bars) · redesign: full · paper: oklch(0.975 0.006 25) · accent: oklch(0.66 0.21 34.6) · display: Geologica · body: Geologica · hero: Rise (/), aubergine Banner with an arched photograph beside the head (/vastgoedeigenaren/, /ondernemers/, /ontwikkelaars/), aubergine Banner (every other inner route, /contact/, /inschrijven/, /abonneren/ and /mijnflexstad/ over their form columns), a quiet head with the Demo badge over cards (/mijnflexstad/overzicht/), aubergine Banner holding the street, address, facts and Ik heb interesse! (/aanbod/<slug>/) · nav: three-part, sticky on translucent paper, the real wordmark at the content edge · footer: aubergine ground, the logo's stripe across its top, hairline rows of links, the wordmark set the width of the column · signature: an aubergine block rising out of the band into the full-screen canal photograph, carrying the client's headline; the band runs on underneath with 2.000+ set as the largest thing on the page
- * sections: Rise hero · aubergine band (2.000+ in the logo orange, the statement, the reasons each marked with one bar of the logo) · Voor wie as an index of four full-width rows with arched windows · Actueel aanbod on the well, flat cards · Van leegstand naar meerwaarde beside an arched window casting an orange arch · FAQ as three ruled lists · Interesse? on the logo orange, set huge · footer
+/* Hallmark · shape: Manifesto · job: join (Aanmelden subscribes; Inschrijven and Contact sign up after viewing the listings) · genre: editorial (inferred) · theme: brand, rebuilt on the logo (#421F54 aubergine, #F6522A orange, the slanted bars) · redesign: full · paper: oklch(0.975 0.006 25) · accent: oklch(0.66 0.21 34.6) · display: Geologica · body: Geologica · hero: Rise (/), aubergine Banner with an arched photograph beside the head (/vastgoedeigenaren/, /ondernemers/, /ontwikkelaars/), aubergine Banner (every other inner route, /contact/, /inschrijven/, /abonneren/ and /mijnflexstad/ over their form columns), a quiet head with the Demo badge over cards (/mijnflexstad/overzicht/), aubergine Banner holding the street, address, facts and Ik heb interesse! (/aanbod/<slug>/) · nav: three-part, sticky on translucent paper, the real wordmark at the content edge · footer: aubergine ground, the logo's stripe across its top, hairline rows of links, the wordmark set the width of the column · signature: an aubergine block rising out of the band into Flexstad's own photograph of a maker at work, carrying the client's headline; the band runs on underneath with 2.000+ set as the largest thing on the page
+ * sections: Rise hero · aubergine band (2.000+ in the logo orange, the statement, the reasons each marked with one bar of the logo) · Voor wie as an index of four full-width rows with arched windows · Actueel aanbod on the well, each card led by the building's own photograph · Van leegstand naar meerwaarde beside the Linnaeusstraat shop before and after, wiped with the Astryx Slider · FAQ as three ruled lists · Interesse? on the logo orange, set huge · footer
  * axes: light/geometric-sans/warm · posture: Rise · contrast: pass · fold: pass · v2.0.0 */
-/* Hallmark · pre-emit critique: P pass · H pass · E pass · S pass · R pass · V pass · weakest: the photograph is a library stand-in of Amsterdam canals, a mood and not a Flexstad building, so no caption or claim sits on it and the client's own photograph replaces it */
+/* Hallmark · pre-emit critique: P pass · H pass · E pass · S pass · R pass · V pass · weakest: some listing photographs are furnished impressions (the live site's own "sfeerimpressie"), named as such in their alt text; the client should confirm which rooms are delivered empty */
+/* Hallmark · dropped hero-amsterdam-canal-dusk.jpg, owners-brick-entrance-blue-doors.jpg, makers-attic-studio-arched-window.jpg, about-brick-windowsill-daylight.jpg, street-quiet-street-blue-hour.jpg, developers-timber-shell-interior.jpg · the owner asked for Flexstad's own photographs from flexstad.com in place of the library stand-ins */
+/* Hallmark · dismissed 28a · the flagged images (the before and after on /, the listing card covers) sit below the first screen and are never the LCP; the LCP is the hero photograph and the first gallery tile, both fetchpriority high and eager */
+/* Hallmark · waive 39b · the 150 to 220px buttons on /aanbod/<slug>/ are the gallery photographs · each tile is a photograph that opens the Lightbox, sized by the mosaic and not a control in a row, with the shared focus ring and hover */
 /* Hallmark · waive 85 · "Aanmelden" is the page that subscribes, so its one e-mail field with the "Aanmelden" button is the page's own job · the stamp names job: join, which a URL run cannot read */
 /* Hallmark · waive 77 · "Aanmelden" holds one e-mail field on a raised sheet, a single-action page whose whole body is that action · a longer page would need copy the client has not given */
 /* Hallmark · dismissed 77 · the form and short pages (Contact, Inschrijven, Aanbod, Vacatures, Dienst, the audience pages) hold three to five sections because each has one subject: its form, its list or its text · "Interesse?" closes them */
@@ -159,18 +162,21 @@ a:active {
   min-height: 48px;
 }
 
-/* The audience index on `/`: hovering or focusing a row brings in one bar of
+/* The audience index on `/` (each row an Astryx ClickableCard): hovering or
+   focusing a row brings in one bar of
    the logo, moves the title along by the bar's length and lifts the arched
    window. Static under reduced motion (only the bar's opacity changes). */
 .flex-index-row:hover .flex-index-bar,
-.flex-index-row:focus-visible .flex-index-bar {
+.astryx-clickable-card:is(:focus-visible, :has(:focus-visible))
+  .flex-index-bar {
   opacity: 1;
   transform: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .flex-index-row:hover .flex-index-pic,
-  .flex-index-row:focus-visible .flex-index-pic {
+  .astryx-clickable-card:is(:focus-visible, :has(:focus-visible))
+    .flex-index-pic {
     transform: translateY(-6px) rotate(-2deg);
   }
 }
@@ -184,7 +190,15 @@ a:active {
 
 @media (prefers-reduced-motion: no-preference) and (min-width: 900px) {
   .flex-index-row:hover .flex-index-title,
-  .flex-index-row:focus-visible .flex-index-title {
+  .astryx-clickable-card:is(:focus-visible, :has(:focus-visible))
+    .flex-index-title {
     transform: translateX(48px);
+  }
+}
+
+/* Listing cards: the building's photograph zooms a little on hover. */
+@media (prefers-reduced-motion: no-preference) {
+  .astryx-clickable-card:hover .flex-cover {
+    transform: scale(1.04);
   }
 }

@@ -110,8 +110,8 @@ export function SiteFooter() {
           <Divider />
           <VStack gap={2}>
             <Text type="supporting" color="secondary">
-              Onofficiële herbouw van de openbare site flexstad.com met Astryx.
-              Foto’s zijn plaatshouders. {HOME_COPY.copyright}
+              Onofficiële herbouw van de openbare site flexstad.com met Astryx.{' '}
+              {HOME_COPY.copyright}
             </Text>
             <Text type="supporting" color="secondary" data-credits="">
               {PHOTO_CREDITS_LINE}

@@ -18,7 +18,7 @@ import {
 import {EnquiryForm} from '../sections/EnquiryForm';
 import {statusLabel} from '../sections/ListingCard';
 import {PageSection} from '../sections/PageSection';
-import {PendingPhoto, placeholderSrc} from '../sections/Placeholder';
+import {LISTING_PHOTOS} from '../photos';
 import {BulletList, Crumbs, CtaBand, Paragraphs} from '../sections/ui';
 import {NotFound} from './NotFound';
 
@@ -43,9 +43,9 @@ const styles = stylex.create({
     fontWeight: 700,
     whiteSpace: 'nowrap',
   },
-  // "Photos follow": one quiet strip of the four slots below the facts, kept
-  // small so the empty frames never outweigh the street, the facts and the
-  // action. One row of four from 900px, two by two on phones.
+  // The building's own photographs: the cover large on the left, four
+  // smaller tiles beside it, the last one counting the photographs the
+  // Lightbox holds beyond them. Two across on phones.
   gallery: {
     display: 'grid',
     gap: 12,
@@ -53,7 +53,31 @@ const styles = stylex.create({
       default: 'repeat(2, minmax(0, 1fr))',
       '@media (min-width: 900px)': 'repeat(4, minmax(0, 1fr))',
     },
-    gridAutoRows: {default: 104, '@media (min-width: 900px)': 136},
+    gridAutoRows: {default: 150, '@media (min-width: 900px)': 220},
+  },
+  lead: {
+    gridColumn: 'span 2',
+    gridRow: {default: 'span 1', '@media (min-width: 900px)': 'span 2'},
+  },
+  tile: {position: 'relative', overflow: 'hidden', minWidth: 0},
+  tileImage: {
+    display: 'block',
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    borderRadius: 'var(--radius-container)',
+  },
+  // "+8 foto's" sits on a solid aubergine plate (the overlay rule).
+  more: {
+    position: 'absolute',
+    insetInlineEnd: 12,
+    bottom: 12,
+    paddingBlock: 8,
+    paddingInline: 14,
+    borderRadius: 'var(--radius-full)',
+    backgroundColor: 'var(--flex-band)',
+    color: 'var(--flex-on-band)',
+    fontWeight: 600,
   },
   shot: {
     display: 'block',
@@ -124,7 +148,8 @@ const styles = stylex.create({
   },
 });
 
-const GALLERY_LABELS = ['Voorgevel', 'Ontvangstruimte', 'Werkruimte', 'Tuin'];
+/** Tiles the mosaic shows; the rest open from the last tile in the Lightbox. */
+const MOSAIC_COUNT = 5;
 
 function Facts({
   listing,
@@ -181,31 +206,46 @@ export function ListingDetail({slug}: {slug: string}) {
     return <NotFound />;
   }
   const address = LISTING_ADDRESS[listing.slug];
-  const media = GALLERY_LABELS.map(label => ({
-    src: placeholderSrc(label),
-    alt: `Fotoplaats: ${listing.name}, ${label}`,
-  }));
+  const photos = LISTING_PHOTOS[listing.slug]?.gallery ?? [];
+  const media = photos.map(photo => ({src: photo.src, alt: photo.alt}));
+  const shown = photos.slice(0, MOSAIC_COUNT);
+  const extra = photos.length - shown.length;
   const detail = slug === 'roemer-visscherstraat' ? ROEMER_DETAIL : null;
 
-  const gallery = (
-    <PageSection paddingBlock={8}>
-      <VStack gap={4}>
-        <Text color="secondary">Foto&apos;s volgen</Text>
+  const gallery =
+    shown.length > 0 ? (
+      <PageSection paddingBlock={8}>
         <div {...stylex.props(styles.gallery)}>
-          {GALLERY_LABELS.map((label, index) => (
+          {shown.map((photo, index) => (
             <button
-              key={label}
+              key={photo.src}
               type="button"
-              aria-label={`Open foto ${index + 1} van ${media.length}`}
+              aria-label={`Open foto ${index + 1} van ${media.length}: ${photo.alt}`}
               onClick={() => setLightbox(index)}
-              {...stylex.props(styles.shot)}>
-              <PendingPhoto label={label} />
+              {...stylex.props(
+                styles.shot,
+                styles.tile,
+                index === 0 ? styles.lead : undefined,
+              )}>
+              <img
+                src={photo.src}
+                width={photo.width}
+                height={photo.height}
+                alt=""
+                loading={index === 0 ? undefined : 'lazy'}
+                fetchPriority={index === 0 ? 'high' : undefined}
+                decoding="async"
+                {...stylex.props(styles.tileImage)}
+                style={{objectPosition: photo.objectPosition}}
+              />
+              {index === shown.length - 1 && extra > 0 ? (
+                <span {...stylex.props(styles.more)}>+{extra} foto&apos;s</span>
+              ) : null}
             </button>
           ))}
         </div>
-      </VStack>
-    </PageSection>
-  );
+      </PageSection>
+    ) : null;
 
   return (
     <>
@@ -244,7 +284,7 @@ export function ListingDetail({slug}: {slug: string}) {
         </VStack>
       </PageSection>
 
-      {detail ? null : gallery}
+      {gallery}
 
       {detail ? (
         <PageSection paddingBlock={10}>
@@ -295,8 +335,6 @@ export function ListingDetail({slug}: {slug: string}) {
           </div>
         </PageSection>
       ) : null}
-
-      {detail ? gallery : null}
 
       <EnquiryForm
         listingName={listing.name}

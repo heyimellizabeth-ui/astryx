@@ -2,12 +2,14 @@
 
 import * as stylex from '@stylexjs/stylex';
 import {Button} from '@astryxdesign/core/Button';
+import {ClickableCard} from '@astryxdesign/core/ClickableCard';
 import {Heading} from '@astryxdesign/core/Heading';
 import {HStack, VStack} from '@astryxdesign/core/Layout';
 import {Text} from '@astryxdesign/core/Text';
 import {ABOUT, AUDIENCES, AUDIENCE_PAGES, HOME_COPY} from '../content';
 import {PHOTOS, type Photo} from '../photos';
 import {bandStyles} from '../sections/bandStyles';
+import {BeforeAfter} from '../sections/BeforeAfter';
 import {Faq} from '../sections/Faq';
 import {ListingGrid} from '../sections/ListingGrid';
 import {PageSection} from '../sections/PageSection';
@@ -215,8 +217,8 @@ const styles = stylex.create({
     color: 'var(--color-text-primary)',
     textDecoration: 'none',
     gridTemplateColumns: {
-      default: 'minmax(0, 1fr) 72px',
-      [WIDE]: 'minmax(0, 6fr) minmax(0, 4fr) 132px',
+      default: 'minmax(0, 1fr) 96px',
+      [WIDE]: 'minmax(0, 6fr) minmax(0, 4fr) 192px',
     },
     gridTemplateAreas: {
       default: '"title pic" "line pic"',
@@ -283,7 +285,7 @@ const styles = stylex.create({
     alignItems: 'center',
     gridTemplateColumns: {
       default: 'minmax(0, 1fr)',
-      [WIDE]: 'minmax(0, 7fr) minmax(0, 5fr)',
+      [WIDE]: 'minmax(0, 6fr) minmax(0, 6fr)',
     },
   },
   statement: {
@@ -299,35 +301,37 @@ const styles = stylex.create({
   // The orange arch sits behind the photograph, offset by one bar, so the
   // window casts the brand colour.
   window: {
-    position: 'relative',
-    width: {default: 'min(100% - 24px, 360px)', [WIDE]: 'calc(100% - 28px)'},
-    maxWidth: 440,
-    justifySelf: 'center',
-    aspectRatio: '4 / 5',
-    '::before': {
-      content: '""',
-      position: 'absolute',
-      inset: 0,
-      borderRadius: 'var(--flex-arch)',
-      backgroundColor: 'var(--flex-orange)',
-      transform: 'translate(24px, 24px)',
-    },
+    width: '100%',
+    maxWidth: 560,
+    justifySelf: {default: 'stretch', [WIDE]: 'end'},
+  },
+  // The row is an Astryx ClickableCard: flat, square, no lift of its own,
+  // so the row's own hover (the bar, the title, the window) carries it.
+  card: {
+    borderRadius: 0,
+    backgroundColor: 'transparent',
+    transform: 'none',
   },
 });
 
 // Each audience with its first sentence and the photograph that is its mood.
 const ROWS: ReadonlyArray<{slug: string; index: number; photo: Photo}> = [
-  {slug: 'vastgoedeigenaren', index: 0, photo: PHOTOS.ownersEntrance},
-  {slug: 'ondernemers', index: 1, photo: PHOTOS.makersAtticStudio},
-  {slug: 'gemeenten', index: 2, photo: PHOTOS.aboutStreet},
-  {slug: 'ontwikkelaars', index: 3, photo: PHOTOS.developersShell},
+  {slug: 'vastgoedeigenaren', index: 0, photo: PHOTOS.ownersApartmentFacade},
+  {slug: 'ondernemers', index: 1, photo: PHOTOS.makersClothingRail},
+  {slug: 'gemeenten', index: 2, photo: PHOTOS.municipalitiesOfficeFloor},
+  {slug: 'ontwikkelaars', index: 3, photo: PHOTOS.developersDesk},
 ];
 
 function Hero() {
   return (
     <section aria-label="Introductie" {...stylex.props(styles.hero)}>
       <div {...stylex.props(styles.photo)}>
-        <PhotoImage photo={PHOTOS.heroCanal} isPriority isBleed isFilled />
+        <PhotoImage
+          photo={PHOTOS.homeMakerAtelier}
+          isPriority
+          isBleed
+          isFilled
+        />
       </div>
       <div {...stylex.props(styles.column)}>
         <div {...stylex.props(styles.block, bandStyles.onBand)}>
@@ -453,23 +457,30 @@ function AudienceRow({
   photo: Photo;
 }) {
   return (
-    <a href={href} {...withClass('flex-index-row', styles.row)}>
-      <h3 {...stylex.props(styles.rowTitle)}>
-        <span
-          aria-hidden="true"
-          {...withClass('flex-index-bar', styles.rowBar)}
-        />
-        <span {...withClass('flex-index-title', styles.rowTitleText)}>
-          {title}
+    <ClickableCard
+      label={title}
+      href={href}
+      padding={0}
+      variant="transparent"
+      xstyle={styles.card}>
+      <div {...withClass('flex-index-row', styles.row)}>
+        <h3 {...stylex.props(styles.rowTitle)}>
+          <span
+            aria-hidden="true"
+            {...withClass('flex-index-bar', styles.rowBar)}
+          />
+          <span {...withClass('flex-index-title', styles.rowTitleText)}>
+            {title}
+          </span>
+        </h3>
+        <Text color="secondary" xstyle={styles.rowLine}>
+          {sentence}
+        </Text>
+        <span {...withClass('flex-index-pic', styles.rowPic)}>
+          <PhotoImage photo={photo} isFilled isArch />
         </span>
-      </h3>
-      <Text color="secondary" xstyle={styles.rowLine}>
-        {sentence}
-      </Text>
-      <span {...withClass('flex-index-pic', styles.rowPic)}>
-        <PhotoImage photo={photo} isFilled isArch />
-      </span>
-    </a>
+      </div>
+    </ClickableCard>
   );
 }
 
@@ -495,9 +506,17 @@ function Value() {
             {HOME_COPY.value[1]}
           </Text>
         </VStack>
-        <div {...stylex.props(styles.window)}>
-          <PhotoImage photo={PHOTOS.aboutWindowsill} isFilled isArch />
-        </div>
+        <VStack gap={4} xstyle={styles.window}>
+          <BeforeAfter
+            before={PHOTOS.linnaeusBefore}
+            after={PHOTOS.linnaeusAfter}
+            label="Schuif tussen voor en na"
+          />
+          <Text type="supporting" color="secondary">
+            Van leegstaande winkelruimte naar African fashion store:
+            winkelruimte van circa 100 m² aan de Linnaeusstraat in Amsterdam.
+          </Text>
+        </VStack>
       </div>
     </PageSection>
   );
