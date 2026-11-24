@@ -13,6 +13,8 @@ import {
   LISTINGS,
   LISTING_ADDRESS,
   ROEMER_DETAIL,
+  listingFeatures,
+  listingUses,
   type Listing,
 } from '../content';
 import {EnquiryForm} from '../sections/EnquiryForm';
@@ -176,12 +178,13 @@ function Facts({
 }
 
 function Features({listing}: {listing: Listing}) {
-  if (!listing.features || listing.features.length === 0) {
+  const features = listingFeatures(listing);
+  if (features.length === 0) {
     return null;
   }
   return (
     <VStack gap={1}>
-      {listing.features.map(line => (
+      {features.map(line => (
         <Text key={line} as="p" color="secondary">
           {line}
         </Text>
@@ -338,6 +341,7 @@ export function ListingDetail({slug}: {slug: string}) {
 
       <EnquiryForm
         listingName={listing.name}
+        uses={listingUses(listing)}
         aside={
           <div {...stylex.props(styles.recap)}>
             <VStack gap={4} align="start">

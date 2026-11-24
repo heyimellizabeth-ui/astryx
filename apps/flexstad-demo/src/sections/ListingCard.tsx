@@ -8,7 +8,7 @@ import {Heading} from '@astryxdesign/core/Heading';
 import {VStack} from '@astryxdesign/core/Layout';
 import {MetadataList, MetadataListItem} from '@astryxdesign/core/MetadataList';
 import {Text} from '@astryxdesign/core/Text';
-import {STATUSES, type Listing} from '../content';
+import {listingFeatures, STATUSES, type Listing} from '../content';
 import {LISTING_PHOTOS} from '../photos';
 
 const styles = stylex.create({
@@ -76,6 +76,7 @@ export function ListingCard({
   isRail?: boolean;
 }) {
   const photo = LISTING_PHOTOS[listing.slug].cover;
+  const features = listingFeatures(listing);
   const coverProps = stylex.props(styles.cover);
   return (
     <ClickableCard
@@ -118,9 +119,9 @@ export function ListingCard({
               </MetadataListItem>
             ))}
           </MetadataList>
-          {listing.features && listing.features.length > 0 ? (
+          {features.length > 0 ? (
             <VStack gap={1}>
-              {listing.features.map(line => (
+              {features.map(line => (
                 <Text key={line} as="p" type="supporting" color="secondary">
                   {line}
                 </Text>

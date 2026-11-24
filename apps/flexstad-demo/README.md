@@ -29,3 +29,26 @@ Known gaps:
 pnpm -F @astryxdesign/flexstad-demo dev
 pnpm -F @astryxdesign/flexstad-demo build
 ```
+
+## Wonen of werken per pand instellen
+
+Elk pand in `src/content.ts` (de lijst `LISTINGS`) heeft één instelling,
+`gebruik`. Verander alleen dat ene woord:
+
+```ts
+{
+  slug: 'winkelwaard-494',
+  gebruik: 'werken', // 'werken', 'wonen' of 'beide'
+  name: 'Winkelwaard',
+  ...
+}
+```
+
+- `'werken'`: alleen voor bedrijven. De kaart en de pandpagina tonen
+  "Alleen voor bedrijven, niet voor bewoning", en het reactieformulier
+  vult "Werken" vast in.
+- `'wonen'`: alleen om te wonen, op dezelfde manier.
+- `'beide'`, of de regel weglaten: de bezoeker kiest zelf Wonen of Werken.
+
+Daarna opnieuw bouwen (`pnpm -F @astryxdesign/flexstad-demo build`) en de
+map `dist` uploaden.

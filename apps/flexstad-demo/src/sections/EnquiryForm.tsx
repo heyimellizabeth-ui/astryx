@@ -11,7 +11,7 @@ import {RadioList, RadioListItem} from '@astryxdesign/core/RadioList';
 import {Selector} from '@astryxdesign/core/Selector';
 import {TextArea} from '@astryxdesign/core/TextArea';
 import {TextInput} from '@astryxdesign/core/TextInput';
-import {BUDGETS} from '../content';
+import {BUDGETS, type ListingUse} from '../content';
 import {NotConnectedNotice, useFormSubmit} from './Forms';
 import {PageSection} from './PageSection';
 
@@ -33,7 +33,12 @@ const styles = stylex.create({
   },
 });
 
-type Use = 'wonen' | 'werken' | '';
+type Use = ListingUse | '';
+
+const USE_LABELS: Record<ListingUse, string> = {
+  wonen: 'Wonen',
+  werken: 'Werken',
+};
 type IsoDate = ComponentProps<typeof DateInput>['value'];
 
 /**
@@ -43,16 +48,20 @@ type IsoDate = ComponentProps<typeof DateInput>['value'];
  */
 export function EnquiryForm({
   listingName,
+  uses = ['wonen', 'werken'],
   aside,
 }: {
   listingName?: string;
+  /** The uses this listing allows; with one, the form shows it fixed. */
+  uses?: ReadonlyArray<ListingUse>;
   /** What the visitor reacts to, set under the head in the left column. */
   aside?: ReactNode;
 }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [use, setUse] = useState<Use>('');
+  const isSingleUse = uses.length === 1;
+  const [use, setUse] = useState<Use>(isSingleUse ? uses[0] : '');
   const [budget, setBudget] = useState<string | undefined>();
   const [start, setStart] = useState<IsoDate>();
   const [end, setEnd] = useState<IsoDate>();
@@ -100,17 +109,37 @@ export function EnquiryForm({
                 isOptional
                 htmlName="phone"
               />
-              <RadioList
-                label="Type gebruik"
-                value={use}
-                onChange={value => setUse(value as Use)}
-                orientation="horizontal"
-                isRequired
-                htmlName="use"
-                status={form.status(errors.use)}>
-                <RadioListItem value="wonen" label="Wonen" />
-                <RadioListItem value="werken" label="Werken" />
-              </RadioList>
+              {isSingleUse ? (
+                <TextInput
+                  size="lg"
+                  label="Type gebruik"
+                  value={USE_LABELS[uses[0]]}
+                  description={
+                    uses[0] === 'werken'
+                      ? 'Deze ruimte is alleen voor bedrijven, niet voor bewoning.'
+                      : 'Deze ruimte is alleen om te wonen.'
+                  }
+                  isReadOnly
+                  htmlName="use"
+                />
+              ) : (
+                <RadioList
+                  label="Type gebruik"
+                  value={use}
+                  onChange={value => setUse(value as Use)}
+                  orientation="horizontal"
+                  isRequired
+                  htmlName="use"
+                  status={form.status(errors.use)}>
+                  {uses.map(item => (
+                    <RadioListItem
+                      key={item}
+                      value={item}
+                      label={USE_LABELS[item]}
+                    />
+                  ))}
+                </RadioList>
+              )}
               {listingName ? (
                 <TextInput
                   size="lg"

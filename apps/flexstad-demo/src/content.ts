@@ -8,8 +8,22 @@
 
 export type ListingStatus = 'available' | 'soon' | 'unavailable';
 
+export type ListingUse = 'wonen' | 'werken';
+
+/**
+ * GEBRUIK: waarvoor een pand gehuurd mag worden. Eén woord per pand:
+ *   'werken'  alleen voor bedrijven (geen bewoning)
+ *   'wonen'   alleen om te wonen
+ *   'beide'   wonen of werken (dit is de standaard als je niets invult)
+ * De regel op de kaart, de tekst op de pandpagina en de keuze in het
+ * reactieformulier volgen hier vanzelf uit. Verder hoeft er niets aan.
+ */
+export type Gebruik = 'werken' | 'wonen' | 'beide';
+
 export interface Listing {
   slug: string;
+  /** Zie GEBRUIK hierboven. Weglaten betekent 'beide'. */
+  gebruik?: Gebruik;
   /** Feature lines the live homepage cards carry under the facts. */
   features?: ReadonlyArray<string>;
   name: string;
@@ -71,6 +85,7 @@ export const LISTINGS: Listing[] = [
   },
   {
     slug: 'winkelwaard-494',
+    gebruik: 'werken',
     name: 'Winkelwaard',
     city: 'Alkmaar',
     status: 'available',
@@ -604,3 +619,33 @@ export const HOME_COPY = {
     'Flexstad houdt leegstaand vastgoed actief, veilig en van waarde.',
   copyright: 'Copyright © 2026 Flexstad',
 } as const;
+
+/** The uses a listing allows, read from its `gebruik` setting. */
+export function listingUses(listing: Listing): ReadonlyArray<ListingUse> {
+  switch (listing.gebruik ?? 'beide') {
+    case 'werken':
+      return ['werken'];
+    case 'wonen':
+      return ['wonen'];
+    default:
+      return ['wonen', 'werken'];
+  }
+}
+
+/** The line a listing shows when it allows only one use; none for 'beide'. */
+export function gebruikLine(listing: Listing): string | undefined {
+  switch (listing.gebruik ?? 'beide') {
+    case 'werken':
+      return 'Alleen voor bedrijven, niet voor bewoning';
+    case 'wonen':
+      return 'Alleen om te wonen, niet voor bedrijven';
+    default:
+      return undefined;
+  }
+}
+
+/** The feature lines a listing shows: its own, then its `gebruik` line. */
+export function listingFeatures(listing: Listing): ReadonlyArray<string> {
+  const line = gebruikLine(listing);
+  return [...(listing.features ?? []), ...(line ? [line] : [])];
+}
