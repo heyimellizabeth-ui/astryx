@@ -72,9 +72,16 @@ const styles = stylex.create({
     paddingTop: 16,
     borderTopWidth: 1,
     borderTopStyle: 'solid',
-    borderTopColor: 'color-mix(in oklch, var(--flex-on-band) 28%, transparent)',
+    borderTopColor: 'var(--color-border)',
   },
-  measure: {maxWidth: '55ch'},
+  measure: {maxWidth: '40ch'},
+  // "Interesse?" is the page's last word: set at the home head's size.
+  ctaHead: {
+    fontSize: 'clamp(52px, 16px + 7.5vw, 140px)',
+    lineHeight: 0.95,
+    letterSpacing: '-0.045em',
+  },
+  ctaBody: {maxWidth: '44ch', fontWeight: 500},
   columns: {
     columnGap: 64,
     columnCount: {default: 1, '@media (min-width: 900px)': 2},
@@ -110,12 +117,16 @@ const styles = stylex.create({
       default: 'minmax(0, 1fr)',
       '@media (min-width: 900px)': 'minmax(0, 7fr) minmax(0, 5fr)',
     },
-    alignItems: 'stretch',
+    alignItems: 'end',
   },
   heroAside: {
     position: 'relative',
-    minHeight: {default: 240, '@media (min-width: 900px)': 400},
+    width: {default: 'min(100%, 340px)', '@media (min-width: 900px)': '100%'},
+    justifySelf: {default: 'start', '@media (min-width: 900px)': 'end'},
+    maxWidth: 440,
+    aspectRatio: '4 / 5',
   },
+  heroHead: {paddingBottom: {default: 0, '@media (min-width: 900px)': 8}},
   photo: {
     borderRadius: 'var(--radius-container)',
     overflow: 'hidden',
@@ -133,6 +144,8 @@ const styles = stylex.create({
     borderRadius: 'var(--radius-container)',
   },
   pictureBleed: {borderRadius: 0},
+  // The arched window: a full half-circle over a 16px-cornered base.
+  pictureArch: {borderRadius: 'var(--flex-arch)'},
   // Fills the nearest positioned box, so a box sized by flex or by its
   // neighbours (the hero) sets the crop and the image never sets the layout.
   pictureFill: {position: 'absolute', inset: 0, height: '100%'},
@@ -220,6 +233,7 @@ export function PhotoImage({
   isPriority = false,
   isBleed = false,
   isFilled = false,
+  isArch = false,
 }: {
   photo: PhotoData;
   ratio?: keyof typeof PHOTO_RATIOS;
@@ -228,12 +242,15 @@ export function PhotoImage({
   isBleed?: boolean;
   /** Fill the nearest positioned box instead of taking a ratio. */
   isFilled?: boolean;
+  /** Frame the photograph as an arched window. */
+  isArch?: boolean;
 }) {
   return (
     <div
       {...stylex.props(
         styles.picture,
         isBleed ? styles.pictureBleed : undefined,
+        isArch ? styles.pictureArch : undefined,
         isFilled ? styles.pictureFill : undefined,
       )}
       style={ratio ? {aspectRatio: PHOTO_RATIOS[ratio]} : undefined}>
@@ -334,7 +351,7 @@ export function PageHero({
     </VStack>
   );
   return (
-    <PageSection isWashed paddingBlock={paddingBlock}>
+    <PageSection isBand paddingBlock={paddingBlock}>
       {aside ? (
         <VStack gap={5} align="stretch">
           {isSplitIndex ? crumbs : null}
@@ -401,12 +418,18 @@ export function CtaBand({
   cta?: Cta;
 }) {
   return (
-    <PageSection isBand paddingBlock={10}>
+    <PageSection isOrange paddingBlock={10}>
       <VStack gap={8}>
         <div {...stylex.props(styles.bandTop)}>
-          <VStack gap={3} xstyle={styles.measure}>
-            <Heading level={2}>{title}</Heading>
-            {body ? <Text color="secondary">{body}</Text> : null}
+          <VStack gap={5}>
+            <Heading level={2} xstyle={styles.ctaHead}>
+              {title}
+            </Heading>
+            {body ? (
+              <Text type="large" xstyle={styles.ctaBody}>
+                {body}
+              </Text>
+            ) : null}
           </VStack>
           <Button
             label={cta.label}

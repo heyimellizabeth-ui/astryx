@@ -11,13 +11,27 @@ import {STATUSES, type Listing} from '../content';
 
 const styles = stylex.create({
   fill: {flexGrow: 1},
+  // Flat on the well: a hairline frame, no shadow. Hover darkens the frame
+  // to ink and lifts the card (the theme's lift).
+  frame: {
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderColor: {
+      default: 'var(--color-border)',
+      ':hover': 'var(--color-text-primary)',
+    },
+    boxShadow: 'none',
+    transitionProperty: 'border-color, transform',
+    transitionDuration: '0.3s',
+  },
   body: {flexGrow: 1, boxSizing: 'border-box'},
   // The street name carries the card: set large, two lines of room so a long
   // name and a short one leave the facts on the same line across the row.
   name: {
-    fontSize: 'clamp(24px, 1.2vw + 14px, 30px)',
-    lineHeight: 1.12,
+    fontSize: 'clamp(26px, 1.2vw + 16px, 34px)',
+    lineHeight: 1.04,
     fontWeight: 700,
+    letterSpacing: '-0.03em',
   },
   nameRoom: {minHeight: '2.24em'},
   // The card foot: a hairline and the word that says the card opens.
@@ -52,8 +66,7 @@ export function ListingCard({
       label={`${listing.name}, ${listing.city}`}
       href={`/aanbod/${listing.slug}/`}
       padding={0}
-      xstyle={styles.fill}
-      elevation="low">
+      xstyle={[styles.fill, styles.frame]}>
       <VStack gap={5} padding={5} justify="between" xstyle={styles.body}>
         <VStack gap={3} align="start">
           <Badge

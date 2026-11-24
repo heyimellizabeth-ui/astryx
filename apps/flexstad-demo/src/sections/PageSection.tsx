@@ -3,7 +3,7 @@
 import * as stylex from '@stylexjs/stylex';
 import type {ReactNode} from 'react';
 import {Section} from '@astryxdesign/core/Section';
-import {bandStyles} from './bandStyles';
+import {bandStyles, orangeStyles} from './bandStyles';
 
 const styles = stylex.create({
   centered: {
@@ -25,6 +25,8 @@ interface PageSectionProps {
   isWashed?: boolean;
   /** Paints the dark aubergine band and flips text tokens to light. */
   isBand?: boolean;
+  /** Paints the logo orange with deep aubergine ink (the closing band). */
+  isOrange?: boolean;
   paddingBlock?: 6 | 8 | 10;
   maxWidth?: number;
   /** Keeps the content to a reading measure, left-aligned on the column edge. */
@@ -38,6 +40,7 @@ export function PageSection({
   variant = 'transparent',
   isWashed = false,
   isBand = false,
+  isOrange = false,
   paddingBlock = 6,
   maxWidth = 1200,
   measure,
@@ -50,13 +53,15 @@ export function PageSection({
       paddingBlock={paddingBlock}
       paddingInline={4}
       xstyle={
-        isBand
-          ? [styles.band, bandStyles.onBand]
-          : isWashed
-            ? styles.wash
-            : variant === 'muted'
-              ? styles.muted
-              : undefined
+        isOrange
+          ? orangeStyles.onOrange
+          : isBand
+            ? [styles.band, bandStyles.onBand]
+            : isWashed
+              ? styles.wash
+              : variant === 'muted'
+                ? styles.muted
+                : undefined
       }>
       <div
         id={id}

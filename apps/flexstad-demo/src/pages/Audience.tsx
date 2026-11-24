@@ -73,7 +73,9 @@ export function Audience({slug}: {slug: string}) {
         ctas={[page.cta]}
         isAsidePhoto={photo !== undefined}
         aside={
-          photo ? <PhotoImage photo={photo} isFilled isPriority /> : undefined
+          photo ? (
+            <PhotoImage photo={photo} isFilled isPriority isArch />
+          ) : undefined
         }
       />
       <PageSection>

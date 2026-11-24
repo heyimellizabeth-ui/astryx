@@ -8,11 +8,27 @@ import {Text} from '@astryxdesign/core/Text';
 import {VStack} from '@astryxdesign/core/Layout';
 import {CONTACT, HOME_COPY, NAV_ABOUT, NAV_FOR_WHO} from '../content';
 import {PHOTO_CREDITS_LINE} from '../photos';
-import {PageSection} from './PageSection';
+import {bandStyles} from './bandStyles';
+import {BrandMark, BrandStripes} from './BrandMark';
 
 const styles = stylex.create({
-  // Colophon block: the wordmark and its line, then three hairline rows of
-  // links and the address as one paragraph.
+  // The footer is the aubergine ground the page stands on: the stripe from
+  // the logo across its top edge, the line and four hairline rows of links,
+  // then the wordmark set as wide as the content column.
+  foot: {
+    backgroundColor: 'var(--flex-band-deep)',
+    paddingBottom: 'clamp(24px, 3vw, 40px)',
+  },
+  inner: {
+    boxSizing: 'border-box',
+    width: 'min(100% - 32px, 1200px)',
+    marginInline: 'auto',
+    paddingTop: 'clamp(56px, 7vw, 96px)',
+  },
+  giant: {
+    marginTop: 'clamp(48px, 7vw, 96px)',
+    color: 'var(--flex-on-band)',
+  },
   row: {
     display: 'grid',
     gap: 12,
@@ -20,7 +36,7 @@ const styles = stylex.create({
     paddingBlock: 16,
     borderTopWidth: 1,
     borderTopStyle: 'solid',
-    borderTopColor: 'var(--color-border-emphasized)',
+    borderTopColor: 'color-mix(in oklch, var(--flex-on-band) 22%, transparent)',
     gridTemplateColumns: {
       default: 'minmax(0, 1fr)',
       '@media (min-width: 900px)': 'minmax(0, 3fr) minmax(0, 9fr)',
@@ -28,19 +44,24 @@ const styles = stylex.create({
   },
   links: {display: 'flex', flexWrap: 'wrap', columnGap: 24, rowGap: 8},
   nowrap: {whiteSpace: 'nowrap'},
+  lead: {
+    maxWidth: '22ch',
+    fontSize: 'clamp(24px, 1.4vw + 16px, 36px)',
+    lineHeight: 1.15,
+    fontWeight: 700,
+    letterSpacing: '-0.02em',
+  },
 });
 
 export function SiteFooter() {
   return (
-    <PageSection variant="section" paddingBlock={8}>
-      <footer>
+    <footer {...stylex.props(styles.foot, bandStyles.onBand)}>
+      <BrandStripes ends={['100%', '64%', '38%']} />
+      <div {...stylex.props(styles.inner)}>
         <VStack gap={8}>
-          <VStack gap={2}>
-            <Text size="3xl" weight="bold">
-              Flexstad
-            </Text>
-            <Text color="secondary">{HOME_COPY.footerLine}</Text>
-          </VStack>
+          <Text type="large" xstyle={styles.lead}>
+            {HOME_COPY.footerLine}
+          </Text>
           <div>
             <div {...stylex.props(styles.row)}>
               <Heading level={3}>Voor wie</Heading>
@@ -97,7 +118,10 @@ export function SiteFooter() {
             </Text>
           </VStack>
         </VStack>
-      </footer>
-    </PageSection>
+        <div {...stylex.props(styles.giant)}>
+          <BrandMark width="100%" />
+        </div>
+      </div>
+    </footer>
   );
 }

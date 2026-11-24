@@ -18,6 +18,7 @@ import {
 import {useIsNarrow} from '../hooks';
 import {usePath} from '../router';
 import {NAV_ABOUT, NAV_FOR_WHO} from '../content';
+import {BrandMark} from './BrandMark';
 
 const styles = stylex.create({
   // Three-part bar on the content column: the wordmark starts where the page
@@ -30,6 +31,20 @@ const styles = stylex.create({
     paddingInline: 0,
   },
   wordmark: {paddingInlineStart: 0},
+  // The bar stays with the reader: paper, a little see-through, over a blur,
+  // with one hairline under it once the page moves beneath.
+  sticky: {
+    position: 'sticky',
+    top: 0,
+    zIndex: 20,
+    backgroundColor:
+      'color-mix(in oklch, var(--color-background-body) 88%, transparent)',
+    backdropFilter: 'saturate(1.4) blur(14px)',
+    borderBottomWidth: 1,
+    borderBottomStyle: 'solid',
+    borderBottomColor: 'var(--color-border)',
+  },
+  phoneLogo: {display: 'flex', alignItems: 'center', minHeight: 44},
 });
 
 function PortalIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -55,7 +70,8 @@ function DesktopHeader() {
       xstyle={styles.bar}
       heading={
         <TopNavHeading
-          heading="Flexstad"
+          logo={<BrandMark width={136} />}
+          logoLabel="Flexstad, naar de homepage"
           headingHref="/"
           xstyle={styles.wordmark}
         />
@@ -117,10 +133,8 @@ function PhoneHeader() {
         paddingInline={4}
         paddingBlock={2}
         gap={2}>
-        <Link href="/" hasUnderline={false}>
-          <Text type="large" weight="bold">
-            Flexstad
-          </Text>
+        <Link href="/" hasUnderline={false} xstyle={styles.phoneLogo}>
+          <BrandMark width={112} />
         </Link>
         <HStack gap={2} align="center">
           <Button label="Inschrijven" variant="primary" href="/inschrijven/" />
@@ -137,11 +151,7 @@ function PhoneHeader() {
         onOpenChange={setIsOpen}
         label="Menu"
         side="end"
-        header={
-          <Text type="large" weight="bold">
-            Flexstad
-          </Text>
-        }>
+        header={<BrandMark width={112} />}>
         <VStack
           gap={5}
           padding={4}
@@ -164,5 +174,9 @@ function PhoneHeader() {
 
 export function SiteHeader() {
   const isNarrow = useIsNarrow(900);
-  return isNarrow ? <PhoneHeader /> : <DesktopHeader />;
+  return (
+    <header {...stylex.props(styles.sticky)}>
+      {isNarrow ? <PhoneHeader /> : <DesktopHeader />}
+    </header>
+  );
 }
