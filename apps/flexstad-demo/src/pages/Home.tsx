@@ -29,7 +29,7 @@ const styles = stylex.create({
   // The band continues under the block: the figure, the statement, the reasons.
   band: {
     backgroundColor: 'var(--color-background-body)',
-    paddingBlock: 'clamp(56px, 8vw, 128px)',
+    paddingBlock: 'clamp(48px, 6vw, 96px)',
     paddingInline: 16,
   },
   bandInner: {maxWidth: 1200, marginInline: 'auto'},
@@ -68,7 +68,7 @@ const styles = stylex.create({
   },
   story: {maxWidth: '52ch'},
   reasonsHead: {
-    marginTop: 'clamp(64px, 8vw, 120px)',
+    marginTop: 'clamp(48px, 6vw, 88px)',
     paddingTop: 24,
     borderTopWidth: 1,
     borderTopStyle: 'solid',
@@ -153,11 +153,15 @@ const styles = stylex.create({
     color: 'var(--color-text-primary)',
     textDecoration: 'none',
     gridTemplateColumns: {
-      default: 'minmax(0, 1fr) 96px',
+      default: 'minmax(0, 1fr)',
+      '@media (min-width: 640px)': 'minmax(0, 1fr) 96px',
       [WIDE]: 'minmax(0, 6fr) minmax(0, 4fr) 192px',
     },
+    // Phones: the arched photograph above the title, then the line, so a
+    // long title keeps the full width.
     gridTemplateAreas: {
-      default: '"title pic" "line pic"',
+      default: '"pic" "title" "line"',
+      '@media (min-width: 640px)': '"title pic" "line pic"',
       [WIDE]: '"title line pic"',
     },
     backgroundColor: {
@@ -205,7 +209,7 @@ const styles = stylex.create({
   rowPic: {
     gridArea: 'pic',
     position: 'relative',
-    width: '100%',
+    width: {default: '40%', '@media (min-width: 640px)': '100%'},
     aspectRatio: '4 / 5',
     alignSelf: 'center',
     transitionProperty: 'transform',
