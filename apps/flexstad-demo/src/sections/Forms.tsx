@@ -57,7 +57,7 @@ export function NotConnectedNotice() {
 export function SentNotice() {
   return (
     <Banner status="success" title="Bedankt!" collapsible={false}>
-      Bedankt! We hebben je aanvraag ontvangen.
+      Bedankt! We hebben uw aanvraag ontvangen.
     </Banner>
   );
 }
@@ -238,7 +238,7 @@ function FormShell({
 /** An e-mail field's message: empty, or no "@" in it. */
 export function emailError(value: string): FieldError {
   if (value.trim() === '') {
-    return 'Vul je e-mailadres in.';
+    return 'Vul uw e-mailadres in.';
   }
   return value.includes('@') ? undefined : 'Vul een geldig e-mailadres in.';
 }
@@ -265,12 +265,12 @@ export function SignupForm() {
   const empty = (value: string, message: string): FieldError =>
     value.trim() === '' ? message : undefined;
   const errors = {
-    first: empty(first, 'Vul je voornaam in.'),
-    last: empty(last, 'Vul je achternaam in.'),
+    first: empty(first, 'Vul uw voornaam in.'),
+    last: empty(last, 'Vul uw achternaam in.'),
     email: emailError(email),
-    phone: empty(phone, 'Vul je telefoonnummer in.'),
+    phone: empty(phone, 'Vul uw telefoonnummer in.'),
     start: start ? undefined : 'Kies een optie bij Gewenste startdatum.',
-    region: empty(region, 'Vul je gewenste regio of plaats in.'),
+    region: empty(region, 'Vul uw gewenste regio of plaats in.'),
     seeks: seeks ? undefined : 'Kies een optie bij Ik zoek.',
     budget: budget ? undefined : 'Kies een optie bij Budget (per maand).',
     who: who ? undefined : 'Kies een optie bij Ik ben.',
@@ -278,8 +278,8 @@ export function SignupForm() {
       isParticulier && !persons
         ? 'Kies een optie bij Aantal personen.'
         : undefined,
-    company: isBusiness ? empty(company, 'Vul je bedrijfsnaam in.') : undefined,
-    sector: isBusiness ? empty(sector, 'Vul je branche in.') : undefined,
+    company: isBusiness ? empty(company, 'Vul uw bedrijfsnaam in.') : undefined,
+    sector: isBusiness ? empty(sector, 'Vul uw branche in.') : undefined,
     staff: isBusiness
       ? empty(staff, 'Vul het aantal medewerkers in.')
       : undefined,
@@ -458,9 +458,9 @@ export function ContactForm() {
   const [subject, setSubject] = useState(about?.subject ?? '');
   const [message, setMessage] = useState(about?.message ?? '');
   const errors = {
-    name: name.trim() === '' ? 'Vul je naam in.' : undefined,
+    name: name.trim() === '' ? 'Vul uw naam in.' : undefined,
     email: emailError(email),
-    message: message.trim() === '' ? 'Vul je bericht in.' : undefined,
+    message: message.trim() === '' ? 'Vul uw bericht in.' : undefined,
   };
   const form = useFormSubmit(
     Object.values(errors).some(Boolean),
@@ -530,7 +530,7 @@ export function ContactForm() {
 }
 
 /**
- * "Je vraagt naar: …" above the contact form, with a link back to where the
+ * "U vraagt naar: …" above the contact form, with a link back to where the
  * visitor chose. The item goes in as text, never as markup.
  */
 const enquiryStyles = stylex.create({
@@ -542,7 +542,7 @@ function EnquiryBanner({text, href}: {text: string; href: string}) {
   return (
     <Banner
       status="info"
-      title="Je vraagt naar"
+      title="U vraagt naar"
       description={text}
       endContent={
         <Link href={href} xstyle={enquiryStyles.change}>

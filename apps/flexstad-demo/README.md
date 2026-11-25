@@ -76,10 +76,10 @@ trek het dan in en maak een nieuw. Het endpoint accepteert alleen POST vanaf de 
 site, beperkt de grootte en het aantal verzoeken per IP, en een verborgen veld plus een
 minimale invultijd houden bots tegen.
 
-## Contactformulier: "Je vraagt naar" en Formspree
+## Contactformulier: "U vraagt naar" en Formspree
 
 Een link naar de contactpagina kan zeggen waar de vraag over gaat:
-`/contact/?about=de-molen`. De contactpagina toont dan "Je vraagt naar: De Molen,
+`/contact/?about=de-molen`. De contactpagina toont dan "U vraagt naar: De Molen,
 Houten (vanaf €250 p/m)", vult het onderwerp en de eerste zin van het bericht in, en
 stuurt de sleutel mee naar Asana en Formspree. Een onbekende sleutel, of geen
 sleutel, verandert niets.

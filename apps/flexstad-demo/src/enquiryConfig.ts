@@ -4,7 +4,7 @@
  * ENQUIRY CONTEXT: the one file to edit (from the enquiry-context plugin 1.0.0).
  *
  * A link to the contact page can carry a key:  /contact/?about=de-molen
- * The contact page then shows "Je vraagt naar: De Molen, Houten (vanaf €250 p/m)",
+ * The contact page then shows "U vraagt naar: De Molen, Houten (vanaf €250 p/m)",
  * fills the subject and the first sentence of the message, and sends the key
  * along with the form. An unknown key, or no key, changes nothing.
  *
