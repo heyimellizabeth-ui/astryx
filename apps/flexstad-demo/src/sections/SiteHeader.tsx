@@ -90,6 +90,11 @@ function DesktopHeader() {
       endContent={
         <>
           <TopNavItem
+            label="Reparatie melden"
+            href="/reparatie-melden/"
+            isSelected={path === '/reparatie-melden/'}
+          />
+          <TopNavItem
             label="Contact"
             href="/contact/"
             isSelected={path === '/contact/'}
@@ -170,6 +175,7 @@ function PhoneHeader() {
           <Link href="/aanbod/">Aanbod</Link>
           <NavGroup title="Voor wie" links={NAV_FOR_WHO} />
           <NavGroup title="Flexstad" links={NAV_ABOUT} />
+          <Link href="/reparatie-melden/">Reparatie melden</Link>
           <Link href="/contact/">Contact</Link>
           <Link href="/mijnflexstad/">Mijn Flexstad</Link>
         </VStack>

@@ -11,6 +11,9 @@ return [
         'contact' => '1220866334231980',      // Contactverzoeken
         'inschrijving' => '1220866331650207', // Inschrijvingen
         'aanmelding' => '1220869466400434',   // Nieuwsbriefaanmeldingen
+        // Create a section "Reparatiemeldingen" in the same project and paste its GID here.
+        // Without it, repair tasks still land in the project, just not in a section.
+        'reparatie' => 'PASTE_SECTION_GID',
     ],
     // Exact origins (scheme + host) the site is served from.
     'allowed_origins' => ['https://www.example.nl', 'https://example.nl'],

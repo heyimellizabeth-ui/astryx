@@ -96,6 +96,9 @@ export function SiteFooter() {
                   <Link href="/inschrijven/">Inschrijven</Link>
                 </span>
                 <span {...stylex.props(styles.nowrap)}>
+                  <Link href="/reparatie-melden/">Reparatie melden</Link>
+                </span>
+                <span {...stylex.props(styles.nowrap)}>
                   <Link href="/privacy/">Privacy en cookies</Link>
                 </span>
                 {isAnalyticsEnabled ? (

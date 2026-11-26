@@ -1,7 +1,8 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 /** Which site form a request comes from; each maps to one Asana section. */
-export type FormKind = 'interesse' | 'contact' | 'inschrijving' | 'aanmelding';
+export type FormKind =
+  'interesse' | 'contact' | 'inschrijving' | 'aanmelding' | 'reparatie';
 
 export type SendResult = 'sent' | 'error' | 'not-connected';
 
@@ -34,6 +35,72 @@ export async function sendToAsana(
     return response.ok ? 'sent' : 'error';
   } catch {
     return 'error';
+  }
+}
+
+/** What a repair report came back with. */
+export type RepairResult =
+  | {
+      status: 'sent';
+      /** The code the tenant can quote; empty when the endpoint gave none. */
+      reference: string;
+      photos: number;
+      /** Photos that did not reach Asana (the report itself did). */
+      photosFailed: number;
+    }
+  | {status: 'error'; message?: string}
+  | {status: 'not-connected'};
+
+/**
+ * Posts a repair report with its photos. Unlike the other forms this is
+ * multipart, because the photos are files. The browser sets the content type
+ * (with its boundary), so none is given here.
+ */
+export async function sendRepair(
+  fields: Record<string, string>,
+  photos: ReadonlyArray<File>,
+  meta: {startedAt: number; website: string},
+): Promise<RepairResult> {
+  const body = new FormData();
+  body.append('kind', 'reparatie');
+  body.append('startedAt', String(meta.startedAt));
+  body.append('website', meta.website);
+  body.append('page', window.location.pathname);
+  for (const [key, value] of Object.entries(fields)) {
+    body.append(`fields[${key}]`, value);
+  }
+  for (const photo of photos) {
+    body.append('photos[]', photo, photo.name);
+  }
+  try {
+    const response = await fetch(ENDPOINT, {method: 'POST', body});
+    if (response.status === 503 || response.status === 404) {
+      return {status: 'not-connected'};
+    }
+    const data: unknown = await response.json().catch(() => null);
+    const record =
+      data !== null && typeof data === 'object'
+        ? (data as Record<string, unknown>)
+        : {};
+    if (!response.ok) {
+      // The endpoint's own message is shown only for a request the tenant can
+      // fix (too big, wrong file type); anything else stays generic.
+      const message =
+        (response.status === 413 || response.status === 422) &&
+        typeof record.error === 'string'
+          ? record.error
+          : undefined;
+      return {status: 'error', message};
+    }
+    return {
+      status: 'sent',
+      reference: typeof record.reference === 'string' ? record.reference : '',
+      photos: typeof record.photos === 'number' ? record.photos : photos.length,
+      photosFailed:
+        typeof record.photosFailed === 'number' ? record.photosFailed : 0,
+    };
+  } catch {
+    return {status: 'error'};
   }
 }
 

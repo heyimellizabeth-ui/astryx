@@ -60,6 +60,9 @@ const Vacatures = lazy(() =>
 const Dienst = lazy(() =>
   import('./pages/Simple').then(m => ({default: m.Dienst})),
 );
+const Reparatie = lazy(() =>
+  import('./pages/Reparatie').then(m => ({default: m.Reparatie})),
+);
 const Privacy = lazy(() =>
   import('./pages/Privacy').then(m => ({default: m.Privacy})),
 );
@@ -78,6 +81,7 @@ const TITLES: Record<string, string> = {
   '/mijnflexstad/overzicht/': 'MijnFlexstad',
   '/vacatures/': 'Vacatures',
   '/privacy/': 'Privacy en cookies',
+  '/reparatie-melden/': 'Reparatie melden',
 };
 
 /** The document title for a path: the page's own name, then Flexstad. */
@@ -144,6 +148,8 @@ function Routes() {
       return <Vacatures />;
     case '/privacy/':
       return <Privacy />;
+    case '/reparatie-melden/':
+      return <Reparatie />;
     default:
       return <NotFound />;
   }
