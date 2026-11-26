@@ -11,15 +11,16 @@ entrepreneurs and makers looking for affordable temporary space (ondernemers), m
 ## Folders
 
 - `flexstad-site 2/`: the live site. Edit and deploy only this one.
-- `flexstad-site/` (no number): old. Do not edit or deploy it.
+- `_archive/flexstad-site-old-2026-11-24/`: the old build, archived. Do not edit or deploy it.
 - Source code: repo `heyimellizabeth-ui/astryx`, app `apps/flexstad-demo` (React, Vite, Astryx).
   Branch `claude/magical-goodall-5g7oju`. Build with `pnpm -F @astryxdesign/flexstad-demo build`; the output is `dist/`.
-- Design rules live in one place only: `apps/flexstad-demo/design.md`. Merge anything new from
-  `design-system/DESIGN.md` and `design-tokens.json` into it, then stop using those copies.
+- Design rules live in one place only: `apps/flexstad-demo/design.md`. Everything useful from the old
+  `design-system/` files (colour rules, contrast, dark mode, scales, audit outcome) was merged into it on
+  2026-11-26. Use design.md only.
 
 ## Key decisions and why
 
-- **Brand from the real logo:** aubergine #421F54, orange #F6522A, Geologica only. They are Flexstad's own.
+- **Brand from the real logo:** aubergine #421F54, orange #f75027 (the logo file's own #F6522A is the same colour), Geologica only. They are Flexstad's own.
 - **Only Flexstad's own photos** (`public/photos/flexstad/`, WebP in 640, 1024 and full sizes). Mood images
   keep "Sfeerimpressie" in their alt text, so a furnished impression is never shown as delivered.
 - **Listings come straight after the hero**, because viewing listings is the page's job.
@@ -63,9 +64,12 @@ entrepreneurs and makers looking for affordable temporary space (ondernemers), m
 7. **Listing hub:** publish to the portals automatically where they allow it. First research per portal:
    Kamernet, Pararius, Funda (incl. in Business), Huurwoningen, Marktplaats, Meta.
 8. **Formspree:** paste the endpoint into `FORMSPREE_ENDPOINT` in `src/enquiryConfig.ts`, rebuild, deploy.
-9. **Ads:** cookie banner with Consent Mode v2, GA4 and conversions first; then Google and Meta campaigns.
+   Blocked on the endpoint ID. When it is on, add Formspree to the privacy page's list of recipients.
+9. **Ads:** the cookie banner, Consent Mode v2, GA4 page views and the `generate_lead` conversion are built
+   (`src/analytics.ts`, `sections/ConsentBanner.tsx`) and switched off until the GA4 id is pasted into
+   `GA_MEASUREMENT_ID`. Still to do: that id, a client review of `/privacy/`, then the Google and Meta campaigns.
 10. **Ask the client** whether their own "je" copy should become "u": "Schrijf je nu in!", "Jouw gegevens",
     "jouw onderneming" on /aanbod/.
-11. **Redesign `/voor-wie/`** to match the home page's Voor wie rows: photos, equal weight per audience.
+11. ~~**Redesign `/voor-wie/`**~~ Done: it uses the home page's rows through `sections/AudienceIndexList.tsx`.
 12. **Ask Flexstad** for a sharper photo of the Roemer Visscherstraat facade (the current one is 1086px wide).
-13. **Merge** heyimellizabeth-ui/astryx#3, then #5.
+13. ~~**Merge** heyimellizabeth-ui/astryx#3, then #5.~~ Done 2026-11-26 (merge commits `b8d2dee`, `6eff7cf`).
