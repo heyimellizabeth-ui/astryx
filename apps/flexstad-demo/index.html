@@ -1,0 +1,41 @@
+<!-- Copyright (c) Meta Platforms, Inc. and affiliates. -->
+
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Flexstad | Leegstaand vastgoed? Wij activeren, beheren en exploiteren
+    </title>
+    <meta
+      name="description"
+      content="Flexstad houdt leegstaand vastgoed actief, veilig en van waarde. Bekijk het actuele aanbod van tijdelijke, flexibele en betaalbare ruimtes." />
+    <!-- Geologica from Google Fonts, connected early instead of through a CSS @import chain. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Geologica:wght@400;500;600;700&display=swap" />
+    <!-- The home hero photograph is the LCP: let the browser fetch it before the app runs, on / only. -->
+    <script>
+      if (location.pathname === '/') {
+        var hero = document.createElement('link');
+        hero.rel = 'preload';
+        hero.as = 'image';
+        hero.href = '/photos/flexstad/home-maker-atelier.webp';
+        hero.setAttribute(
+          'imagesrcset',
+          '/photos/flexstad/home-maker-atelier-640.webp 640w, /photos/flexstad/home-maker-atelier-1024.webp 1024w, /photos/flexstad/home-maker-atelier.webp 2560w',
+        );
+        hero.setAttribute('imagesizes', '100vw');
+        hero.setAttribute('fetchpriority', 'high');
+        document.head.appendChild(hero);
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

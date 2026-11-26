@@ -1,0 +1,75 @@
+// Copyright (c) Meta Platforms, Inc. and affiliates.
+
+import * as stylex from '@stylexjs/stylex';
+import type {ReactNode} from 'react';
+import {Section} from '@astryxdesign/core/Section';
+import {bandStyles, orangeStyles} from './bandStyles';
+
+const styles = stylex.create({
+  centered: {
+    marginInlineStart: 'auto',
+    marginInlineEnd: 'auto',
+    width: '100%',
+  },
+  // One vertical rhythm for every seam. The aubergine and orange bands make
+  // every seam visible, so each side carries at least 72px at desktop.
+  rhythm: {paddingBlock: 'clamp(24px, 3.4vw, 48px)'},
+  wash: {backgroundColor: 'var(--color-background-body)'},
+  band: {backgroundColor: 'var(--flex-band)'},
+  muted: {backgroundColor: 'var(--color-background-muted)'},
+});
+
+interface PageSectionProps {
+  id?: string;
+  variant?: 'section' | 'transparent' | 'muted';
+  /** Paints the theme's page wash (lavender) behind the band. */
+  isWashed?: boolean;
+  /** Paints the dark aubergine band and flips text tokens to light. */
+  isBand?: boolean;
+  /** Paints the logo orange with deep aubergine ink (the closing band). */
+  isOrange?: boolean;
+  paddingBlock?: 6 | 8 | 10;
+  maxWidth?: number;
+  /** Keeps the content to a reading measure, left-aligned on the column edge. */
+  measure?: number;
+  children: ReactNode;
+}
+
+/** A full-width band whose content stays inside a centred column. */
+export function PageSection({
+  id,
+  variant = 'transparent',
+  isWashed = false,
+  isBand = false,
+  isOrange = false,
+  paddingBlock = 6,
+  maxWidth = 1200,
+  measure,
+  children,
+}: PageSectionProps) {
+  return (
+    <Section
+      variant={variant}
+      padding={0}
+      paddingBlock={paddingBlock}
+      paddingInline={4}
+      xstyle={
+        isOrange
+          ? orangeStyles.onOrange
+          : isBand
+            ? [styles.band, bandStyles.onBand]
+            : isWashed
+              ? styles.wash
+              : variant === 'muted'
+                ? styles.muted
+                : undefined
+      }>
+      <div
+        id={id}
+        {...stylex.props(styles.centered, styles.rhythm)}
+        style={{maxWidth}}>
+        {measure ? <div style={{maxWidth: measure}}>{children}</div> : children}
+      </div>
+    </Section>
+  );
+}

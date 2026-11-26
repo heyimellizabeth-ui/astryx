@@ -1,0 +1,223 @@
+/* Hallmark · shape: Manifesto · job: join (Aanmelden subscribes; Inschrijven and Contact sign up after viewing the listings) · genre: editorial (inferred) · theme: brand, rebuilt on the logo (#421F54 aubergine, #F6522A orange, the slanted bars) · redesign: full · paper: oklch(0.975 0.006 25) · accent: oklch(0.66 0.21 34.6) · display: Geologica · body: Geologica · hero: Rise (/ and /aanbod/<slug>/, the building's own photograph under an aubergine block with its name, facts and Ik heb interesse!), aubergine Banner with an arched photograph beside the head (/vastgoedeigenaren/, /ondernemers/, /ontwikkelaars/), aubergine Banner (every other inner route, /contact/, /inschrijven/, /abonneren/ and /mijnflexstad/ over their form columns), a quiet head with the Demo badge over cards (/mijnflexstad/overzicht/), aubergine Banner holding the street, address, facts and Ik heb interesse! (/aanbod/<slug>/) · nav: three-part, sticky on translucent paper, the real wordmark at the content edge · footer: aubergine ground, the logo's stripe across its top, hairline rows of links, the wordmark set the width of the column · signature: an aubergine block rising out of the band into Flexstad's own photograph of a maker at work, carrying the client's headline; the band runs on underneath with 2.000+ set as the largest thing on the page
+ * sections: Rise hero · Actueel aanbod as a bento on the aubergine band (the lead listing tall on seven columns, two beside it, names and facts on solid plates) · 2.000+ on paper in ink with an orange plus, the statement, the reasons each marked with one bar of the logo · Voor wie as an index of four full-width rows with arched windows · Van leegstand naar meerwaarde beside the Linnaeusstraat shop before and after, wiped with the Astryx Slider · FAQ as three ruled lists · Interesse? on the logo orange, set huge · footer
+ * axes: light/geometric-sans/warm · posture: Rise · contrast: pass · fold: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P pass · H pass · E pass · S pass · R pass · V pass · weakest: some listing photographs are furnished impressions (the live site's own "sfeerimpressie"), named as such in their alt text; the client should confirm which rooms are delivered empty */
+/* Hallmark · dropped hero-amsterdam-canal-dusk.jpg, owners-brick-entrance-blue-doors.jpg, makers-attic-studio-arched-window.jpg, about-brick-windowsill-daylight.jpg, street-quiet-street-blue-hour.jpg, developers-timber-shell-interior.jpg · the owner asked for Flexstad's own photographs from flexstad.com in place of the library stand-ins */
+/* Hallmark · dismissed 28a · the flagged images (the before and after on /, the listing card covers) sit below the first screen and are never the LCP; the LCP is the hero photograph and the first gallery tile, both fetchpriority high and eager */
+/* Hallmark · waive 39b · the 150 to 220px buttons on /aanbod/<slug>/ are the gallery photographs · each tile is a photograph that opens the Lightbox, sized by the mosaic and not a control in a row, with the shared focus ring and hover */
+/* Hallmark · waive 85 · "Aanmelden" is the page that subscribes, so its one e-mail field with the "Aanmelden" button is the page's own job · the stamp names job: join, which a URL run cannot read */
+/* Hallmark · waive 77 · "Aanmelden" holds one e-mail field on a raised sheet, a single-action page whose whole body is that action · a longer page would need copy the client has not given */
+/* Hallmark · dismissed 77 · the form and short pages (Contact, Inschrijven, Aanbod, Vacatures, Dienst, the audience pages) hold three to five sections because each has one subject: its form, its list or its text · "Interesse?" closes them */
+/* Hallmark · answered F19 · Geologica at 400 for text, 500 for buttons and questions, 600 for badges and 700 for heads · the four weights are one family, and each role keeps its own */
+/* Hallmark · waive 44c · inner pages open with a Banner hero (trail, head and one action across the content column, about 300 to 460px tall; on the owners, entrepreneurs and developers pages a photograph stands beside the head, about 600px tall, with the head and its action inside the first screen); on the aanbod detail pages the head holds the street, address, facts and Ik heb interesse!, about 520 to 580px tall, and the small Foto's volgen strip sits below the facts · the stamp's hero field names the posture per route and the built stylesheet strips the stamp, so a URL run cannot read it and reports the posture as unset */
+/* Copyright (c) Meta Platforms, Inc. and affiliates. */
+
+/* Geologica loads from index.html (preconnect and stylesheet link). */
+
+/* Placeholder to ensure Vite emits a CSS asset for StyleX aggregation. */
+:root {
+  --stylex-injection: 0;
+}
+
+/* Dark aubergine band used by the closing call-to-action only. It is also the one overlay rule for text on a photograph: the words sit on
+   a solid plate of this band (never on a gradient scrim or the bare image), so
+   their contrast is a plain colour pair, the same over every pixel and in both
+   colour modes. The photograph itself never carries text in the hero. */
+:root {
+  --flex-band: oklch(0.314 0.097 312.6);
+  --flex-band-deep: oklch(0.24 0.08 312);
+  --flex-on-band: oklch(0.97 0.01 300);
+  --flex-on-band-muted: oklch(0.85 0.03 300);
+  /* The logo's orange (#F6522A): the stripe, the bars and the figure. */
+  --flex-orange: oklch(0.66 0.21 34.6);
+  /* Ink on the orange band: deep aubergine, 4.6:1 on the logo orange. */
+  --flex-on-orange: oklch(0.2 0.07 312);
+  /* The stripe: three rows, each as tall as the logo's bars are wide. */
+  --flex-stripe: 12px;
+  --flex-stripe-gap: 6px;
+  /* The arched window: Amsterdam's gables, and the attic studio's own. */
+  --flex-arch: 999px 999px var(--radius-container) var(--radius-container);
+  --flex-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --flex-band: oklch(0.2 0.06 310);
+    --flex-band-deep: oklch(0.14 0.04 310);
+  }
+}
+
+html,
+body {
+  overflow-x: clip;
+}
+
+/* Display heads: Geologica set tight, the way the wordmark is set. */
+h1,
+h2 {
+  letter-spacing: -0.028em;
+}
+
+/* Long Dutch compounds must wrap instead of widening the page on phones. */
+h1,
+h2,
+h3 {
+  min-width: 0;
+  overflow-wrap: break-word;
+  hyphens: manual;
+  text-wrap: balance;
+}
+
+/* Astryx draws its own focus ring inside its components; links get the same
+   tokens so a bare anchor is never left without one. */
+a:focus-visible {
+  outline: var(--focus-outline-width) var(--focus-outline-style)
+    var(--focus-outline-color);
+  outline-offset: var(--focus-outline-offset);
+}
+
+/* Scroll reveal, dial 4. Only where the browser supports view timelines and
+   the visitor has not asked for less motion; otherwise nothing animates and
+   every element sits at full opacity. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes flex-reveal {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* Job: sequence. Audience tiles and listing cards arrive one after the
+       other as the page is read, instead of all being there at once. */
+    [data-reveal] {
+      animation: flex-reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 45%;
+    }
+
+    /* Job: hierarchy. The homepage carousel is one object, so it reveals as
+       a whole; its cards sit in a horizontal scroller that has no vertical
+       view progress of their own. */
+    [data-reveal='block'] {
+      animation-range: entry 0% entry 35%;
+    }
+  }
+}
+
+/* Pressed and disabled states for the bare links and native controls that
+   sit outside the Astryx components. */
+a:active {
+  opacity: 0.8;
+}
+
+:disabled {
+  cursor: not-allowed;
+}
+
+/*
+ * Disabled buttons (gate 39a): besides the lower opacity, a muted colour pair
+ * and a not-allowed cursor, so a form's submit never signals "off" by opacity
+ * alone. Astryx marks the state with aria-disabled, which keeps it focusable.
+ */
+.astryx-button[aria-disabled='true'] {
+  background-color: var(--color-background-muted);
+  color: var(--color-text-secondary);
+  cursor: not-allowed;
+}
+
+/* The native control fills its 48px field: the field keeps no block padding
+   of its own, so the bare input, date input and selector button measure as
+   tall as the field they sit in (gate 39b reads the inner control). */
+.astryx-text-input,
+.astryx-date-input,
+.astryx-selector {
+  padding-block: 0;
+}
+
+.astryx-text-input > input,
+.astryx-date-input input {
+  align-self: stretch;
+  height: auto;
+}
+
+.astryx-selector > button {
+  align-self: stretch;
+  align-items: center;
+  height: auto;
+}
+
+/* Badges are set at 600 (the stamp's weight for badges), a step under heads. */
+.astryx-badge {
+  font-weight: var(--font-weight-semibold);
+}
+
+/* FAQ triggers stand as tall as the other controls (44px or more). */
+.astryx-collapsible-trigger {
+  min-height: 48px;
+}
+
+/* The audience index on `/` (each row an Astryx ClickableCard): hovering or
+   focusing a row brings in one bar of
+   the logo, moves the title along by the bar's length and lifts the arched
+   window. Static under reduced motion (only the bar's opacity changes). */
+.flex-index-row:hover .flex-index-bar,
+.astryx-clickable-card:is(:focus-visible, :has(:focus-visible))
+  .flex-index-bar {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .flex-index-row:hover .flex-index-pic,
+  .astryx-clickable-card:is(:focus-visible, :has(:focus-visible))
+    .flex-index-pic {
+    transform: translateY(-6px) rotate(-2deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flex-index-bar {
+    transform: none !important;
+    transition-property: opacity !important;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) and (min-width: 900px) {
+  .flex-index-row:hover .flex-index-title,
+  .astryx-clickable-card:is(:focus-visible, :has(:focus-visible))
+    .flex-index-title {
+    transform: translateX(48px);
+  }
+}
+
+/* Listing cards: the building's photograph zooms a little on hover. */
+@media (prefers-reduced-motion: no-preference) {
+  .astryx-clickable-card:hover .flex-cover {
+    transform: scale(1.04);
+  }
+}
+
+/* Skip link: hidden until focused, then it sits at the top left on the
+   paper, above the sticky bar. */
+.flex-skip {
+  position: absolute;
+  left: 16px;
+  top: 8px;
+  z-index: 30;
+  padding: 12px 16px;
+  border-radius: var(--radius-inner);
+  background-color: var(--color-background-surface);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+  transform: translateY(-200%);
+}
+
+.flex-skip:focus-visible {
+  transform: none;
+}
