@@ -18,6 +18,7 @@ import {Selector} from '@astryxdesign/core/Selector';
 import {TextArea} from '@astryxdesign/core/TextArea';
 import {TextInput} from '@astryxdesign/core/TextInput';
 import {CONTACT, SIGNUP} from '../content';
+import {trackEvent} from '../analytics';
 import {FORMSPREE_ENDPOINT} from '../enquiryConfig';
 import {useEnquiryContext} from './enquiryContext';
 import {
@@ -173,9 +174,14 @@ export function useFormSubmit(
       kind === 'contact' && FORMSPREE_ENDPOINT !== ''
         ? sendToFormspree(FORMSPREE_ENDPOINT, fields, website)
         : null;
-    void Promise.all([toAsana, toFormspree]).then(([asana, formspree]) =>
-      setState(formspree === 'sent' ? 'sent' : asana),
-    );
+    void Promise.all([toAsana, toFormspree]).then(([asana, formspree]) => {
+      const result = formspree === 'sent' ? 'sent' : asana;
+      if (result === 'sent') {
+        // A conversion, counted only when the visitor accepted analytics.
+        trackEvent('generate_lead', {form_kind: kind});
+      }
+      setState(result);
+    });
   }
 
   // The messages land on the render after the press, so focus moves here.

@@ -6,12 +6,17 @@ import {InternationalizationProvider} from '@astryxdesign/core/i18n';
 import nlNL from '@astryxdesign/core/locales/nl-NL.generated.js';
 import {Theme} from '@astryxdesign/core/theme';
 import {flexstadTheme} from './flexstadTheme';
+import {initAnalytics, trackPageView} from './analytics';
 import {AUDIENCE_PAGES, LISTINGS} from './content';
 import {Home} from './pages/Home';
 import {NotFound} from './pages/NotFound';
 import {RouterProvider, usePath} from './router';
+import {ConsentBanner} from './sections/ConsentBanner';
 import {SiteFooter} from './sections/SiteFooter';
 import {SiteHeader} from './sections/SiteHeader';
+
+// A visitor who accepted analytics on an earlier visit gets the tag again.
+initAnalytics();
 
 const styles = stylex.create({
   page: {
@@ -55,6 +60,9 @@ const Vacatures = lazy(() =>
 const Dienst = lazy(() =>
   import('./pages/Simple').then(m => ({default: m.Dienst})),
 );
+const Privacy = lazy(() =>
+  import('./pages/Privacy').then(m => ({default: m.Privacy})),
+);
 const PortalShell = lazy(() =>
   import('./portal/PortalShell').then(m => ({default: m.PortalShell})),
 );
@@ -69,6 +77,7 @@ const TITLES: Record<string, string> = {
   '/mijnflexstad/': 'MijnFlexstad',
   '/mijnflexstad/overzicht/': 'MijnFlexstad',
   '/vacatures/': 'Vacatures',
+  '/privacy/': 'Privacy en cookies',
 };
 
 /** The document title for a path: the page's own name, then Flexstad. */
@@ -101,6 +110,7 @@ function Routes() {
   const path = usePath();
   useEffect(() => {
     document.title = titleFor(path);
+    trackPageView(path);
   }, [path]);
   const [first, second] = path.split('/').filter(Boolean);
   if (!first) {
@@ -132,6 +142,8 @@ function Routes() {
       return <PortalShell />;
     case '/vacatures/':
       return <Vacatures />;
+    case '/privacy/':
+      return <Privacy />;
     default:
       return <NotFound />;
   }
@@ -153,6 +165,7 @@ export default function App() {
               </Suspense>
             </main>
             <SiteFooter />
+            <ConsentBanner />
           </div>
         </RouterProvider>
       </Theme>

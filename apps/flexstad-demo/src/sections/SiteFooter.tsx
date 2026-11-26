@@ -1,11 +1,13 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 import * as stylex from '@stylexjs/stylex';
+import {Button} from '@astryxdesign/core/Button';
 import {Divider} from '@astryxdesign/core/Divider';
 import {Heading} from '@astryxdesign/core/Heading';
 import {Link} from '@astryxdesign/core/Link';
 import {Text} from '@astryxdesign/core/Text';
 import {VStack} from '@astryxdesign/core/Layout';
+import {isAnalyticsEnabled, openConsentSettings} from '../analytics';
 import {CONTACT, HOME_COPY, NAV_ABOUT, NAV_FOR_WHO} from '../content';
 import {PHOTO_CREDITS_LINE} from '../photos';
 import {bandStyles} from './bandStyles';
@@ -93,6 +95,18 @@ export function SiteFooter() {
                 <span {...stylex.props(styles.nowrap)}>
                   <Link href="/inschrijven/">Inschrijven</Link>
                 </span>
+                <span {...stylex.props(styles.nowrap)}>
+                  <Link href="/privacy/">Privacy en cookies</Link>
+                </span>
+                {isAnalyticsEnabled ? (
+                  <span {...stylex.props(styles.nowrap)}>
+                    <Button
+                      label="Cookie-instellingen"
+                      variant="ghost"
+                      onClick={openConsentSettings}
+                    />
+                  </span>
+                ) : null}
               </div>
             </div>
             <div {...stylex.props(styles.row)}>

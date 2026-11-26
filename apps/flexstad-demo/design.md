@@ -4,7 +4,7 @@ The locked system. Every Hallmark run reads this first and pages share it. Chang
 
 ## System
 
-- Genre: editorial (inferred). The brand is the logo itself, read from flexstad.com: aubergine `#421F54`, orange `#F6522A`, and the mark's four slanted bars.
+- Genre: editorial (inferred). The brand is the logo itself, read from flexstad.com: aubergine `#421F54`, orange `#F6522A`, and the mark's four slanted bars. The orange token `oklch(0.66 0.21 34.6)` renders as `#f75027`, one to two steps per channel from the logo file's `#F6522A`: the same colour to the eye, and `#f75027` is the value to use wherever a hex is needed.
 - Shape of the first page: Manifesto, **Rise** posture on `/`: Flexstad's own photograph of a maker at work fills the first screen and an aubergine block rises out of the band below into it, carrying the client's headline. Block and band are one colour. Inner pages open on an aubergine Banner.
 - Theme: brand, from `src/flexstadTheme.ts`; no Hallmark theme dealt.
 - Axes: light/geometric-sans/warm · posture: Rise on `/`, aubergine Banner inside · nav: three-part, sticky on translucent paper, the real wordmark at the content edge.
@@ -40,13 +40,54 @@ The locked system. Every Hallmark run reads this first and pages share it. Chang
   --flex-orange: oklch(
     0.66 0.21 34.6
   ); /* the figure, bars, stripe, closing band */
-  --flex-on-orange: oklch(0.2 0.07 312); /* ink on the orange band, 4.6:1 */
+  --flex-on-orange: oklch(
+    0.2 0.07 312
+  ); /* ink on the orange band, 5.4:1 (measured) */
   --flex-arch: 999px 999px 16px 16px;
   --flex-ease: cubic-bezier(0.16, 1, 0.3, 1);
 }
 ```
 
 Surfaces, in order down `/`: photograph, aubergine (block and band), paper (Voor wie), well (listings), paper (value, FAQ), orange (Interesse?), deep aubergine (footer). Never two orange or two aubergine sections apart from the block and its band. `bandStyles.onBand` flips text, accent-text, border and focus tokens to light on aubergine; `orangeStyles.onOrange` sets deep aubergine ink and turns the primary button aubergine with light text on the orange band.
+
+### Colour rules
+
+1. Orange is a **fill** (buttons, the mark, the stripe, the closing band). For orange **text or icons on paper** use `--color-text-accent` (`#af2e0f`).
+2. Text on an orange fill is deep aubergine ink (`--flex-on-orange`, `#20092c`), never white.
+3. Neutrals lean toward the brand hue: warm pink-white in light mode, aubergine-black in dark. No pure grey.
+4. Semantic colours (success, warning, error, info) and the ten tinted hues are Astryx defaults. Do not restyle them for the brand.
+5. Orange on plain aubergine is for the mark, icons and large type only; small text on a band uses `--flex-on-band`.
+
+### Contrast (computed, WCAG 2.x; the key pairs also read from the rendered site)
+
+| Pair                                            | Ratio           | Result                                      |
+| ----------------------------------------------- | --------------- | ------------------------------------------- |
+| Aubergine ink on paper (`#421f54` on `#fbf5f5`) | 12.5:1          | AAA                                         |
+| Secondary text on paper (`#514958`)             | 8.0:1           | AAA                                         |
+| Ink on orange button (`#20092c` on `#f75027`)   | 5.4:1           | AA                                          |
+| `--color-text-accent` on paper (`#af2e0f`)      | 6.1:1           | AA                                          |
+| `--flex-on-band` / muted on aubergine           | 12.4:1 / 8.5:1  | AAA                                         |
+| Body / secondary text on dark body              | 16.5:1 / 10.2:1 | AAA                                         |
+| Orange on aubergine / on deep aubergine         | 3.9:1 / 4.9:1   | Large text and graphics only / AA           |
+| **White on orange**                             | **3.35:1**      | **Fails: never use**                        |
+| **Orange fill as text on paper**                | **3.18:1**      | **Fails below large size: use text-accent** |
+
+### Dark mode
+
+Every brand token has a dark counterpart; neutrals are tinted, not inverted grey.
+
+| Role                    | Light                                               | Dark                                            |
+| ----------------------- | --------------------------------------------------- | ----------------------------------------------- |
+| Body                    | `#fbf5f5`                                           | `#110e13`                                       |
+| Surface / card          | `#fefcfb`                                           | `#1a171d`                                       |
+| Popover                 | `#fefcfb`                                           | `#1f1b22`                                       |
+| Muted well              | `#f0e9e9`                                           | `#242027`                                       |
+| Text                    | `#421f54`                                           | `#f4ecec`                                       |
+| Secondary text          | `#514958`                                           | `#c0bbc5`                                       |
+| Accent fill             | `#f75027`                                           | `#ff8051`                                       |
+| Accent text, focus ring | `#af2e0f`                                           | `#ff9661`                                       |
+| Emphasised border       | `#797180`                                           | `#908995`                                       |
+| Band / deep band        | `oklch(0.314 0.097 312.6)` / `oklch(0.24 0.08 312)` | `oklch(0.20 0.06 310)` / `oklch(0.14 0.04 310)` |
 
 ## Type scale
 
@@ -64,6 +105,13 @@ Geologica, base 17px, ratio 1.25, one colour per head. Display heads are set tig
 - Nav, hero block and page content share the same left edge.
 - One radius per nesting level: 0 for a full-bleed photograph, 16px for cards, panels and the top corners of the hero block, the arch for framed photographs, pills for controls.
 
+## Spacing, radius and elevation
+
+- **Spacing:** a 4px unit. Steps 2, 4, 6, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48px (Astryx `--spacing-*`); card and section padding 12px; large controls 48px.
+- **Radius tokens:** inner 8px, element 10px, container 16px, page 28px, full 9999px. Buttons, badges and tokens are pills; cards are 16px.
+- **Elevation:** `low`, `med` and `high`, two soft layers each. In dark mode the alpha rises and a 1px light inner edge replaces reliance on shadow. Listing cards use none (see Controls); the consent banner uses `high`.
+- **Breakpoints:** 640px (rows gain a photo column) and 900px (the wide layouts); `pointer: coarse` under 1024px for touch sizing.
+
 ## Controls
 
 - Primary: orange fill, deep aubergine label, pill, `size="lg"` = 48px. On the orange band it turns aubergine with a light label.
@@ -73,6 +121,8 @@ Geologica, base 17px, ratio 1.25, one colour per head. Display heads are set tig
 ## Composition of `/` and the listing pages
 
 - `/`: Rise hero (`sections/RiseHero.tsx`), then **Actueel aanbod as a bento on the aubergine band** (`sections/ListingBento.tsx`: the available listings, the first tall on seven columns, each an Astryx `ClickableCard` filled by its building's photograph with name, city, price and total on a solid plate), then 2.000+ on paper (ink, the plus in orange), Voor wie, Van leegstand naar meerwaarde (Linnaeusstraat, linked), FAQ, Interesse?, footer.
+- `/voor-wie/`: the Voor wie rows of the home page, from one shared component (`sections/AudienceIndexList.tsx`), so the two pages cannot drift apart. Four audiences, equal weight: title, first sentence, arched window; each row links to that audience's own page, where its action lives. No per-audience buttons or extra copy here.
+- `/privacy/`: privacy and cookies (`pages/Privacy.tsx`), linked from the footer and the consent banner.
 - `/aanbod/<slug>/`: the same Rise hero with the building's cover photograph, the head, address, facts and Ik heb interesse! on the block; the rest of its photographs as a mosaic on the aubergine band beneath (the Lightbox holds them all, the cover first).
 - Every photograph ships with 640 and 1024px cuts (`srcSetFor` in `photos.ts`) and a `sizes` for its slot. Routes other than `/` load on demand (`React.lazy` in `App.tsx`); `/` preloads its hero photograph from `index.html`; Geologica loads from `index.html` with preconnects. A skip link ("Naar de inhoud") leads to `<main id="inhoud">`, and every route sets its own document title.
 
@@ -83,6 +133,15 @@ Geologica, base 17px, ratio 1.25, one colour per head. Display heads are set tig
 - `/`: the hero is the maker at work in her atelier (the live site's own hero photograph); the Voor wie rows and the four audience heroes take the photographs flexstad.com gives each audience page; Van leegstand naar meerwaarde shows the Linnaeusstraat shop empty and as the African fashion store it became, wiped with the Astryx `Slider` (keyboard steps included), captioned with the live site's own line.
 - Rendered by `PhotoImage` (`isArch` for the arched frame) or, inside components, a plain `<img>` with `width`/`height`, Dutch `alt` and `object-fit: cover`. The first photograph on a route is `fetchPriority="high"`; every other one is lazy.
 - **Overlay rule:** text on a photograph sits on a solid plate (the aubergine hero block, a Badge, the "+N foto's" pill), never on a scrim or the bare image.
+
+## Consent and privacy
+
+- Analytics is off until a GA4 measurement id is pasted into `GA_MEASUREMENT_ID` in `src/analytics.ts`. While it is empty nothing loads, no cookie is set and no banner shows.
+- Strict consent: Google's script is not requested until the visitor accepts. Accepting grants the four Consent Mode v2 signals (`analytics_storage`, `ad_storage`, `ad_user_data`, `ad_personalization`) in the order default denied, then update granted. Declining or withdrawing keeps the script away, sets the disable flag and removes the `_ga` cookies.
+- The choice lives in `localStorage['flexstad-cookie-consent']` (`granted` or `denied`) and nowhere else. The footer's "Cookie-instellingen" (shown only when analytics is on) and the privacy page reopen it.
+- The banner (`sections/ConsentBanner.tsx`): a surface panel at the bottom, **both choices the same button style and size** ("Alleen noodzakelijke cookies", "Alles accepteren"), copy addressed with "u", a link to `/privacy/`. It does not take focus on a first visit; reopened from the footer it does.
+- Page views are sent by the router effect (the site routes on the client); a successful form send fires `generate_lead` with the form kind. Both only after consent.
+- The privacy text is written from what the site does (forms into Asana, Hostinger hosting, optional Analytics). It makes no claim about data processing agreements or retention periods; those need the client's answers before it goes live.
 
 ## Demo portal
 
@@ -99,6 +158,11 @@ Geologica, base 17px, ratio 1.25, one colour per head. Display heads are set tig
 - On scroll: reasons and listing cards reveal through a view timeline.
 - On hover or focus of an audience row: the bar slides in, the title moves along by its length, the arched window lifts and tilts 2deg.
 - Under `prefers-reduced-motion: reduce` nothing moves: content is at full opacity, and only the bar's opacity changes on hover.
+
+## Audit log
+
+- **2026-11-26, design audit.** Three suspected problems were checked on the rendered site and none was a defect: the Figtree rules in the compiled CSS belong to the unused `neutral` theme, headings render in Geologica with all four weights; no component sets white text on orange (every orange button uses the ink, 5.4:1); the only orange text on paper is the decorative 230px "+" (3.18:1, which passes for large text). The rules above stay as guards for new components.
+- Radius tokens differ between layers: the compiled Astryx CSS shows 12 / 10 / 6px, the theme overrides them to 16 / 8px at runtime. Use the theme values.
 
 ## Exports
 
