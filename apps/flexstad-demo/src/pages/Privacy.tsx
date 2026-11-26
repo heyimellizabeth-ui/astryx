@@ -90,8 +90,9 @@ export function Privacy() {
             <Heading level={2}>Cookies</Heading>
             <Paragraphs
               items={[
-                'Zonder uw toestemming plaatsen wij geen cookies. Wij onthouden alleen uw keuze over cookies, in de opslag van uw eigen browser (sleutel flexstad-cookie-consent). Daarvoor is geen toestemming nodig.',
+                'Zonder uw toestemming plaatsen wij geen cookies, behalve als u zelf een taal kiest (zie hieronder). Wij onthouden alleen uw keuze over cookies, in de opslag van uw eigen browser (sleutel flexstad-cookie-consent). Daarvoor is geen toestemming nodig.',
                 'Meten wij hoe de website wordt gebruikt, dan gebeurt dat met Google Analytics 4 en alleen nadat u toestemming heeft gegeven. Google plaatst dan cookies met de namen _ga en _ga_*. Zonder toestemming wordt de code van Google niet eens geladen. Trekt u uw toestemming in, dan verwijderen wij deze cookies.',
+                'Google Translate. Kiest u in de taalkiezer een automatisch vertaalde taal, dan plaatst Google Translate een cookie met de naam googtrans op uw apparaat en stuurt het de tekst van de pagina naar Google om te laten vertalen. Er wordt niets van Google geladen voordat u die keuze maakt. Hoe Google met gegevens omgaat, staat in het privacybeleid van Google (policies.google.com/privacy). Automatische vertalingen kunnen fouten bevatten; de Nederlandse tekst is leidend.',
               ]}
             />
             <Text weight="semibold">{choice}</Text>

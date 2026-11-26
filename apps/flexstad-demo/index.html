@@ -23,6 +23,9 @@
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Geologica:wght@400;500;600;700&display=swap" />
+    <!-- Language picker (public/lang/): stylesheet and config here, the script loads from LanguagePicker.tsx. -->
+    <link rel="stylesheet" href="/lang/lang-picker.css" />
+    <script src="/lang/lang-picker-config.js"></script>
     <!-- The home hero photograph is the LCP: let the browser fetch it before the app runs, on / only. -->
     <script>
       if (location.pathname === '/') {

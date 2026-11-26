@@ -19,6 +19,7 @@ import {useIsNarrow} from '../hooks';
 import {usePath} from '../router';
 import {NAV_ABOUT, NAV_FOR_WHO} from '../content';
 import {BrandMark} from './BrandMark';
+import {LanguagePicker} from './LanguagePicker';
 
 const styles = stylex.create({
   // Three-part bar on the content column: the wordmark starts where the page
@@ -99,6 +100,7 @@ function DesktopHeader() {
             href="/contact/"
             isSelected={path === '/contact/'}
           />
+          <LanguagePicker />
           <IconButton
             label="Mijn Flexstad"
             icon={<PortalIcon />}
@@ -142,6 +144,7 @@ function PhoneHeader() {
           <BrandMark width={112} />
         </Link>
         <HStack gap={2} align="center">
+          <LanguagePicker />
           <Button
             label="Inschrijven"
             variant="primary"
