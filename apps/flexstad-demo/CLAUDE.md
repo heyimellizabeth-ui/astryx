@@ -30,6 +30,9 @@ entrepreneurs and makers looking for affordable temporary space (ondernemers), m
   - Each task is created in the project, then moved into its section. If the move fails, no submission is lost.
 - **`?about=<key>` on links to /contact/** (from the enquiry-context plugin) fills in the subject and the first
   sentence. `src/enquiryConfig.ts` is the one file to edit; listing prices are read from `content.ts`.
+- **Repair reports** use the same endpoint (`kind: reparatie`, multipart, up to 5 photos shrunk in the browser) and
+  land in Asana with the photos attached; the tenant sees a reference code. Page: `/reparatie-melden/`, linked from
+  the header, the contact page and the footer. Needs its own Asana section (`sections.reparatie` in the config).
 - **`gebruik` per listing in `content.ts`** (`werken` | `wonen` | `beide`). Winkelwaard is `werken`, for businesses only.
 - **The demo portal (`/mijnflexstad/`) never sends data**, because it is not on Flexstad's own domain.
 - **The live flexstad.com uses Gravity Forms 3.2.1 on WordPress/Bricks.** Integrations there hook
@@ -58,8 +61,9 @@ entrepreneurs and makers looking for affordable temporary space (ondernemers), m
    and staging access; the list of properties (panden); Google Sheets or Excel; ad channels and budget.
 3. **Mail to Asana, quick start:** a Gmail filter forwards the form mails to the Asana project's e-mail address.
 4. **Mail to Asana, structured:** a must-use plugin on flexstad.com hooked on `gform_after_submission`.
-5. **Repair form** on flexstad.com, built in Gravity Forms: tenants submit, staff pick it up. Photos become
-   Asana attachments, and the tenant gets a confirmation.
+5. ~~**Repair form**~~ Built in this app instead of Gravity Forms: `/reparatie-melden/` (see Key decisions). Still to do
+   before it works live: create the Asana section "Reparatiemeldingen" and add its GID to the config. A Gravity Forms
+   version for the WordPress site is not built.
 6. **Room spreadsheet to Asana**, one way: a status change creates a task. Google Apps Script if it is Sheets.
 7. **Listing hub:** publish to the portals automatically where they allow it. First research per portal:
    Kamernet, Pararius, Funda (incl. in Business), Huurwoningen, Marktplaats, Meta.

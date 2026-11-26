@@ -167,7 +167,22 @@ export function Contact() {
       <PageHero title="Contact" trail={[HOME, {title: 'Contact'}]} />
       <PageSection>
         <div {...stylex.props(styles.split)}>
-          <ContactDetails />
+          <VStack gap={8} align="stretch">
+            <ContactDetails />
+            <VStack gap={3} align="start">
+              <Heading level={3}>Iets kapot in uw pand?</Heading>
+              <Text color="secondary">
+                Huurt u bij ons en is er iets kapot of beschadigd? Meld het met
+                foto’s, dan komt het direct bij ons team terecht.
+              </Text>
+              <Button
+                label="Reparatie melden"
+                href="/reparatie-melden/"
+                variant="secondary"
+                size="lg"
+              />
+            </VStack>
+          </VStack>
           <FormPanel>
             <ContactForm />
           </FormPanel>

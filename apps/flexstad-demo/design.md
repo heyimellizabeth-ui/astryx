@@ -123,6 +123,7 @@ Geologica, base 17px, ratio 1.25, one colour per head. Display heads are set tig
 - `/`: Rise hero (`sections/RiseHero.tsx`), then **Actueel aanbod as a bento on the aubergine band** (`sections/ListingBento.tsx`: the available listings, the first tall on seven columns, each an Astryx `ClickableCard` filled by its building's photograph with name, city, price and total on a solid plate), then 2.000+ on paper (ink, the plus in orange), Voor wie, Van leegstand naar meerwaarde (Linnaeusstraat, linked), FAQ, Interesse?, footer.
 - `/voor-wie/`: the Voor wie rows of the home page, from one shared component (`sections/AudienceIndexList.tsx`), so the two pages cannot drift apart. Four audiences, equal weight: title, first sentence, arched window; each row links to that audience's own page, where its action lives. No per-audience buttons or extra copy here.
 - `/privacy/`: privacy and cookies (`pages/Privacy.tsx`), linked from the footer and the consent banner.
+- `/reparatie-melden/`: where a tenant reports something broken (`pages/Reparatie.tsx`, `sections/RepairForm.tsx`). Linked where tenants look: a plain item in the header before Contact (desktop and phone menu), a block on `/contact/`, and the footer. The acute-danger note (112 first, then the office phone) sits above the tips beside the form.
 - `/aanbod/<slug>/`: the same Rise hero with the building's cover photograph, the head, address, facts and Ik heb interesse! on the block; the rest of its photographs as a mosaic on the aubergine band beneath (the Lightbox holds them all, the cover first).
 - Every photograph ships with 640 and 1024px cuts (`srcSetFor` in `photos.ts`) and a `sizes` for its slot. Routes other than `/` load on demand (`React.lazy` in `App.tsx`); `/` preloads its hero photograph from `index.html`; Geologica loads from `index.html` with preconnects. A skip link ("Naar de inhoud") leads to `<main id="inhoud">`, and every route sets its own document title.
 
@@ -133,6 +134,14 @@ Geologica, base 17px, ratio 1.25, one colour per head. Display heads are set tig
 - `/`: the hero is the maker at work in her atelier (the live site's own hero photograph); the Voor wie rows and the four audience heroes take the photographs flexstad.com gives each audience page; Van leegstand naar meerwaarde shows the Linnaeusstraat shop empty and as the African fashion store it became, wiped with the Astryx `Slider` (keyboard steps included), captioned with the live site's own line.
 - Rendered by `PhotoImage` (`isArch` for the arched frame) or, inside components, a plain `<img>` with `width`/`height`, Dutch `alt` and `object-fit: cover`. The first photograph on a route is `fetchPriority="high"`; every other one is lazy.
 - **Overlay rule:** text on a photograph sits on a solid plate (the aubergine hero block, a Badge, the "+N foto's" pill), never on a scrim or the bare image.
+
+## Repair reports
+
+- One more kind on the existing endpoint: `kind: reparatie` in `public/api/aanvraag.php`, sent as multipart because it carries photos. The JSON forms are untouched. Fields: name, address or pand, description (required), photos (up to 5, optional) and a phone or e-mail (optional, so staff can reach the tenant).
+- Photos are shrunk in the browser first (longest side 1600px, JPEG at 0.82, `sections/repairPhotos.ts`). That keeps a mobile upload to a few hundred KB, turns the photo the right way up and drops what is stored inside the file, including where it was taken. The endpoint still checks every file itself: a real upload, JPG, PNG or WebP by content, at most 6 MB each, 14 MB in all.
+- The task is named `Reparatie R<yymmdd>-<5 characters>: <address> – <name>`; the code is also shown to the tenant on the confirmation, to quote when they call. The confirmation takes focus when it appears. If Asana takes the task but refuses a photo, the tenant is told how many arrived and where to mail the rest; a report is never lost over a photo.
+- The Asana section for these tasks is `sections.reparatie` in `flexstad-asana-config.php`. Without it the task still lands in the project, just not in a section.
+- The footer's "demo portal never sends data" rule is untouched: the portal's own report card stays a demo; this is the real form.
 
 ## Consent and privacy
 
