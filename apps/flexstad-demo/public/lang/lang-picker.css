@@ -1,0 +1,65 @@
+/* lang-picker.css (version 1.0.0). Change the variables to match the site. */
+.lp-root {
+  /* Flexstad: colours come from the site theme (aubergine text, orange focus ring), so dark mode follows. */
+  --lp-color: var(--color-text-primary, #421f54);
+  --lp-bg: var(--color-background-body, #fff);
+  --lp-text: var(--color-text-primary, #421f54);
+  --lp-hover: color-mix(in oklch, var(--color-text-primary, #421f54) 7%, transparent);
+  --lp-active: color-mix(in oklch, var(--color-accent, #f75027) 16%, transparent);
+  --lp-focus: var(--color-text-accent, #b8391a);
+  --lp-shadow: 0 8px 28px rgba(66, 31, 84, .18), 0 1px 3px rgba(66, 31, 84, .1);
+  position: relative;
+  display: inline-block;
+  font: 14px/1.2 Geologica, system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--lp-color);
+}
+.lp-root > summary { list-style: none; }
+.lp-root > summary::-webkit-details-marker { display: none; }
+.lp-btn {
+  display: inline-flex; align-items: center; gap: 6px; font-weight: 500;
+  min-height: 44px; padding: 8px 6px; cursor: pointer; color: inherit; border-radius: 4px;
+  -webkit-tap-highlight-color: transparent;
+}
+.lp-btn:focus-visible, .lp-opt:focus-visible { outline: 2px solid var(--lp-focus); outline-offset: 2px; }
+.lp-flag { width: 24px; height: 18px; flex: none; display: block; border-radius: 2px; overflow: hidden; box-shadow: 0 0 0 1px rgba(0, 0, 0, .08); }
+.lp-flag:empty { display: none; }
+.lp-flag svg { width: 100%; height: 100%; display: block; }
+.lp-cur { font-size: 12px; font-weight: 500; letter-spacing: .08em; }
+.lp-chev { width: 12px; height: 12px; fill: currentColor; transition: transform .2s; }
+.lp-root[open] .lp-chev { transform: rotate(180deg); }
+
+.lp-list {
+  position: absolute; top: calc(100% + 4px); right: 0; z-index: 30;
+  min-width: 220px; max-height: min(60vh, 420px); overflow-y: auto;
+  margin: 0; padding: 6px; list-style: none;
+  background: var(--lp-bg); color: var(--lp-text);
+  border-radius: 10px; box-shadow: var(--lp-shadow);
+}
+.lp-left .lp-list { right: auto; left: 0; }
+.lp-list li { list-style: none; margin: 0; padding: 0; }
+.lp-opt {
+  display: flex; align-items: center; gap: 10px; width: 100%; box-sizing: border-box;
+  padding: 8px 10px; border: 0; border-radius: 6px; background: transparent;
+  cursor: pointer; white-space: nowrap; color: inherit; font: inherit; text-align: left; text-decoration: none;
+}
+.lp-opt:hover { background: var(--lp-hover); }
+.lp-opt[aria-current="true"] { background: var(--lp-active); font-weight: 600; }
+.lp-name { flex: 1; }
+.lp-code { opacity: .55; font-size: 12px; text-transform: uppercase; }
+.lp-group { margin-top: 6px; padding: 10px 10px 4px; border-top: 1px solid var(--color-border, rgba(66, 31, 84, .14)); font-size: 12px; opacity: .6; }
+
+/* If the picker sits in a fixed header that other content covers, add class "lp-lift" to that header:
+   it is raised while the dropdown is open, so every item can be clicked. */
+.lp-lift.lp-open { z-index: 2147483000; }
+
+/* Hide Google Translate's own interface (banner, tooltip, highlight, gadget) */
+#lp-gt, .goog-te-banner-frame, iframe.skiptranslate, #goog-gt-tt, .goog-te-balloon-frame,
+.VIpgJd-ZVi9od-ORHb-OEVmcd, .VIpgJd-ZVi9od-aZ2wEe-wOHMyf { display: none !important; }
+body { top: 0 !important; }
+font.VIpgJd-yAWNEb-VIpgJd-fmcmS-sn54Q, .goog-text-highlight { background: none !important; box-shadow: none !important; }
+
+/* Flexstad: on a phone the list is anchored to the screen edge, not to the button, so it never runs off-screen. */
+@media (max-width: 900px) {
+  .lp-root { position: static; }
+  .lp-list { position: absolute; top: calc(100% + 4px); left: 8px; right: auto; max-width: calc(100vw - 16px); }
+}
