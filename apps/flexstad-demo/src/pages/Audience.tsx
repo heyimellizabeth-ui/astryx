@@ -67,7 +67,13 @@ export function Audience({slug}: {slug: string}) {
           {title: 'Voor wie', href: '/voor-wie/'},
           {title: page.navTitle},
         ]}
-        ctas={[page.cta]}
+        ctas={[
+          // The contact link names the audience (?about=), so the contact
+          // page opens with it filled in (enquiryConfig.ts).
+          page.cta.href === '/contact/'
+            ? {...page.cta, href: `/contact/?about=${slug}`}
+            : page.cta,
+        ]}
         isAsidePhoto={photo !== undefined}
         aside={
           photo ? (
@@ -115,7 +121,9 @@ export function Audience({slug}: {slug: string}) {
           </div>
         </PageSection>
       ) : null}
-      <CtaBand />
+      <CtaBand
+        cta={{label: 'Neem contact op', href: `/contact/?about=${slug}`}}
+      />
     </>
   );
 }

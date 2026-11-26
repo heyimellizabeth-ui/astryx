@@ -335,7 +335,7 @@ export function PageHero({
             {title}
           </Heading>
           {intro ? (
-            <Text type="supporting" color="secondary" xstyle={styles.prose2}>
+            <Text type="large" color="secondary" xstyle={styles.prose2}>
               {intro}
             </Text>
           ) : null}

@@ -29,8 +29,8 @@ export function LoginPanel() {
   const [tries, setTries] = useState(0);
 
   const userError =
-    user.trim() === '' ? 'Vul je gebruikersnaam in.' : undefined;
-  const passError = pass === '' ? 'Vul je wachtwoord in.' : undefined;
+    user.trim() === '' ? 'Vul uw gebruikersnaam in.' : undefined;
+  const passError = pass === '' ? 'Vul uw wachtwoord in.' : undefined;
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -72,7 +72,7 @@ export function LoginPanel() {
       <Heading level={2}>Inloggen</Heading>
       <Banner status="info" title="Demo" collapsible={false}>
         Dit is een testomgeving. Log in met gebruikersnaam {'KEESFLEX'} en
-        wachtwoord {'12345678'}. Vul hier nooit je echte gegevens in.
+        wachtwoord {'12345678'}. Vul hier nooit uw echte gegevens in.
       </Banner>
       <form ref={formRef} onSubmit={handleSubmit} noValidate autoComplete="off">
         <VStack gap={6} align="stretch">

@@ -120,8 +120,14 @@ export function VoorWie() {
           {ROWS.map(({slug, cta}) => {
             const page = AUDIENCE_PAGES[slug];
             const label = cta ?? page.cta.label;
+            // A contact button names its audience (?about=), so the contact
+            // page opens with it filled in (enquiryConfig.ts).
             const href =
-              slug === 'vastgoedeigenaren' ? `/${slug}/` : page.cta.href;
+              slug === 'vastgoedeigenaren'
+                ? `/${slug}/`
+                : page.cta.href === '/contact/'
+                  ? `/contact/?about=${slug}`
+                  : page.cta.href;
             return (
               <li key={slug} {...stylex.props(styles.row)}>
                 <VStack gap={5} align="start">

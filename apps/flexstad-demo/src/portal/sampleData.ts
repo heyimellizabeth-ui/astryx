@@ -94,7 +94,7 @@ export const TENANT_MESSAGES: ReadonlyArray<SampleMessage> = [
   {
     id: 'm2',
     date: '29 oktober 2026',
-    title: 'Je melding is opgelost',
+    title: 'Uw melding is opgelost',
     body: 'Voorbeeldbericht: de lamp in de gang is vervangen. Laat het weten als het weer misgaat.',
   },
   {

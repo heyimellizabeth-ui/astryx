@@ -38,7 +38,7 @@ const styles = stylex.create({
     top: 0,
     zIndex: 20,
     backgroundColor:
-      'color-mix(in oklch, var(--color-background-body) 88%, transparent)',
+      'color-mix(in oklch, var(--color-background-body) 95%, transparent)',
     backdropFilter: 'saturate(1.4) blur(14px)',
     borderBottomWidth: 1,
     borderBottomStyle: 'solid',

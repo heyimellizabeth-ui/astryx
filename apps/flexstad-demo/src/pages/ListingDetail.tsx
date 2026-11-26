@@ -123,6 +123,8 @@ const styles = stylex.create({
   },
   // At least twice the space above each section head as under it.
   part: {paddingTop: 48},
+  // Sub-heads in the long Roemer Visscherstraat text, a clear step above it.
+  subhead: {fontSize: 24, lineHeight: 1.2},
   panel: {
     padding: 24,
     boxSizing: 'border-box',
@@ -315,7 +317,9 @@ export function ListingDetail({slug}: {slug: string}) {
               </VStack>
               {detail.sections.map(section => (
                 <VStack key={section.title} gap={3} xstyle={styles.part}>
-                  <Heading level={3}>{section.title}</Heading>
+                  <Heading level={3} xstyle={styles.subhead}>
+                    {section.title}
+                  </Heading>
                   <Paragraphs items={section.body} />
                   {'list' in section && section.list ? (
                     <VStack gap={2}>
@@ -371,7 +375,12 @@ export function ListingDetail({slug}: {slug: string}) {
           </div>
         }
       />
-      <CtaBand />
+      <CtaBand
+        cta={{
+          label: 'Neem contact op',
+          href: `/contact/?about=${listing.slug}`,
+        }}
+      />
       <Lightbox
         isOpen={lightbox !== null}
         onOpenChange={open => setLightbox(open ? (lightbox ?? 0) : null)}

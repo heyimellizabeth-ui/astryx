@@ -12,7 +12,9 @@ import {listingFeatures, STATUSES, type Listing} from '../content';
 import {LISTING_PHOTOS, srcSetFor} from '../photos';
 
 const styles = stylex.create({
-  fill: {flexGrow: 1},
+  // The card is a column, so the body grows and the Bekijk row sits at the
+  // foot of every card in a row, whatever lines sit above it.
+  fill: {flexGrow: 1, display: 'flex', flexDirection: 'column'},
   // Flat on the well: a hairline frame, no shadow. Hover darkens the frame
   // to ink and lifts the card (the theme's lift).
   frame: {
