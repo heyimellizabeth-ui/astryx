@@ -1,9 +1,10 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 import * as stylex from '@stylexjs/stylex';
-import {useState} from 'react';
+import {useEffect, useRef, useState, type ReactNode} from 'react';
 import {Badge} from '@astryxdesign/core/Badge';
 import {Button} from '@astryxdesign/core/Button';
+import {Collapsible} from '@astryxdesign/core/Collapsible';
 import {Heading} from '@astryxdesign/core/Heading';
 import {VStack} from '@astryxdesign/core/Layout';
 import {Lightbox} from '@astryxdesign/core/Lightbox';
@@ -21,6 +22,7 @@ import {EnquiryForm} from '../sections/EnquiryForm';
 import {statusLabel} from '../sections/ListingCard';
 import {PageSection} from '../sections/PageSection';
 import {RiseHero} from '../sections/RiseHero';
+import {StickyInterestBar} from '../sections/StickyInterestBar';
 import {LISTING_PHOTOS, srcSetFor} from '../photos';
 import {BulletList, Crumbs, CtaBand, Paragraphs} from '../sections/ui';
 import {NotFound} from './NotFound';
@@ -121,10 +123,6 @@ const styles = stylex.create({
     lineHeight: 1.5,
     maxWidth: '40em',
   },
-  // At least twice the space above each section head as under it.
-  part: {paddingTop: 48},
-  // Sub-heads in the long Roemer Visscherstraat text, a clear step above it.
-  subhead: {fontSize: 24, lineHeight: 1.2},
   panel: {
     padding: 24,
     boxSizing: 'border-box',
@@ -150,6 +148,18 @@ const styles = stylex.create({
     fontSize: 'clamp(22px, 1vw + 14px, 28px)',
     lineHeight: 1.15,
     fontWeight: 700,
+  },
+  // The panel's own button only helps while the panel is held in view (from
+  // 900px). Below that the sticky bar replaces it.
+  panelCta: {
+    display: {default: 'none', '@media (min-width: 900px)': 'block'},
+  },
+  // A folded part on phones: a hairline above it, the title as the trigger.
+  fold: {
+    borderTopWidth: 1,
+    borderTopStyle: 'solid',
+    borderTopColor: 'var(--color-border)',
+    paddingBlock: 8,
   },
 });
 
@@ -208,6 +218,24 @@ function StatusBadge({listing}: {listing: Listing}) {
 export function ListingDetail({slug}: {slug: string}) {
   const listing = LISTINGS.find(item => item.slug === slug);
   const [lightbox, setLightbox] = useState<number | null>(null);
+  const heroCta = useRef<HTMLDivElement>(null);
+
+  // Following #reageren (a button or a typed link) also puts the cursor in the
+  // form, so a keyboard or screen-reader visitor lands where they are going.
+  useEffect(() => {
+    const focusForm = () => {
+      if (window.location.hash !== '#reageren') {
+        return;
+      }
+      document
+        .getElementById('reageren')
+        ?.querySelector<HTMLElement>('input, select, textarea')
+        ?.focus({preventScroll: true});
+    };
+    window.addEventListener('hashchange', focusForm);
+    return () => window.removeEventListener('hashchange', focusForm);
+  }, []);
+
   if (!listing) {
     return <NotFound />;
   }
@@ -290,12 +318,14 @@ export function ListingDetail({slug}: {slug: string}) {
               <Facts listing={listing} isLarge />
               <Features listing={listing} />
             </VStack>
-            <Button
-              label="Ik heb interesse!"
-              href="#reageren"
-              variant="primary"
-              size="lg"
-            />
+            <div ref={heroCta}>
+              <Button
+                label="Ik heb interesse!"
+                href="#reageren"
+                variant="primary"
+                size="lg"
+              />
+            </div>
           </div>
         </VStack>
       </RiseHero>
@@ -315,25 +345,39 @@ export function ListingDetail({slug}: {slug: string}) {
                 </Text>
                 <Paragraphs items={detail.intro} />
               </VStack>
-              {detail.sections.map(section => (
-                <VStack key={section.title} gap={3} xstyle={styles.part}>
-                  <Heading level={3} xstyle={styles.subhead}>
-                    {section.title}
-                  </Heading>
-                  <Paragraphs items={section.body} />
-                  {'list' in section && section.list ? (
-                    <VStack gap={2}>
-                      {section.listTitle ? (
-                        <Text weight="medium">{section.listTitle}</Text>
-                      ) : null}
-                      <BulletList items={section.list} />
-                    </VStack>
-                  ) : null}
-                  {'after' in section && section.after ? (
-                    <Paragraphs items={[section.after]} />
-                  ) : null}
-                </VStack>
-              ))}
+              {detail.sections.map((section, sectionIndex) => {
+                const body: ReactNode = (
+                  <>
+                    <Paragraphs items={section.body} />
+                    {'list' in section && section.list ? (
+                      <VStack gap={2}>
+                        {section.listTitle ? (
+                          <Text weight="medium">{section.listTitle}</Text>
+                        ) : null}
+                        <BulletList items={section.list} />
+                      </VStack>
+                    ) : null}
+                    {'after' in section && section.after ? (
+                      <Paragraphs items={[section.after]} />
+                    ) : null}
+                  </>
+                );
+                // Each part folds away behind its title, so the page can be
+                // skimmed on any screen; the first stays open.
+                return (
+                  <div key={section.title} {...stylex.props(styles.fold)}>
+                    <Collapsible
+                      defaultIsOpen={sectionIndex === 0}
+                      trigger={
+                        <Text type="large" weight="bold">
+                          {section.title}
+                        </Text>
+                      }>
+                      <VStack gap={3}>{body}</VStack>
+                    </Collapsible>
+                  </div>
+                );
+              })}
             </article>
             <aside {...stylex.props(styles.panel)}>
               <VStack gap={5}>
@@ -342,12 +386,14 @@ export function ListingDetail({slug}: {slug: string}) {
                   <Text type="supporting">{address}</Text>
                 </VStack>
                 <Facts listing={listing} />
-                <Button
-                  label="Ik heb interesse!"
-                  href="#reageren"
-                  variant="primary"
-                  size="lg"
-                />
+                <div {...stylex.props(styles.panelCta)}>
+                  <Button
+                    label="Ik heb interesse!"
+                    href="#reageren"
+                    variant="primary"
+                    size="lg"
+                  />
+                </div>
               </VStack>
             </aside>
           </div>
@@ -381,6 +427,7 @@ export function ListingDetail({slug}: {slug: string}) {
           href: `/contact/?about=${listing.slug}`,
         }}
       />
+      <StickyInterestBar heroCta={heroCta} listingSlug={listing.slug} />
       <Lightbox
         isOpen={lightbox !== null}
         onOpenChange={open => setLightbox(open ? (lightbox ?? 0) : null)}
