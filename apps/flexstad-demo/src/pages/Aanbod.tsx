@@ -260,7 +260,7 @@ export function Aanbod() {
         padding={4}>
         {filters}
       </Drawer>
-      <CtaBand />
+      <CtaBand about="aanbod" />
     </>
   );
 }

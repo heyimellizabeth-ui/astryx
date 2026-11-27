@@ -6,6 +6,10 @@ import {useSearch} from '../router';
 export interface EnquiryContext {
   /** The key from ?about=, lower case. */
   key: string;
+  /** The banner's heading: "U vraagt naar" or "U reageert op". */
+  title: string;
+  /** True for a key that only records the page: no banner, nothing filled in. */
+  isQuiet: boolean;
   /** The item as shown: its label, with its price for a package. */
   text: string;
   /** The first sentence for the message box. */
@@ -35,16 +39,38 @@ export function useEnquiryContext(): EnquiryContext | null {
   }
   const entry = ENQUIRY_ENTRIES[key];
   const text = entry.price ? `${entry.label} (${entry.price})` : entry.label;
+  if (entry.kind === 'source') {
+    return {
+      key,
+      title: ENQUIRY_WORDS.titleAsk,
+      isQuiet: true,
+      text: '',
+      message: '',
+      subject: '',
+      changeHref: entry.changeHref,
+    };
+  }
   const isPackage = entry.kind === 'package';
+  const isVacancy = entry.kind === 'vacancy';
+  const words = isVacancy
+    ? ENQUIRY_WORDS.vacancy
+    : isPackage
+      ? ENQUIRY_WORDS.package
+      : ENQUIRY_WORDS.ask;
+  const subjectWords = isVacancy
+    ? ENQUIRY_WORDS.subjectVacancy
+    : isPackage
+      ? ENQUIRY_WORDS.subjectPackage
+      : ENQUIRY_WORDS.subjectAsk;
   return {
     key,
+    title: isVacancy ? ENQUIRY_WORDS.titleVacancy : ENQUIRY_WORDS.titleAsk,
+    isQuiet: false,
     text,
-    message: isPackage
-      ? ENQUIRY_WORDS.package.split('{item}').join(text)
-      : ENQUIRY_WORDS.ask.split('{item}').join(lowerFirst(entry.label)),
-    subject:
-      (isPackage ? ENQUIRY_WORDS.subjectPackage : ENQUIRY_WORDS.subjectAsk) +
-      text,
+    message: words
+      .split('{item}')
+      .join(isPackage ? text : lowerFirst(entry.label)),
+    subject: subjectWords + text,
     changeHref: entry.changeHref,
   };
 }

@@ -324,7 +324,7 @@ export function Vacatures() {
               </Text>
               <Button
                 label="Neem contact op"
-                href="/contact/"
+                href="/contact/?about=vacature"
                 variant="primary"
                 size="lg"
               />
@@ -354,7 +354,7 @@ export function Vacatures() {
               <div>
                 <Button
                   label="Neem contact op"
-                  href="/contact/"
+                  href="/contact/?about=vacature"
                   variant="primary"
                   size="lg"
                 />
@@ -363,7 +363,7 @@ export function Vacatures() {
           </VStack>
         </div>
       </PageSection>
-      <CtaBand />
+      <CtaBand about="vacature" />
     </>
   );
 }
@@ -398,7 +398,7 @@ export function Dienst({slug}: {slug: string}) {
         </Text>
       </PageSection>
       <Faq />
-      <CtaBand />
+      <CtaBand about={service.slug} />
     </>
   );
 }
