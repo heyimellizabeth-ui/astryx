@@ -3,8 +3,8 @@
 /**
  * Which look the site ships with.
  *
- *   'huidig' the current aubergine and orange design (default)
- *   'wit'    white page and pale bands, same layout (src/variantWit.css)
+ *   'huidig' the earlier aubergine and orange design
+ *   'wit'    white page and pale bands, same layout (src/variantWit.css) (default)
  *
  * To switch after the client decides, change this one value. Add
  * ?variant=wit or ?variant=huidig to any URL to compare both side by side;
@@ -12,4 +12,4 @@
  */
 export type SiteVariant = 'huidig' | 'wit';
 
-export const SITE_VARIANT: SiteVariant = 'huidig';
+export const SITE_VARIANT: SiteVariant = 'wit';
