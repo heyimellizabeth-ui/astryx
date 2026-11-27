@@ -1,0 +1,17 @@
+/* THROWAWAY PREVIEW: white version. Active only with ?preview=white.
+   Not part of the design; delete this file and the hook in main.tsx. */
+html[data-preview='white'] {
+  --color-background-body: #fff;
+  --color-background-muted: oklch(0.972 0.006 300);
+  --color-border: oklch(0.3 0.03 312 / 0.16);
+  /* Bands go from dark aubergine to a pale tint; text on them turns aubergine. */
+  --flex-band: oklch(0.985 0.005 320);
+  --flex-band-deep: oklch(0.955 0.012 320);
+  --flex-on-band: oklch(0.314 0.097 312.6);
+  --flex-on-band-muted: oklch(0.42 0.025 310);
+}
+
+/* App.tsx hardcodes the page background; override it for the preview. */
+html[data-variant='wit'] div[class*='App__styles.page'] {
+  background-color: #fff;
+}
