@@ -18,7 +18,6 @@ import {
   listingUses,
   type Listing,
 } from '../content';
-import {useIsNarrow} from '../hooks';
 import {EnquiryForm} from '../sections/EnquiryForm';
 import {statusLabel} from '../sections/ListingCard';
 import {PageSection} from '../sections/PageSection';
@@ -124,10 +123,6 @@ const styles = stylex.create({
     lineHeight: 1.5,
     maxWidth: '40em',
   },
-  // At least twice the space above each section head as under it.
-  part: {paddingTop: 48},
-  // Sub-heads in the long Roemer Visscherstraat text, a clear step above it.
-  subhead: {fontSize: 24, lineHeight: 1.2},
   panel: {
     padding: 24,
     boxSizing: 'border-box',
@@ -223,7 +218,6 @@ function StatusBadge({listing}: {listing: Listing}) {
 export function ListingDetail({slug}: {slug: string}) {
   const listing = LISTINGS.find(item => item.slug === slug);
   const [lightbox, setLightbox] = useState<number | null>(null);
-  const isNarrow = useIsNarrow(900);
   const heroCta = useRef<HTMLDivElement>(null);
 
   // Following #reageren (a button or a typed link) also puts the cursor in the
@@ -368,10 +362,9 @@ export function ListingDetail({slug}: {slug: string}) {
                     ) : null}
                   </>
                 );
-                // On a phone each part folds away behind its title, so the
-                // page can be skimmed; the first stays open. From 900px the
-                // full text is shown as before.
-                return isNarrow ? (
+                // Each part folds away behind its title, so the page can be
+                // skimmed on any screen; the first stays open.
+                return (
                   <div key={section.title} {...stylex.props(styles.fold)}>
                     <Collapsible
                       defaultIsOpen={sectionIndex === 0}
@@ -383,13 +376,6 @@ export function ListingDetail({slug}: {slug: string}) {
                       <VStack gap={3}>{body}</VStack>
                     </Collapsible>
                   </div>
-                ) : (
-                  <VStack key={section.title} gap={3} xstyle={styles.part}>
-                    <Heading level={3} xstyle={styles.subhead}>
-                      {section.title}
-                    </Heading>
-                    {body}
-                  </VStack>
                 );
               })}
             </article>
