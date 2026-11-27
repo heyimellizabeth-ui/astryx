@@ -417,10 +417,16 @@ export function firstSentence(text: string) {
 export function CtaBand({
   title = 'Interesse?',
   body,
-  cta = {label: 'Neem contact op', href: '/contact/'},
+  about,
+  cta = {
+    label: 'Neem contact op',
+    href: about ? `/contact/?about=${about}` : '/contact/',
+  },
 }: {
   title?: string;
   body?: string;
+  /** A key from enquiryConfig.ts: the contact form then knows which page this came from. */
+  about?: string;
   cta?: Cta;
 }) {
   return (

@@ -303,7 +303,7 @@ export function Home() {
       <AudienceIndex />
       <Value />
       <Faq />
-      <CtaBand body={HOME_COPY.interest} />
+      <CtaBand about="home" body={HOME_COPY.interest} />
     </>
   );
 }

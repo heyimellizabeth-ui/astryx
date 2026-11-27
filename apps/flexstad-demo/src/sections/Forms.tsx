@@ -476,12 +476,17 @@ export function ContactForm() {
       email,
       subject,
       message,
-      ...(about ? {about: about.key, _subject: about.subject} : {}),
+      ...(about
+        ? {
+            about: about.key,
+            ...(about.isQuiet ? {} : {_subject: about.subject}),
+          }
+        : {}),
     }),
   );
   // As the plugin does: with a known key, the visitor lands in the first
   // field still empty (the name), the banner and the pre-filled text in view.
-  const aboutKey = about?.key;
+  const aboutKey = about?.isQuiet ? undefined : about?.key;
   useEffect(() => {
     if (!aboutKey) {
       return;
@@ -493,8 +498,12 @@ export function ContactForm() {
   }, [aboutKey, form.formRef]);
   return (
     <FormShell form={form} submitLabel="Verstuur bericht">
-      {about ? (
-        <EnquiryBanner text={about.text} href={about.changeHref} />
+      {about && !about.isQuiet ? (
+        <EnquiryBanner
+          title={about.title}
+          text={about.text}
+          href={about.changeHref}
+        />
       ) : null}
       <TextInput
         size="lg"
@@ -544,11 +553,19 @@ const enquiryStyles = stylex.create({
   change: {color: 'var(--color-text-primary)'},
 });
 
-function EnquiryBanner({text, href}: {text: string; href: string}) {
+function EnquiryBanner({
+  title,
+  text,
+  href,
+}: {
+  title: string;
+  text: string;
+  href: string;
+}) {
   return (
     <Banner
       status="info"
-      title="U vraagt naar"
+      title={title}
       description={text}
       endContent={
         <Link href={href} xstyle={enquiryStyles.change}>

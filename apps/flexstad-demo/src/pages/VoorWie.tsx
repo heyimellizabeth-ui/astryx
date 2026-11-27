@@ -21,7 +21,7 @@ export function VoorWie() {
       <PageSection paddingBlock={8}>
         <AudienceIndexList />
       </PageSection>
-      <CtaBand />
+      <CtaBand about="voor-wie" />
     </>
   );
 }

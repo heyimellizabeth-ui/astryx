@@ -96,7 +96,7 @@ export function OverOns() {
           </ul>
         </VStack>
       </PageSection>
-      <CtaBand title={ABOUT.meetTitle} body={ABOUT.meet} />
+      <CtaBand about="over-ons" title={ABOUT.meetTitle} body={ABOUT.meet} />
     </>
   );
 }
